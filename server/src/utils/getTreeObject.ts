@@ -23,8 +23,9 @@ export const getTreeObject = (
     const item = new TreeItem(stats.isDirectory() ? depth - 1 : 0, thisPath);
 
     item.name = currPath;
-    item.isDirectory = stats.isDirectory();
     item.size = stats.size;
+    item.path = thisPath;
+    item.isDirectory = stats.isDirectory();
 
     items.push(item);
   }

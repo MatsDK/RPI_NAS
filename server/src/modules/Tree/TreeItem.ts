@@ -6,6 +6,9 @@ export class TreeItem {
   @Field(() => String)
   name: string;
 
+  @Field(() => String)
+  path: string;
+
   @Field(() => Boolean)
   isDirectory: boolean;
 

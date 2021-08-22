@@ -5,11 +5,20 @@ import cors from "cors";
 import dotenv from "dotenv";
 import Express from "express";
 import { buildSchema } from "type-graphql";
+import {
+  ApolloServerPluginLandingPageDisabled,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from "apollo-server-core";
 
 dotenv.config();
 
 (async () => {
   const apolloServer = new ApolloServer({
+    plugins: [
+      process.env.NODE_ENV === "production"
+        ? ApolloServerPluginLandingPageDisabled()
+        : ApolloServerPluginLandingPageGraphQLPlayground(),
+    ],
     schema: await buildSchema({
       resolvers: [__dirname + "/modules/**/*.ts"],
     }),
@@ -25,11 +34,15 @@ dotenv.config();
   app.use(
     cors({
       credentials: true,
-      origin: "http://localhost:3000",
+      origin: process.env.CLIENT_URL,
     })
   );
 
-  apolloServer.applyMiddleware({ app, cors: false });
+  await apolloServer.start();
+  apolloServer.applyMiddleware({
+    app,
+    cors: { origin: process.env.CLIENT_URL },
+  });
 
   app.listen(4000, () => {
     console.log("> Server started on http://localhost:4000/graphql");
