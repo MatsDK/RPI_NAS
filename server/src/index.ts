@@ -22,10 +22,6 @@ dotenv.config();
     schema: await buildSchema({
       resolvers: [__dirname + "/modules/**/*.ts"],
     }),
-    context: ({ req, res }: any) => ({
-      req,
-      res,
-    }),
   });
 
   const app = Express();
