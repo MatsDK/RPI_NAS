@@ -3,8 +3,8 @@ import Head from "next/head";
 import PropTypes from "prop-types";
 import React from "react";
 import { getDataFromTree } from "react-apollo";
-import initApollo from "../initApollo";
-import { isBrowser } from "../isBrowser";
+import initApollo from "../utils/initApollo";
+import { isBrowser } from "../utils/isBrowser";
 
 const docExists = () => typeof document !== "undefined";
 
@@ -50,7 +50,7 @@ const withApollo = (App: any) => {
             />
           );
         } catch (error) {
-          console.error("Error while running `getDataFromTree`", error);
+          // console.error("Error while running `getDataFromTree`", error);
         }
 
         // getDataFromTree does not call componentWillUnmount

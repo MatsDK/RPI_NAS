@@ -6,6 +6,7 @@ export const getTreeQuery = gql`
       path
       __typename
       tree {
+        isDirectory
         name
         path
         __typename
