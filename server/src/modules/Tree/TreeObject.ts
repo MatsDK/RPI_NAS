@@ -10,9 +10,18 @@ export class Tree {
   @Field(() => [TreeItem], { nullable: true })
   tree: TreeItem[] | null;
 
-  constructor(path: string, depth: number) {
+  constructor(
+    path: string,
+    depth: number,
+    basePath: string,
+    directoryTree: boolean
+  ) {
     this.path = path;
 
-    this.tree = getTreeObject(path, depth, true);
+    this.tree = getTreeObject(path, depth, {
+      checkPath: true,
+      directoryTree,
+      basePath,
+    });
   }
 }

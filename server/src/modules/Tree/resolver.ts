@@ -8,6 +8,14 @@ export class TreeResolver {
     @Arg("path", () => String) path: string,
     @Arg("depth", () => Number) depth: number = 1
   ): Tree {
-    return new Tree(path, depth);
+    return new Tree(path, depth, "H:/js-py", false);
+  }
+
+  @Query(() => Tree)
+  directoryTree(
+    @Arg("path", () => String) path: string,
+    @Arg("depth", () => Number) depth: number = 1
+  ): Tree {
+    return new Tree(path, depth, "H:/js-py", true);
   }
 }

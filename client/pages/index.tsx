@@ -1,8 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
-import { useGetTreeQueryQuery, TreeItem } from "generated/apolloComponents";
-import { getTreeQuery } from "graphql/TreeObject/queryTree";
-import { useApolloClient } from "react-apollo";
-import TreeObjectItem from "lib/components/TreeItem";
+import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
+import Tree from "lib/components/Tree";
 
 type Maybe<T> = T | null;
 
@@ -19,36 +17,19 @@ interface ApolloContext {
 }
 
 const Index: NextFunctionComponent<Props> = () => {
-  const client: any = useApolloClient();
-
-  const { data, loading, error } = useGetTreeQueryQuery({
-    client: client,
-    variables: {
-      depth: 1,
-      path: "H:/js-py",
-    },
-  });
-
-  if (loading) return <div>loading..</div>;
-  if (error) return <div>errors</div>;
-
-  if (!data?.tree?.tree) return <div>Tree not found</div>;
-
   return (
     <div>
-      {data.tree.tree.map((item, idx) => (
-        <TreeObjectItem item={item as TreeItem} key={idx} />
-      ))}
+      <Tree />
     </div>
   );
 };
 
 Index.getInitialProps = async (ctx: ApolloContext) => {
   const { loading, data } = await ctx.apolloClient.query({
-    query: getTreeQuery,
+    query: getDirectoryTreeQuery,
     variables: {
       depth: 1,
-      path: "H:/js-py",
+      path: "/",
     },
   });
 
