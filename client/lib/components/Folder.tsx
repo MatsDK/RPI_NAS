@@ -38,7 +38,7 @@ const Folder: React.FC<Props> = ({ path }) => {
               onClick={() =>
                 window
                   ?.open(
-                    `http://localhost:4000/download/${item.relativePath}`,
+                    `http://localhost:4000/download?s=6c9106c0-996f-4905-ade7-3a84d83ca50e`,
                     "_blank"
                   )
                   ?.focus()

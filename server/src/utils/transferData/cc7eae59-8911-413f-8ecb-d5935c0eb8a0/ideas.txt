@@ -1,0 +1,7 @@
+-Github interface https://api.github.com/repos/MatsDK/SSH_Files/git/trees/master?recursive=1
+-Command line ssh tool
+-DB relations
+
+-SSH Files // create abilty to use multiple shells at once 
+-Github groups create ability to take tasks
+-docker interface

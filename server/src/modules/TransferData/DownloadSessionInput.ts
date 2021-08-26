@@ -1,4 +1,5 @@
 import { Field, InputType } from "type-graphql";
+import { Type } from "../../types";
 
 @InputType()
 export class DownloadSessionInput {
@@ -6,5 +7,5 @@ export class DownloadSessionInput {
   path: string;
 
   @Field(() => String)
-  type: string;
+  type: Type;
 }
