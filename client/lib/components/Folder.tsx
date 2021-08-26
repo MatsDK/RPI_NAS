@@ -32,7 +32,21 @@ const Folder: React.FC<Props> = ({ path }) => {
             <Link href={`/path/${item.relativePath}`}>{item.name}</Link>
           </div>
         ) : (
-          <div key={idx}>{item.name}</div>
+          <div key={idx} style={{ display: "flex" }}>
+            <p>{item.name}</p>
+            <button
+              onClick={() =>
+                window
+                  ?.open(
+                    `http://localhost:4000/download/${item.relativePath}`,
+                    "_blank"
+                  )
+                  ?.focus()
+              }
+            >
+              download
+            </button>
+          </div>
         )
       )}
     </div>

@@ -9,6 +9,7 @@ import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
 } from "apollo-server-core";
+import { router } from "./routers/indexRouter";
 
 dotenv.config();
 
@@ -33,6 +34,8 @@ dotenv.config();
       origin: process.env.CLIENT_URL,
     })
   );
+
+  app.use("/", router);
 
   await apolloServer.start();
   apolloServer.applyMiddleware({
