@@ -1,7 +1,8 @@
-import { DownloadSessionInput } from "../../modules/TransferData/DownloadSessionInput";
-import fs from "fs-extra";
 import archiver from "archiver";
+import fs from "fs-extra";
 import fsPath from "path";
+import { TMP_FOLDER } from "../../constants";
+import { DownloadSessionInput } from "../../modules/TransferData/DownloadSessionInput";
 
 export const getDownloadPath = async (
   session: DownloadSessionInput[],
@@ -10,7 +11,7 @@ export const getDownloadPath = async (
   if (session.length === 1 && session[0].type === "file")
     return session[0].path;
 
-  const folderName = `${__dirname}/${sessionId}`;
+  const folderName = `${TMP_FOLDER}/${sessionId}`;
 
   fs.mkdirSync(folderName);
 
@@ -42,9 +43,11 @@ export const getDownloadPath = async (
 
   await new Promise((res, rej) => {
     output.on("close", () => {
-      res("done");
+      res("");
     });
   });
+
+  fs.removeSync(folderName);
 
   return `${folderName}.zip`;
 };

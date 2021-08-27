@@ -1,7 +1,10 @@
-import { useGetTreeQueryQuery } from "generated/apolloComponents";
+import { TreeItem, useGetTreeQueryQuery } from "generated/apolloComponents";
 import { useApolloClient } from "react-apollo";
-import React from "react";
-import Link from "next/link";
+import React, { useContext } from "react";
+import FolderItem from "./FolderItem";
+import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
+import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
+import { SelectedContext } from "lib/providers/selected";
 
 interface Props {
   path: string;
@@ -9,6 +12,8 @@ interface Props {
 
 const Folder: React.FC<Props> = ({ path }) => {
   const client: any = useApolloClient();
+
+  const selectedCtx = useContext(SelectedContext);
 
   const { data, error, loading } = useGetTreeQueryQuery({
     variables: {
@@ -24,31 +29,40 @@ const Folder: React.FC<Props> = ({ path }) => {
 
   if (!data?.tree?.tree) return <div>folder not found</div>;
 
+  const createDownloadSession = async (): Promise<void> => {
+    if (!selectedCtx) return;
+
+    const selected = Array.from(selectedCtx.selected).map(([_, v]) => v);
+
+    const { data } = await (
+      client as ApolloClient<NormalizedCacheObject>
+    ).mutate({
+      mutation: createSessionMutation,
+      variables: {
+        data: selected.map(({ isDirectory, relativePath }) => ({
+          path: relativePath,
+          type: isDirectory ? "directory" : "file",
+        })),
+      },
+    });
+
+    const sessionId = data?.createDownloadSession;
+    if (!sessionId) return;
+
+    window
+      ?.open(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/download?s=${sessionId}`,
+        "_blank"
+      )
+      ?.focus();
+  };
+
   return (
     <div>
-      {data.tree.tree.map((item, idx) =>
-        item.isDirectory ? (
-          <div key={idx}>
-            <Link href={`/path/${item.relativePath}`}>{item.name}</Link>
-          </div>
-        ) : (
-          <div key={idx} style={{ display: "flex" }}>
-            <p>{item.name}</p>
-            <button
-              onClick={() =>
-                window
-                  ?.open(
-                    `http://localhost:4000/download?s=6c9106c0-996f-4905-ade7-3a84d83ca50e`,
-                    "_blank"
-                  )
-                  ?.focus()
-              }
-            >
-              download
-            </button>
-          </div>
-        )
-      )}
+      <button onClick={() => createDownloadSession()}>Download</button>
+      {data.tree.tree.map((item, idx) => (
+        <FolderItem item={item as TreeItem} key={idx} />
+      ))}
     </div>
   );
 };

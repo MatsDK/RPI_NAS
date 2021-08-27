@@ -14,6 +14,21 @@ export type Scalars = {
   Float: number;
 };
 
+export type DownloadSessionInput = {
+  path: Scalars['String'];
+  type: Scalars['String'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  createDownloadSession: Scalars['String'];
+};
+
+
+export type MutationCreateDownloadSessionArgs = {
+  data: Array<DownloadSessionInput>;
+};
+
 export type Query = {
   __typename?: 'Query';
   tree: Tree;
@@ -48,6 +63,13 @@ export type TreeItem = {
   tree?: Maybe<Array<TreeItem>>;
 };
 
+export type CreateSessionMutationVariables = Exact<{
+  data: Array<DownloadSessionInput> | DownloadSessionInput;
+}>;
+
+
+export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSession: string };
+
 export type GetDirectoryTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
   depth: Scalars['Float'];
@@ -65,6 +87,37 @@ export type GetTreeQueryQueryVariables = Exact<{
 export type GetTreeQueryQuery = { __typename?: 'Query', tree: { __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string }>> } };
 
 
+export const CreateSessionDocument = gql`
+    mutation createSession($data: [DownloadSessionInput!]!) {
+  createDownloadSession(data: $data)
+}
+    `;
+export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutation, CreateSessionMutationVariables>;
+
+/**
+ * __useCreateSessionMutation__
+ *
+ * To run a mutation, you first call `useCreateSessionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSessionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSessionMutation, { data, loading, error }] = useCreateSessionMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, options);
+      }
+export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
+export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
+export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
 export const GetDirectoryTreeQueryDocument = gql`
     query getDirectoryTreeQuery($path: String!, $depth: Float!) {
   directoryTree(path: $path, depth: $depth) {
