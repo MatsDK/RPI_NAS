@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Selected, SelectedContext } from "lib/providers/selected";
+import { FolderContextValue, FolderContext } from "lib/providers/folderState";
 import App from "next/app";
 import "../css/global.css";
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
@@ -18,9 +18,9 @@ class MyApp extends App<Props> {
     return (
       <div>
         <ApolloProvider client={apolloClient}>
-          <SelectedContext.Provider value={Selected}>
+          <FolderContext.Provider value={FolderContextValue}>
             <Component {...pageProps} />
-          </SelectedContext.Provider>
+          </FolderContext.Provider>
         </ApolloProvider>
       </div>
     );

@@ -1,25 +1,29 @@
 import { TreeItem } from "generated/apolloComponents";
-import { SelectedContext } from "lib/providers/selected";
+import { FolderContext, FolderContextType } from "lib/providers/folderState";
 import Link from "next/link";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 interface Props {
   item: TreeItem;
 }
 
 const FolderItem: React.FC<Props> = ({ item }) => {
-  const selectedCtx = useContext(SelectedContext);
+  const folderCtx: FolderContextType = useContext(FolderContext);
 
   const [selected, setSelected] = useState(false);
+
+  useEffect(() => {
+    setSelected(false);
+  }, [item]);
 
   return (
     <div
       style={{ backgroundColor: selected ? "#ededed" : "#fff" }}
       onClick={() => {
         setSelected((selected) => !selected);
-        if (selectedCtx?.isSelected(item.path))
-          selectedCtx?.removeSelected(item.path);
-        else selectedCtx?.addSelected(item);
+        if (folderCtx?.selected.isSelected(item.path))
+          folderCtx?.selected.removeSelected(item.path);
+        else folderCtx?.selected.addSelected(item);
       }}
     >
       <div style={{ minWidth: 200 }}>
