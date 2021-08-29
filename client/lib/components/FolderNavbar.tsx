@@ -35,7 +35,7 @@ const FolderNavbar = () => {
 
     const { data: resData, hostIp, ...rest } = data.createDownloadSession;
 
-    axios.get(`/api/download`, {
+    const res = await axios.get(`/api/download`, {
       params: {
         data: {
           downloadPath: "H:/sshTests",
@@ -48,6 +48,8 @@ const FolderNavbar = () => {
         },
       },
     });
+
+    console.log(res);
   };
 
   const createDownloadSession = async (): Promise<void> => {
@@ -70,7 +72,7 @@ const FolderNavbar = () => {
       },
     });
 
-    const sessionId = data?.createDownloadSession;
+    const sessionId = data?.createDownloadSession?.id;
     if (!sessionId) return;
 
     window

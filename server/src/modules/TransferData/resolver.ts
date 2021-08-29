@@ -19,14 +19,17 @@ export class TreeResolver {
 
       downloadSessions.addSession(
         id,
-        data.map((obj) => ({ ...obj, path: fsPath.join("H:/js-py", obj.path) }))
+        data.map((obj) => ({
+          ...obj,
+          path: fsPath.join(process.env.BASEPATH || "", obj.path),
+        }))
       );
 
       returnObj.id = id;
     } else if (type === "SSH") {
       returnObj.data = data.map(({ path, type }) => ({
         type,
-        path: fsPath.join("H:/js-py", path),
+        path: fsPath.join(process.env.BASEPATH || "", path),
       }));
 
       returnObj.hostIp = process.env.HOST_IP;
