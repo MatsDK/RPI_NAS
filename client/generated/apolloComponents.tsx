@@ -19,13 +19,30 @@ export type DownloadSessionInput = {
   type: Scalars['String'];
 };
 
+export type DownloadSessionObject = {
+  __typename?: 'DownloadSessionObject';
+  path: Scalars['String'];
+  type: Scalars['String'];
+};
+
+export type DownloadSessionReturn = {
+  __typename?: 'DownloadSessionReturn';
+  id?: Maybe<Scalars['String']>;
+  data?: Maybe<Array<DownloadSessionObject>>;
+  hostIp?: Maybe<Scalars['String']>;
+  username?: Maybe<Scalars['String']>;
+  port?: Maybe<Scalars['Float']>;
+  password?: Maybe<Scalars['String']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
-  createDownloadSession: Scalars['String'];
+  createDownloadSession: DownloadSessionReturn;
 };
 
 
 export type MutationCreateDownloadSessionArgs = {
+  type: Scalars['String'];
   data: Array<DownloadSessionInput>;
 };
 
@@ -65,10 +82,11 @@ export type TreeItem = {
 
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadSessionInput> | DownloadSessionInput;
+  type: Scalars['String'];
 }>;
 
 
-export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSession: string };
+export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSession: { __typename?: 'DownloadSessionReturn', hostIp?: Maybe<string>, username?: Maybe<string>, password?: Maybe<string>, port?: Maybe<number>, id?: Maybe<string>, data?: Maybe<Array<{ __typename?: 'DownloadSessionObject', type: string, path: string }>> } };
 
 export type GetDirectoryTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
@@ -88,8 +106,18 @@ export type GetTreeQueryQuery = { __typename?: 'Query', tree: { __typename: 'Tre
 
 
 export const CreateSessionDocument = gql`
-    mutation createSession($data: [DownloadSessionInput!]!) {
-  createDownloadSession(data: $data)
+    mutation createSession($data: [DownloadSessionInput!]!, $type: String!) {
+  createDownloadSession(data: $data, type: $type) {
+    data {
+      type
+      path
+    }
+    hostIp
+    username
+    password
+    port
+    id
+  }
 }
     `;
 export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutation, CreateSessionMutationVariables>;
@@ -108,6 +136,7 @@ export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutat
  * const [createSessionMutation, { data, loading, error }] = useCreateSessionMutation({
  *   variables: {
  *      data: // value for 'data'
+ *      type: // value for 'type'
  *   },
  * });
  */

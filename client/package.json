@@ -19,6 +19,7 @@
     "react": "^17.0.1",
     "react-apollo": "^3.1.5",
     "react-dom": "^17.0.1",
+    "ssh-package": "^1.0.1",
     "tslib": "2.1.0"
   },
   "devDependencies": {

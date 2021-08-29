@@ -3,6 +3,8 @@ import fs from "fs";
 import fsPath from "path";
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method !== "GET") return;
+
   let path = (req.query.path as string[]).join("/");
   if (!path.endsWith("/")) path += "/";
 

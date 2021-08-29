@@ -27,7 +27,7 @@ const withApollo = (App: any) => {
           getToken: () => req.headers.cookie || "",
         },
         {
-          uri: "http://localhost:4000/graphql",
+          uri: process.env.NEXT_PUBLIC_SERVER_URL + "/graphql",
           credentials: "include",
         }
       );
@@ -80,7 +80,7 @@ const withApollo = (App: any) => {
           },
         },
         {
-          uri: "http://localhost:4000/graphql",
+          uri: process.env.NEXT_PUBLIC_SERVER_URL + "/graphql",
           credentials: "include",
         }
       );

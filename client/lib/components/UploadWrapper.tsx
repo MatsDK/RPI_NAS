@@ -8,7 +8,7 @@ const UploadWrapper = () => {
   const [folderPath, setFolderPath] = useState<string>(
     folderCtx?.currentFolderPath || "/"
   );
-  const [path, setpath] = useState("H:/");
+  const [path, setPath] = useState("H:/");
   const [folderData, setFolderData] = useState<
     Array<{ name: string; path: string; isDirectory: boolean }>
   >([]);
@@ -46,12 +46,29 @@ const UploadWrapper = () => {
         value={folderPath}
         onChange={(e) => setFolderPath(e.target.value)}
       />
+      <div style={{ display: "flex" }}>
+        {path.split(`/`).map((x, idx) => (
+          <div
+            onClick={() => {
+              const newPath = path
+                .split("/")
+                .slice(0, idx + 1)
+                .join("/");
+
+              setPath(newPath);
+            }}
+            key={idx}
+          >
+            {x}/
+          </div>
+        ))}
+      </div>
       {folderData.map((item, idx) => (
         <div key={idx} style={{ display: "flex" }}>
           {item.isDirectory ? (
             <p
               style={{ cursor: "pointer", width: "fit-content" }}
-              onClick={() => setpath(item.path)}
+              onClick={() => setPath(item.path.replace(/\\/g, "/"))}
             >
               {item.name}
             </p>
