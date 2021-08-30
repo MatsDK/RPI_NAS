@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import fs from "fs";
 import fsPath from "path";
 import { Client } from "ssh-package";
 
@@ -8,6 +9,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { data, connectData, downloadPath } = JSON.parse(
     req.query.data as string
   );
+
+  if (!fs.existsSync(downloadPath) || !fs.lstatSync(downloadPath).isDirectory())
+    return res.status(200).json({ err: `path "${downloadPath}" not found` });
 
   const timeout = new Promise((res) =>
     setTimeout(() => {

@@ -7,7 +7,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { connectionData, uploadPath, uploadData } = JSON.parse(
     req.query.data as string
   );
-  console.log(connectionData);
 
   const timeout = new Promise((res) =>
     setTimeout(() => {
@@ -16,9 +15,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   );
 
   const getData = new Promise((res, rej) => {
-    const client = new Client(connectionData);
+    const client = new Client({
+      host: connectionData.hostIp,
+      ...connectionData,
+    });
 
-    client.on("ready", () => {
+    client.on("ready", async () => {
       const uploadFiles: paths = [],
         uploadDirs: paths = [];
 
@@ -30,7 +32,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         else uploadFiles.push({ local: path, remote: newPath });
       }
 
-      console.log(uploadFiles, uploadDirs);
+      await client.upload.files(uploadFiles);
+      await client.upload.directories(uploadDirs);
+
+      res({ err: false });
     });
 
     client.on("timeout", () => {
