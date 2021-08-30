@@ -1,8 +1,13 @@
+import { useApolloClient } from "react-apollo";
+import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
 import axios from "axios";
+import { createUploadSessionMutation } from "graphql/TransferData/createUploadSession";
 import { FolderContext, FolderContextType } from "lib/providers/folderState";
 import React, { useContext, useEffect, useState } from "react";
 
 const UploadWrapper = () => {
+  const client: any = useApolloClient();
+
   const folderCtx: FolderContextType = useContext(FolderContext);
 
   const [folderPath, setFolderPath] = useState<string>(
@@ -12,7 +17,9 @@ const UploadWrapper = () => {
   const [folderData, setFolderData] = useState<
     Array<{ name: string; path: string; isDirectory: boolean }>
   >([]);
-  const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
+  const [selectedPaths, setSelectedPaths] = useState<
+    Map<string, { isDir: boolean }>
+  >(new Map());
 
   useEffect(() => {
     updateUploadFolderView();
@@ -25,7 +32,41 @@ const UploadWrapper = () => {
   };
 
   const upload = async () => {
-    console.log(folderPath);
+    const data = Array.from(selectedPaths),
+      newData: Array<{ path: string; isDir: boolean }> = [];
+
+    for (const path of data) {
+      let addValue = true;
+
+      data.forEach((p) => {
+        if (path.includes(p[0]) && path !== p) addValue = false;
+      });
+
+      if (addValue) newData.push({ path: path[0], isDir: path[1].isDir });
+    }
+
+    const {
+      data: {
+        createUploadSession: { uploadPath, ...connectionData },
+      },
+    } = await (client as ApolloClient<NormalizedCacheObject>).mutate({
+      mutation: createUploadSessionMutation,
+      variables: {
+        uploadPath: folderPath,
+      },
+    });
+
+    const res = await axios.get(`/api/upload`, {
+      params: {
+        data: {
+          connectionData,
+          uploadPath,
+          uploadData: newData,
+        },
+      },
+    });
+
+    console.log(res.data);
   };
 
   return (
@@ -80,11 +121,14 @@ const UploadWrapper = () => {
             onClick={() => {
               if (!selectedPaths.has(item.path)) {
                 setSelectedPaths(
-                  (selectedPaths) => new Set(selectedPaths.add(item.path))
+                  (selectedPaths) =>
+                    new Map(
+                      selectedPaths.set(item.path, { isDir: item.isDirectory })
+                    )
                 );
               } else {
                 selectedPaths.delete(item.path);
-                setSelectedPaths((selectedPaths) => new Set(selectedPaths));
+                setSelectedPaths((selectedPaths) => new Map(selectedPaths));
               }
             }}
           >
@@ -94,7 +138,17 @@ const UploadWrapper = () => {
       ))}
       <h1>selected</h1>
       {Array.from(selectedPaths).map((path, idx) => (
-        <div key={idx}>{path}</div>
+        <div key={idx}>
+          {path[0]}
+          <button
+            onClick={() => {
+              selectedPaths.delete(path[0]);
+              setSelectedPaths((selectedPaths) => new Map(selectedPaths));
+            }}
+          >
+            remove
+          </button>
+        </div>
       ))}
       <button onClick={upload}>Upload</button>
     </div>

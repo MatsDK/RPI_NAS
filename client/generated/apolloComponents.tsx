@@ -37,7 +37,13 @@ export type DownloadSessionReturn = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createUploadSession: UploadSessionReturn;
   createDownloadSession: DownloadSessionReturn;
+};
+
+
+export type MutationCreateUploadSessionArgs = {
+  uploadPath: Scalars['String'];
 };
 
 
@@ -80,6 +86,15 @@ export type TreeItem = {
   tree?: Maybe<Array<TreeItem>>;
 };
 
+export type UploadSessionReturn = {
+  __typename?: 'UploadSessionReturn';
+  uploadPath: Scalars['String'];
+  hostIp: Scalars['String'];
+  username: Scalars['String'];
+  port: Scalars['Float'];
+  password: Scalars['String'];
+};
+
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadSessionInput> | DownloadSessionInput;
   type: Scalars['String'];
@@ -87,6 +102,13 @@ export type CreateSessionMutationVariables = Exact<{
 
 
 export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSession: { __typename?: 'DownloadSessionReturn', hostIp?: Maybe<string>, username?: Maybe<string>, password?: Maybe<string>, port?: Maybe<number>, id?: Maybe<string>, data?: Maybe<Array<{ __typename?: 'DownloadSessionObject', type: string, path: string }>> } };
+
+export type CreateUploadSessionMutationMutationVariables = Exact<{
+  uploadPath: Scalars['String'];
+}>;
+
+
+export type CreateUploadSessionMutationMutation = { __typename?: 'Mutation', createUploadSession: { __typename?: 'UploadSessionReturn', uploadPath: string, hostIp: string, username: string, port: number, password: string } };
 
 export type GetDirectoryTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
@@ -147,6 +169,43 @@ export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
 export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
 export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
+export const CreateUploadSessionMutationDocument = gql`
+    mutation createUploadSessionMutation($uploadPath: String!) {
+  createUploadSession(uploadPath: $uploadPath) {
+    uploadPath
+    hostIp
+    username
+    port
+    password
+  }
+}
+    `;
+export type CreateUploadSessionMutationMutationFn = Apollo.MutationFunction<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>;
+
+/**
+ * __useCreateUploadSessionMutationMutation__
+ *
+ * To run a mutation, you first call `useCreateUploadSessionMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUploadSessionMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUploadSessionMutationMutation, { data, loading, error }] = useCreateUploadSessionMutationMutation({
+ *   variables: {
+ *      uploadPath: // value for 'uploadPath'
+ *   },
+ * });
+ */
+export function useCreateUploadSessionMutationMutation(baseOptions?: Apollo.MutationHookOptions<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>(CreateUploadSessionMutationDocument, options);
+      }
+export type CreateUploadSessionMutationMutationHookResult = ReturnType<typeof useCreateUploadSessionMutationMutation>;
+export type CreateUploadSessionMutationMutationResult = Apollo.MutationResult<CreateUploadSessionMutationMutation>;
+export type CreateUploadSessionMutationMutationOptions = Apollo.BaseMutationOptions<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>;
 export const GetDirectoryTreeQueryDocument = gql`
     query getDirectoryTreeQuery($path: String!, $depth: Float!) {
   directoryTree(path: $path, depth: $depth) {

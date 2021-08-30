@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import fsPath from "path";
 import { Client } from "ssh-package";
 
-type paths = Array<{ local: string; remote: string }>;
+export type paths = Array<{ local: string; remote: string }>;
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { data, connectData, downloadPath } = JSON.parse(

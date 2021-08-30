@@ -49,7 +49,7 @@ const FolderNavbar = () => {
       },
     });
 
-    console.log(res);
+    if (res.data.err) console.log(res.data.err);
   };
 
   const createDownloadSession = async (): Promise<void> => {
