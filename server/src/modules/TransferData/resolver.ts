@@ -4,9 +4,26 @@ import { v4 } from "uuid";
 import { downloadSessions } from "../../utils/transferData/downloadSessions";
 import fsPath from "path";
 import { DownloadSessionReturn } from "./DownloadSessionReturn";
+import { UploadSessionReturn } from "./UploadSessionReturn";
 
 @Resolver()
 export class TreeResolver {
+  @Mutation(() => UploadSessionReturn)
+  createUploadSession(
+    @Arg("uploadPath", () => String) uploadPath: string
+  ): UploadSessionReturn {
+    const returnObj = new UploadSessionReturn();
+
+    returnObj.uploadPath = fsPath.join(process.env.BASEPATH || "", uploadPath);
+
+    returnObj.hostIp = process.env.HOST_IP || "";
+    returnObj.password = "mats";
+    returnObj.username = "mats";
+    returnObj.port = 22;
+
+    return returnObj;
+  }
+
   @Mutation(() => DownloadSessionReturn)
   createDownloadSession(
     @Arg("data", () => [DownloadSessionInput]) data: DownloadSessionInput[],
