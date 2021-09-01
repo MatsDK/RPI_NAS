@@ -2,7 +2,7 @@ import { useApolloClient } from "react-apollo";
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
 import axios from "axios";
 import { createUploadSessionMutation } from "graphql/TransferData/createUploadSession";
-import { FolderContext, FolderContextType } from "lib/providers/folderState";
+import { FolderContext, FolderContextType } from "src/providers/folderState";
 import React, { useContext, useEffect, useState } from "react";
 
 const UploadWrapper = () => {

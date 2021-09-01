@@ -1,10 +1,10 @@
 import * as React from "react";
-import { FolderContextValue, FolderContext } from "lib/providers/folderState";
+import { FolderContextValue, FolderContext } from "src/providers/folderState";
 import App from "next/app";
 import "../css/global.css";
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
-import withApollo from "lib/HOC/withApollo";
+import withApollo from "src/HOC/withApollo";
 
 interface Props {
   apolloClient: ApolloClient<NormalizedCacheObject>;

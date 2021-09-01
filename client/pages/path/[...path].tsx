@@ -1,7 +1,7 @@
 import { useRouter } from "next/dist/client/router";
 import React from "react";
-import Tree from "lib/components/Tree/Tree";
-import FolderItems from "lib/components/Folder/Folder";
+import Tree from "src/components/Tree/Tree";
+import FolderItems from "src/components/Folder/Folder";
 import { ApolloContext, NextFunctionComponent } from "types/types";
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";

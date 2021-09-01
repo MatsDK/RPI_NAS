@@ -1,5 +1,5 @@
 import { TreeItem } from "generated/apolloComponents";
-import { FolderContext, FolderContextType } from "lib/providers/folderState";
+import { FolderContext, FolderContextType } from "src/providers/folderState";
 import Link from "next/link";
 import React, { useContext, useEffect, useState } from "react";
 

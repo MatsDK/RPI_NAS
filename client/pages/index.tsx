@@ -1,5 +1,5 @@
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
-import Tree from "lib/components/Tree/Tree";
+import Tree from "src/components/Tree/Tree";
 import { NextFunctionComponent, ApolloContext, Maybe } from "types/types";
 
 interface Props {

@@ -2,7 +2,7 @@ import { TreeItem, useGetTreeQueryQuery } from "generated/apolloComponents";
 import { useApolloClient } from "react-apollo";
 import React, { useContext, useEffect } from "react";
 import FolderItem from "./FolderItem";
-import { FolderContext, FolderContextType } from "lib/providers/folderState";
+import { FolderContext, FolderContextType } from "src/providers/folderState";
 import FolderNavbar from "./FolderNavbar";
 
 interface Props {

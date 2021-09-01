@@ -10,6 +10,7 @@ import {
   ApolloServerPluginLandingPageGraphQLPlayground,
 } from "apollo-server-core";
 import { router } from "./routers/indexRouter";
+import { createConnection } from "typeorm";
 
 dotenv.config();
 
@@ -24,6 +25,10 @@ dotenv.config();
       resolvers: [__dirname + "/modules/**/*.ts"],
     }),
   });
+
+  await createConnection().then(() =>
+    console.log("> Connected to postgreSQL database")
+  );
 
   const app = Express();
 
