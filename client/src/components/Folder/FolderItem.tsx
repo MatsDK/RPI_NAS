@@ -5,9 +5,10 @@ import React, { useContext, useEffect, useState } from "react";
 
 interface Props {
   item: TreeItem;
+  dataStoreId: number | null;
 }
 
-const FolderItem: React.FC<Props> = ({ item }) => {
+const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
   const folderCtx: FolderContextType = useContext(FolderContext);
 
   const [selected, setSelected] = useState(false);
@@ -28,7 +29,7 @@ const FolderItem: React.FC<Props> = ({ item }) => {
     >
       <div style={{ minWidth: 200 }}>
         {item.isDirectory ? (
-          <Link href={`/path/${item.relativePath}`}>
+          <Link href={`/path/${item.relativePath}?d=${dataStoreId}`}>
             <p style={{ width: "fit-content", cursor: "pointer" }}>
               {item.name}
             </p>

@@ -27,7 +27,11 @@ const Tree: React.FC<Props> = ({ path = "/" }) => {
   return (
     <div style={{ minWidth: 300, overflowY: "auto", height: "100vh" }}>
       {data.directoryTree.tree.map((item, idx) => (
-        <TreeObjectItem item={item as TreeItem} key={idx} />
+        <TreeObjectItem
+          dataStoreId={item.dataStoreId}
+          item={item as TreeItem}
+          key={idx}
+        />
       ))}
     </div>
   );

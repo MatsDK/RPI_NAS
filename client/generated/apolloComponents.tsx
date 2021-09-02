@@ -61,12 +61,14 @@ export type Query = {
 
 export type QueryTreeArgs = {
   depth: Scalars['Float'];
+  dataStore?: Maybe<Scalars['Float']>;
   path: Scalars['String'];
 };
 
 
 export type QueryDirectoryTreeArgs = {
   depth: Scalars['Float'];
+  dataStore?: Maybe<Scalars['Float']>;
   path: Scalars['String'];
 };
 
@@ -82,7 +84,8 @@ export type TreeItem = {
   path: Scalars['String'];
   relativePath: Scalars['String'];
   isDirectory: Scalars['Boolean'];
-  size: Scalars['Float'];
+  dataStoreId?: Maybe<Scalars['Float']>;
+  size?: Maybe<Scalars['Float']>;
   tree?: Maybe<Array<TreeItem>>;
 };
 
@@ -113,14 +116,16 @@ export type CreateUploadSessionMutationMutation = { __typename?: 'Mutation', cre
 export type GetDirectoryTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
   depth: Scalars['Float'];
+  dataStore?: Maybe<Scalars['Float']>;
 }>;
 
 
-export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree: { __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', isDirectory: boolean, name: string, relativePath: string, path: string }>> } };
+export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree: { __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: Maybe<number>, name: string, relativePath: string, path: string }>> } };
 
 export type GetTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
   depth: Scalars['Float'];
+  dataStore?: Maybe<Scalars['Float']>;
 }>;
 
 
@@ -207,12 +212,13 @@ export type CreateUploadSessionMutationMutationHookResult = ReturnType<typeof us
 export type CreateUploadSessionMutationMutationResult = Apollo.MutationResult<CreateUploadSessionMutationMutation>;
 export type CreateUploadSessionMutationMutationOptions = Apollo.BaseMutationOptions<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>;
 export const GetDirectoryTreeQueryDocument = gql`
-    query getDirectoryTreeQuery($path: String!, $depth: Float!) {
-  directoryTree(path: $path, depth: $depth) {
+    query getDirectoryTreeQuery($path: String!, $depth: Float!, $dataStore: Float) {
+  directoryTree(path: $path, depth: $depth, dataStore: $dataStore) {
     path
     __typename
     tree {
       isDirectory
+      dataStoreId
       name
       relativePath
       path
@@ -236,6 +242,7 @@ export const GetDirectoryTreeQueryDocument = gql`
  *   variables: {
  *      path: // value for 'path'
  *      depth: // value for 'depth'
+ *      dataStore: // value for 'dataStore'
  *   },
  * });
  */
@@ -251,8 +258,8 @@ export type GetDirectoryTreeQueryQueryHookResult = ReturnType<typeof useGetDirec
 export type GetDirectoryTreeQueryLazyQueryHookResult = ReturnType<typeof useGetDirectoryTreeQueryLazyQuery>;
 export type GetDirectoryTreeQueryQueryResult = Apollo.QueryResult<GetDirectoryTreeQueryQuery, GetDirectoryTreeQueryQueryVariables>;
 export const GetTreeQueryDocument = gql`
-    query getTreeQuery($path: String!, $depth: Float!) {
-  tree(path: $path, depth: $depth) {
+    query getTreeQuery($path: String!, $depth: Float!, $dataStore: Float) {
+  tree(path: $path, depth: $depth, dataStore: $dataStore) {
     path
     __typename
     tree {
@@ -280,6 +287,7 @@ export const GetTreeQueryDocument = gql`
  *   variables: {
  *      path: // value for 'path'
  *      depth: // value for 'depth'
+ *      dataStore: // value for 'dataStore'
  *   },
  * });
  */

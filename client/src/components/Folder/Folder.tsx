@@ -7,9 +7,10 @@ import FolderNavbar from "./FolderNavbar";
 
 interface Props {
   path: string;
+  dataStoreId: number | null;
 }
 
-const Folder: React.FC<Props> = ({ path }) => {
+const Folder: React.FC<Props> = ({ path, dataStoreId }) => {
   const client: any = useApolloClient();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
@@ -18,15 +19,10 @@ const Folder: React.FC<Props> = ({ path }) => {
     variables: {
       depth: 1,
       path,
+      dataStore: dataStoreId,
     },
     client,
   });
-
-  if (loading) return <div>Loading</div>;
-
-  if (error) return <div>error</div>;
-
-  if (!data?.tree?.tree) return <div>folder not found</div>;
 
   useEffect(() => {
     if (folderCtx) {
@@ -35,11 +31,21 @@ const Folder: React.FC<Props> = ({ path }) => {
     }
   }, [path]);
 
+  if (loading) return <div>Loading</div>;
+
+  if (error) return <div>error</div>;
+
+  if (!data?.tree?.tree) return <div>folder not found</div>;
+
   return (
     <div>
       <FolderNavbar />
       {data.tree.tree.map((item, idx) => (
-        <FolderItem item={item as TreeItem} key={idx} />
+        <FolderItem
+          dataStoreId={dataStoreId}
+          item={item as TreeItem}
+          key={idx}
+        />
       ))}
     </div>
   );

@@ -8,18 +8,19 @@ import { getTreeQuery } from "graphql/TreeObject/queryTree";
 
 const Folder: NextFunctionComponent<{}> = () => {
   const router = useRouter(),
-    path = ((router.query.path || []) as string[]).join("/");
+    path = ((router.query.path || []) as string[]).join("/"),
+    dataStoreId = router?.query?.d ? Number(router.query.d) : null;
 
   return (
     <div style={{ display: "flex" }}>
       <Tree />
-      <FolderItems path={path} />
+      <FolderItems path={path} dataStoreId={dataStoreId} />
     </div>
   );
 };
 
 Folder.getInitialProps = async (ctx: ApolloContext) => {
-  const { loading, data } = await ctx.apolloClient.query({
+  const { loading } = await ctx.apolloClient.query({
     query: getDirectoryTreeQuery,
     variables: {
       depth: 1,
@@ -27,17 +28,23 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
     },
   });
 
+  const path = (ctx as any).query.path.join("/"),
+    dataStore = (ctx as any).req?.query?.d
+      ? Number((ctx as any).req.query.d)
+      : null;
+
   await ctx.apolloClient.query({
     query: getTreeQuery,
     variables: {
       depth: 1,
-      path: (ctx as any).query.path.join("/"),
+      path,
+      dataStore,
     },
   });
 
   if (loading) return { tree: null };
 
-  return { tree: data.tree };
+  return { tree: null };
 };
 
 export default Folder;

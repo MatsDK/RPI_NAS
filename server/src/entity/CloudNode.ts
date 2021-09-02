@@ -10,4 +10,7 @@ export class Node extends BaseEntity {
 
   @Column("text")
   ip: string;
+
+  @Column("text", { nullable: true })
+  host: string;
 }

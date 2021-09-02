@@ -8,9 +8,10 @@ import { useApolloClient } from "react-apollo";
 
 interface Props {
   item: TreeItem;
+  dataStoreId?: number | null;
 }
 
-const Item: React.FC<Props> = ({ item }) => {
+const Item: React.FC<Props> = ({ item, dataStoreId }) => {
   const [nestedItems, setNestedItems] = useState<TreeItem[] | null>(null);
   const [showNestedItems, setShowNestedItems] = useState(false);
 
@@ -23,6 +24,7 @@ const Item: React.FC<Props> = ({ item }) => {
     variables: {
       depth: 1,
       path: item.relativePath,
+      dataStore: dataStoreId,
     },
   });
 
@@ -48,7 +50,7 @@ const Item: React.FC<Props> = ({ item }) => {
         </button>
         <div
           onClick={() => {
-            router.push(`/path/${item.relativePath}`);
+            router.push(`/path/${item.relativePath}?d=${dataStoreId}`);
           }}
         >
           {item.name}
@@ -57,7 +59,9 @@ const Item: React.FC<Props> = ({ item }) => {
       <div style={{ marginLeft: 20 }}>
         {showNestedItems &&
           nestedItems &&
-          nestedItems.map((i, idx) => <Item item={i} key={idx} />)}
+          nestedItems.map((i, idx) => (
+            <Item dataStoreId={dataStoreId} item={i} key={idx} />
+          ))}
       </div>
     </>
   ) : (

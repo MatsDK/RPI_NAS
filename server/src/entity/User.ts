@@ -1,7 +1,7 @@
 import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
-class User extends BaseEntity {
+export class User extends BaseEntity {
   @PrimaryColumn("int")
   id: number;
 
@@ -10,13 +10,4 @@ class User extends BaseEntity {
 
   @Column("text")
   userName: string;
-
-  @Column("id")
-  localHostNodeId: number;
-
-  @Column("id")
-  localNodeId: number;
-
-  @Column("text")
-  basePath: string;
 }

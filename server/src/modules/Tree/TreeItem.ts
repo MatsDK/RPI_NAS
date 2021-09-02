@@ -16,7 +16,10 @@ export class TreeItem {
   @Field(() => Boolean)
   isDirectory: boolean;
 
-  @Field(() => Number)
+  @Field(() => Number, { nullable: true })
+  dataStoreId: number;
+
+  @Field(() => Number, { nullable: true })
   size: number;
 
   @Field(() => [TreeItem], { nullable: true })
