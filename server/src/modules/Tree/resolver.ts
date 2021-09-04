@@ -1,6 +1,6 @@
 import { Arg, Query, Resolver } from "type-graphql";
 import { buildTreeObject } from "./buildTreeObject";
-import { GetTreeInput } from "./getTreeInput";
+import { GetTreeInput } from "./GetTreeInput";
 import { Tree } from "./TreeObject";
 
 @Resolver()

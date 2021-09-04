@@ -24,6 +24,7 @@ dotenv.config();
     schema: await buildSchema({
       resolvers: [__dirname + "/modules/**/*.ts"],
     }),
+    context: ({ req, res }) => ({ req, res }),
   });
 
   await createConnection().then(() =>

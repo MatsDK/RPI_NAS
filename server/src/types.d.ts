@@ -1,6 +1,8 @@
-// export enum Type {
-//   file = "file",
-//   directory = "directory",
-// }
+import { Request, Response } from "express";
 
 export type Type = "file" | "directory";
+
+export interface MyContext {
+  req: Request;
+  res: Response;
+}
