@@ -23,10 +23,17 @@ export class UserResolver {
 
     const { accessToken, refreshToken } = createTokens(user);
 
-    res.cookie("access-token", accessToken, { maxAge: MAX_AGE_ACCESS_TOKEN });
+    res.cookie("access-token", accessToken, {
+      maxAge: MAX_AGE_ACCESS_TOKEN,
+    });
     res.cookie("refresh-token", refreshToken, {
       maxAge: MAX_AGE_REFRESH_TOKEN,
     });
+
+    res.setHeader(
+      "Cookie",
+      `refresh-token=${refreshToken}; access-token=${accessToken}`
+    );
 
     return user;
   }

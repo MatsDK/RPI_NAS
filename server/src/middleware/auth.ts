@@ -31,7 +31,7 @@ export const isAuth: MiddlewareFn<MyContext> = async (
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET as string
     );
-  } catch {
+  } catch (e) {
     return null;
   }
 

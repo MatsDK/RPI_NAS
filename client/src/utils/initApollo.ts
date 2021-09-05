@@ -1,5 +1,4 @@
 import { ApolloClient, InMemoryCache } from "apollo-boost";
-import { setContext } from "apollo-link-context";
 import { createHttpLink, HttpLink } from "apollo-link-http";
 import { isBrowser } from "./isBrowser";
 
@@ -14,24 +13,15 @@ const create = (
   { getToken }: Options,
   linkOptions: HttpLink.Options
 ) => {
-  const httpLink = createHttpLink(linkOptions);
-
-  const authLink = setContext((_, { headers = {} }) => {
-    const token: string = getToken();
-
-    if (linkOptions.credentials == "omit")
-      headers.Authorization = token ? `${token}` : "";
-    else headers.cookie = token ? `${token}` : "";
-
-    return {
-      headers,
-    };
+  const httpLink = createHttpLink({
+    ...linkOptions,
+    headers: { Cookie: getToken() },
   });
 
   return new ApolloClient({
     connectToDevTools: isBrowser,
     ssrMode: !isBrowser,
-    link: authLink.concat(httpLink),
+    link: httpLink,
     cache: new InMemoryCache().restore(initialState || {}),
   });
 };

@@ -24,7 +24,9 @@ const withApollo = (App: any) => {
       const apollo = initApollo(
         {},
         {
-          getToken: () => req.headers.cookie || "",
+          getToken: () => {
+            return req.headers.cookie || "";
+          },
         },
         {
           uri: process.env.NEXT_PUBLIC_SERVER_URL + "/graphql",

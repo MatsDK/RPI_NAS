@@ -32,12 +32,13 @@ dotenv.config();
   );
 
   const app = Express();
-
   app.use(cookieParser());
+
   app.use(
     cors({
       credentials: true,
       origin: process.env.CLIENT_URL,
+      exposedHeaders: ["Cookie"],
     })
   );
 
@@ -46,7 +47,7 @@ dotenv.config();
   await apolloServer.start();
   apolloServer.applyMiddleware({
     app,
-    cors: { origin: process.env.CLIENT_URL },
+    cors: false,
   });
 
   app.listen(4000, () => {

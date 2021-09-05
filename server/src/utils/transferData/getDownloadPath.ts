@@ -5,17 +5,20 @@ import { TMP_FOLDER } from "../../constants";
 import { DownloadSessionInput } from "../../modules/TransferData/DownloadSessionInput";
 
 export const getDownloadPath = async (
-  session: DownloadSessionInput[],
+  session: DownloadSessionInput,
   sessionId: string
 ): Promise<string | { err: any }> => {
-  if (session.length === 1 && session[0].type === "file")
-    return session[0].path;
+  if (
+    session.downloadPaths.length === 1 &&
+    session.downloadPaths[0].type === "file"
+  )
+    return session.downloadPaths[0].path;
 
   const folderName = `${TMP_FOLDER}/${sessionId}`;
 
   fs.mkdirSync(folderName);
 
-  for (const item of session) {
+  for (const item of session.downloadPaths) {
     if (item.type === "file")
       fs.copyFileSync(item.path, `${folderName}/${fsPath.basename(item.path)}`);
     else fs.copySync(item.path, `${folderName}/${fsPath.basename(item.path)}`);
