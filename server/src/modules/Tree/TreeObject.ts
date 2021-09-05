@@ -1,6 +1,4 @@
 import { Field, ObjectType } from "type-graphql";
-import fsPath from "path";
-import { Datastore } from "../../entity/Datastore";
 import { getTreeObject } from "../../utils/getTreeObject";
 import { TreeItem } from "./TreeItem";
 import { getDataStoresTreeObject } from "../../utils/getDataStoresTreeObject";

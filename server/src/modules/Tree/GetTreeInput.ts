@@ -1,5 +1,4 @@
 import { Field, InputType } from "type-graphql";
-import { Type } from "../../types";
 
 @InputType()
 export class GetTreeInput {
@@ -7,7 +6,7 @@ export class GetTreeInput {
   path: string;
 
   @Field(() => Number, { nullable: true })
-  dataStore: number;
+  dataStoreId: number;
 
   @Field(() => Number, { nullable: true })
   depth: number;

@@ -19,7 +19,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId }) => {
     variables: {
       depth: 1,
       path,
-      dataStore: dataStoreId,
+      dataStoreId: dataStoreId,
     },
     client,
   });

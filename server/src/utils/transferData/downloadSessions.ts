@@ -1,8 +1,11 @@
-import { DownloadSessionInput } from "../../modules/TransferData/DownloadSessionInput";
+import {
+  DownloadPathsInput,
+  DownloadSessionInput,
+} from "../../modules/TransferData/DownloadSessionInput";
 
 export const downloadSessions = {
   sessions: new Map(),
-  addSession: (id: string, paths: DownloadSessionInput[]) => {
+  addSession: (id: string, paths: DownloadPathsInput[]) => {
     downloadSessions.sessions.set(id, paths);
   },
   deleteSessions: (id: string) => {

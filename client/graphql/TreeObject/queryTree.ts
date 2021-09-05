@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
 export const getTreeQuery = gql`
-  query getTreeQuery($path: String!, $depth: Float!, $dataStore: Float) {
-    tree(path: $path, depth: $depth, dataStore: $dataStore) {
+  query getTreeQuery($path: String!, $depth: Float!, $dataStoreId: Float) {
+    tree(data: { path: $path, dataStoreId: $dataStoreId, depth: $depth }) {
       path
       __typename
       tree {

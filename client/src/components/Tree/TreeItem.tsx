@@ -24,7 +24,7 @@ const Item: React.FC<Props> = ({ item, dataStoreId }) => {
     variables: {
       depth: 1,
       path: item.relativePath,
-      dataStore: dataStoreId,
+      dataStoreId: dataStoreId,
     },
   });
 

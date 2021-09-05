@@ -4,9 +4,11 @@ export const getDirectoryTreeQuery = gql`
   query getDirectoryTreeQuery(
     $path: String!
     $depth: Float!
-    $dataStore: Float
+    $dataStoreId: Float
   ) {
-    directoryTree(path: $path, depth: $depth, dataStore: $dataStore) {
+    directoryTree(
+      data: { path: $path, depth: $depth, dataStoreId: $dataStoreId }
+    ) {
       path
       __typename
       tree {

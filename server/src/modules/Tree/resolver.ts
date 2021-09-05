@@ -1,16 +1,20 @@
-import { Arg, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
+import { isAuth } from "../../middleware/auth";
+import { MyContext } from "../../types";
 import { buildTreeObject } from "./buildTreeObject";
 import { GetTreeInput } from "./GetTreeInput";
 import { Tree } from "./TreeObject";
 
 @Resolver()
 export class TreeResolver {
-  @Query(() => Tree)
+  @UseMiddleware(isAuth)
+  @Query(() => Tree, { nullable: true })
   async tree(
     @Arg("data", () => GetTreeInput)
-    { dataStore: dataStoreId, path, depth }: GetTreeInput
+    { dataStoreId, path, depth }: GetTreeInput,
+    @Ctx() { req }: MyContext
   ): Promise<Tree> {
-    const userId = 1;
+    const userId = (req as any).userId;
 
     return await buildTreeObject({
       dataStoreId,
@@ -21,19 +25,23 @@ export class TreeResolver {
     });
   }
 
-  @Query(() => Tree)
+  @UseMiddleware(isAuth)
+  @Query(() => Tree, { nullable: true })
   async directoryTree(
     @Arg("data", () => GetTreeInput)
-    { dataStore: dataStoreId, path, depth }: GetTreeInput
+    { dataStoreId, path, depth }: GetTreeInput,
+    @Ctx() { req }: MyContext
   ): Promise<Tree> {
-    const userId = 1;
+    const userId = (req as any).userId;
 
-    return await buildTreeObject({
+    const res = await buildTreeObject({
       dataStoreId,
       path,
       depth,
       userId,
       directoryTree: true,
     });
+
+    return res;
   }
 }

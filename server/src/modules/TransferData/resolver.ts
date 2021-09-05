@@ -1,22 +1,31 @@
-import { Arg, Mutation, Resolver } from "type-graphql";
+import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { DownloadSessionInput } from "./DownloadSessionInput";
 import { v4 } from "uuid";
 import { downloadSessions } from "../../utils/transferData/downloadSessions";
 import fsPath from "path";
 import { DownloadSessionReturn } from "./DownloadSessionReturn";
 import { UploadSessionReturn } from "./UploadSessionReturn";
+import { isAuth } from "../../middleware/auth";
+import { getDataStoreAndNode } from "../../middleware/getDataStoreNode";
+import { Datastore } from "../../entity/Datastore";
+import { UploadSessionInput } from "./UploadSessionInput";
+import { Node } from "../../entity/CloudNode";
 
 @Resolver()
 export class TreeResolver {
-  @Mutation(() => UploadSessionReturn)
+  @UseMiddleware(isAuth, getDataStoreAndNode)
+  @Mutation(() => UploadSessionReturn, { nullable: true })
   createUploadSession(
-    @Arg("uploadPath", () => String) uploadPath: string
+    @Arg("data", () => UploadSessionInput) { uploadPath }: UploadSessionInput,
+    @Ctx() { req }: any
   ): UploadSessionReturn {
-    const returnObj = new UploadSessionReturn();
+    const dataStore = req.dataStore as Datastore,
+      localNode = req.localNode as Node,
+      returnObj = new UploadSessionReturn();
 
-    returnObj.uploadPath = fsPath.join(process.env.BASEPATH || "", uploadPath);
+    returnObj.uploadPath = fsPath.join(dataStore.basePath, uploadPath);
 
-    returnObj.hostIp = process.env.HOST_IP || "";
+    returnObj.hostIp = localNode.ip;
     returnObj.password = "mats";
     returnObj.username = "mats";
     returnObj.port = 22;
@@ -24,35 +33,45 @@ export class TreeResolver {
     return returnObj;
   }
 
-  @Mutation(() => DownloadSessionReturn)
+  @UseMiddleware(isAuth, getDataStoreAndNode)
+  @Mutation(() => DownloadSessionReturn, { nullable: true })
   createDownloadSession(
-    @Arg("data", () => [DownloadSessionInput]) data: DownloadSessionInput[],
-    @Arg("type", () => String) type: string
+    @Arg("data", () => DownloadSessionInput)
+    { downloadPaths, type }: DownloadSessionInput,
+    @Ctx() { req }: any
   ): DownloadSessionReturn {
-    const returnObj = new DownloadSessionReturn();
+    const returnObj = new DownloadSessionReturn(),
+      dataStore = req.dataStore as Datastore;
 
-    if (type === "http") {
-      const id = v4();
+    switch (type) {
+      case "http":
+        const id = v4();
 
-      downloadSessions.addSession(
-        id,
-        data.map((obj) => ({
-          ...obj,
-          path: fsPath.join(process.env.BASEPATH || "", obj.path),
-        }))
-      );
+        downloadSessions.addSession(
+          id,
+          downloadPaths.map((obj) => ({
+            ...obj,
+            path: fsPath.join(dataStore.basePath, obj.path),
+          }))
+        );
 
-      returnObj.id = id;
-    } else if (type === "SSH") {
-      returnObj.data = data.map(({ path, type }) => ({
-        type,
-        path: fsPath.join(process.env.BASEPATH || "", path),
-      }));
+        returnObj.id = id;
+        break;
 
-      returnObj.hostIp = process.env.HOST_IP;
-      returnObj.password = "mats";
-      returnObj.username = "mats";
-      returnObj.port = 22;
+      case "SSH":
+        returnObj.data = downloadPaths.map(({ path, ...rest }) => ({
+          ...rest,
+          path: fsPath.join(dataStore.basePath, path),
+        }));
+
+        returnObj.hostIp = (req.localNode as Node).ip;
+        returnObj.password = "mats";
+        returnObj.username = "mats";
+        returnObj.port = 22;
+        break;
+
+      default:
+        break;
     }
 
     return returnObj;

@@ -1,8 +1,5 @@
-import { Field, InterfaceType, ObjectType } from "type-graphql";
-import {
-  DownloadSessionInput,
-  DownloadSessionObject,
-} from "./DownloadSessionInput";
+import { Field, ObjectType } from "type-graphql";
+import { DownloadSessionObject } from "./DownloadSessionInput";
 
 @ObjectType()
 export class DownloadSessionReturn {
@@ -10,7 +7,7 @@ export class DownloadSessionReturn {
   id?: string | null;
 
   @Field(() => [DownloadSessionObject], { nullable: true })
-  data?: DownloadSessionInput[] | null;
+  data?: DownloadSessionObject[] | null;
 
   @Field(() => String, { nullable: true })
   hostIp?: string | null;

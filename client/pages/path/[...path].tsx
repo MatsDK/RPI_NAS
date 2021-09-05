@@ -38,7 +38,7 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
     variables: {
       depth: 1,
       path,
-      dataStore,
+      dataStoreId: dataStore,
     },
   });
 

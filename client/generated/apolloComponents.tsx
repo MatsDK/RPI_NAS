@@ -14,9 +14,25 @@ export type Scalars = {
   Float: number;
 };
 
-export type DownloadSessionInput = {
+export type Datastore = {
+  __typename?: 'Datastore';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  userId: Scalars['Float'];
+  localHostNodeId: Scalars['Float'];
+  localNodeId: Scalars['Float'];
+  basePath: Scalars['String'];
+};
+
+export type DownloadPathsInput = {
   path: Scalars['String'];
   type: Scalars['String'];
+};
+
+export type DownloadSessionInput = {
+  type: Scalars['String'];
+  downloadPaths: Array<DownloadPathsInput>;
+  dataStoreId: Scalars['Float'];
 };
 
 export type DownloadSessionObject = {
@@ -35,21 +51,48 @@ export type DownloadSessionReturn = {
   password?: Maybe<Scalars['String']>;
 };
 
+export type GetTreeInput = {
+  path: Scalars['String'];
+  dataStoreId?: Maybe<Scalars['Float']>;
+  depth?: Maybe<Scalars['Float']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
-  createUploadSession: UploadSessionReturn;
+  createUploadSession?: Maybe<UploadSessionReturn>;
   createDownloadSession: DownloadSessionReturn;
+  login?: Maybe<User>;
+  logout?: Maybe<Scalars['Boolean']>;
+  register: User;
 };
 
 
 export type MutationCreateUploadSessionArgs = {
-  uploadPath: Scalars['String'];
+  data: UploadSessionInput;
 };
 
 
 export type MutationCreateDownloadSessionArgs = {
-  type: Scalars['String'];
-  data: Array<DownloadSessionInput>;
+  data: DownloadSessionInput;
+};
+
+
+export type MutationLoginArgs = {
+  password: Scalars['String'];
+  email: Scalars['String'];
+};
+
+
+export type MutationRegisterArgs = {
+  data: RegisterInput;
+};
+
+export type Node = {
+  __typename?: 'Node';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  ip: Scalars['String'];
+  host?: Maybe<Scalars['String']>;
 };
 
 export type Query = {
@@ -60,16 +103,18 @@ export type Query = {
 
 
 export type QueryTreeArgs = {
-  depth: Scalars['Float'];
-  dataStore?: Maybe<Scalars['Float']>;
-  path: Scalars['String'];
+  data: GetTreeInput;
 };
 
 
 export type QueryDirectoryTreeArgs = {
-  depth: Scalars['Float'];
-  dataStore?: Maybe<Scalars['Float']>;
-  path: Scalars['String'];
+  data: GetTreeInput;
+};
+
+export type RegisterInput = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+  userName: Scalars['String'];
 };
 
 export type Tree = {
@@ -89,6 +134,11 @@ export type TreeItem = {
   tree?: Maybe<Array<TreeItem>>;
 };
 
+export type UploadSessionInput = {
+  uploadPath: Scalars['String'];
+  dataStoreId: Scalars['Float'];
+};
+
 export type UploadSessionReturn = {
   __typename?: 'UploadSessionReturn';
   uploadPath: Scalars['String'];
@@ -98,9 +148,17 @@ export type UploadSessionReturn = {
   password: Scalars['String'];
 };
 
+export type User = {
+  __typename?: 'User';
+  id: Scalars['ID'];
+  email: Scalars['String'];
+  userName: Scalars['String'];
+};
+
 export type CreateSessionMutationVariables = Exact<{
-  data: Array<DownloadSessionInput> | DownloadSessionInput;
+  data: Array<DownloadPathsInput> | DownloadPathsInput;
   type: Scalars['String'];
+  dataStoreId: Scalars['Float'];
 }>;
 
 
@@ -108,15 +166,16 @@ export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSes
 
 export type CreateUploadSessionMutationMutationVariables = Exact<{
   uploadPath: Scalars['String'];
+  dataStoreId: Scalars['Float'];
 }>;
 
 
-export type CreateUploadSessionMutationMutation = { __typename?: 'Mutation', createUploadSession: { __typename?: 'UploadSessionReturn', uploadPath: string, hostIp: string, username: string, port: number, password: string } };
+export type CreateUploadSessionMutationMutation = { __typename?: 'Mutation', createUploadSession?: Maybe<{ __typename?: 'UploadSessionReturn', uploadPath: string, hostIp: string, username: string, port: number, password: string }> };
 
 export type GetDirectoryTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
   depth: Scalars['Float'];
-  dataStore?: Maybe<Scalars['Float']>;
+  dataStoreId?: Maybe<Scalars['Float']>;
 }>;
 
 
@@ -125,7 +184,7 @@ export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree: 
 export type GetTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
   depth: Scalars['Float'];
-  dataStore?: Maybe<Scalars['Float']>;
+  dataStoreId?: Maybe<Scalars['Float']>;
 }>;
 
 
@@ -133,8 +192,10 @@ export type GetTreeQueryQuery = { __typename?: 'Query', tree: { __typename: 'Tre
 
 
 export const CreateSessionDocument = gql`
-    mutation createSession($data: [DownloadSessionInput!]!, $type: String!) {
-  createDownloadSession(data: $data, type: $type) {
+    mutation createSession($data: [DownloadPathsInput!]!, $type: String!, $dataStoreId: Float!) {
+  createDownloadSession(
+    data: {type: $type, downloadPaths: $data, dataStoreId: $dataStoreId}
+  ) {
     data {
       type
       path
@@ -164,6 +225,7 @@ export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutat
  *   variables: {
  *      data: // value for 'data'
  *      type: // value for 'type'
+ *      dataStoreId: // value for 'dataStoreId'
  *   },
  * });
  */
@@ -175,8 +237,8 @@ export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSession
 export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
 export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
 export const CreateUploadSessionMutationDocument = gql`
-    mutation createUploadSessionMutation($uploadPath: String!) {
-  createUploadSession(uploadPath: $uploadPath) {
+    mutation createUploadSessionMutation($uploadPath: String!, $dataStoreId: Float!) {
+  createUploadSession(data: {uploadPath: $uploadPath, dataStoreId: $dataStoreId}) {
     uploadPath
     hostIp
     username
@@ -201,6 +263,7 @@ export type CreateUploadSessionMutationMutationFn = Apollo.MutationFunction<Crea
  * const [createUploadSessionMutationMutation, { data, loading, error }] = useCreateUploadSessionMutationMutation({
  *   variables: {
  *      uploadPath: // value for 'uploadPath'
+ *      dataStoreId: // value for 'dataStoreId'
  *   },
  * });
  */
@@ -212,8 +275,8 @@ export type CreateUploadSessionMutationMutationHookResult = ReturnType<typeof us
 export type CreateUploadSessionMutationMutationResult = Apollo.MutationResult<CreateUploadSessionMutationMutation>;
 export type CreateUploadSessionMutationMutationOptions = Apollo.BaseMutationOptions<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>;
 export const GetDirectoryTreeQueryDocument = gql`
-    query getDirectoryTreeQuery($path: String!, $depth: Float!, $dataStore: Float) {
-  directoryTree(path: $path, depth: $depth, dataStore: $dataStore) {
+    query getDirectoryTreeQuery($path: String!, $depth: Float!, $dataStoreId: Float) {
+  directoryTree(data: {path: $path, depth: $depth, dataStoreId: $dataStoreId}) {
     path
     __typename
     tree {
@@ -242,7 +305,7 @@ export const GetDirectoryTreeQueryDocument = gql`
  *   variables: {
  *      path: // value for 'path'
  *      depth: // value for 'depth'
- *      dataStore: // value for 'dataStore'
+ *      dataStoreId: // value for 'dataStoreId'
  *   },
  * });
  */
@@ -258,8 +321,8 @@ export type GetDirectoryTreeQueryQueryHookResult = ReturnType<typeof useGetDirec
 export type GetDirectoryTreeQueryLazyQueryHookResult = ReturnType<typeof useGetDirectoryTreeQueryLazyQuery>;
 export type GetDirectoryTreeQueryQueryResult = Apollo.QueryResult<GetDirectoryTreeQueryQuery, GetDirectoryTreeQueryQueryVariables>;
 export const GetTreeQueryDocument = gql`
-    query getTreeQuery($path: String!, $depth: Float!, $dataStore: Float) {
-  tree(path: $path, depth: $depth, dataStore: $dataStore) {
+    query getTreeQuery($path: String!, $depth: Float!, $dataStoreId: Float) {
+  tree(data: {path: $path, dataStoreId: $dataStoreId, depth: $depth}) {
     path
     __typename
     tree {
@@ -287,7 +350,7 @@ export const GetTreeQueryDocument = gql`
  *   variables: {
  *      path: // value for 'path'
  *      depth: // value for 'depth'
- *      dataStore: // value for 'dataStore'
+ *      dataStoreId: // value for 'dataStoreId'
  *   },
  * });
  */

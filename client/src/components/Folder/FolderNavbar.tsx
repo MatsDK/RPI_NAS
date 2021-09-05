@@ -5,9 +5,11 @@ import { FolderContext, FolderContextType } from "src/providers/folderState";
 import React, { useContext, useState } from "react";
 import { useApolloClient } from "react-apollo";
 import UploadWrapper from "./UploadWrapper";
+import { useRouter } from "next/dist/client/router";
 
 const FolderNavbar = () => {
   const client: any = useApolloClient();
+  const router = useRouter();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
 
@@ -20,6 +22,8 @@ const FolderNavbar = () => {
       ([_, v]) => v
     );
 
+    if (!router.query.d) return;
+
     const { data } = await (
       client as ApolloClient<NormalizedCacheObject>
     ).mutate({
@@ -30,6 +34,7 @@ const FolderNavbar = () => {
           type: isDirectory ? "directory" : "file",
         })),
         type: "SSH",
+        dataStoreId: Number(router.query.d),
       },
     });
 
@@ -59,6 +64,8 @@ const FolderNavbar = () => {
       ([_, v]) => v
     );
 
+    if (!router.query.d) return;
+
     const { data } = await (
       client as ApolloClient<NormalizedCacheObject>
     ).mutate({
@@ -69,6 +76,7 @@ const FolderNavbar = () => {
           type: isDirectory ? "directory" : "file",
         })),
         type: "http",
+        dataStoreId: Number(router.query.d),
       },
     });
 
