@@ -16,7 +16,19 @@ export class Node extends BaseEntity {
   @Column("text")
   ip: string;
 
-  @Field({ nullable: true })
-  @Column("text", { nullable: true })
+  @Field()
+  @Column("text")
+  loginName: string;
+
+  @Field()
+  @Column("text")
+  password: string;
+
+  @Field()
+  @Column("int")
+  port: number;
+
+  @Field()
+  @Column("text")
   host: string;
 }

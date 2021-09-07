@@ -2,23 +2,20 @@ import archiver from "archiver";
 import fs from "fs-extra";
 import fsPath from "path";
 import { TMP_FOLDER } from "../../constants";
-import { DownloadSessionInput } from "../../modules/TransferData/DownloadSessionInput";
+import { DownloadPathsInput } from "../../modules/TransferData/DownloadSessionInput";
 
 export const getDownloadPath = async (
-  session: DownloadSessionInput,
+  session: DownloadPathsInput[],
   sessionId: string
 ): Promise<string | { err: any }> => {
-  if (
-    session.downloadPaths.length === 1 &&
-    session.downloadPaths[0].type === "file"
-  )
-    return session.downloadPaths[0].path;
+  if (session.length === 1 && session[0].type === "file")
+    return session[0].path;
 
   const folderName = `${TMP_FOLDER}/${sessionId}`;
 
   fs.mkdirSync(folderName);
 
-  for (const item of session.downloadPaths) {
+  for (const item of session) {
     if (item.type === "file")
       fs.copyFileSync(item.path, `${folderName}/${fsPath.basename(item.path)}`);
     else fs.copySync(item.path, `${folderName}/${fsPath.basename(item.path)}`);
@@ -48,6 +45,8 @@ export const getDownloadPath = async (
     output.on("close", () => {
       res("");
     });
+
+    output.on("error", (e) => rej(e));
   });
 
   fs.removeSync(folderName);

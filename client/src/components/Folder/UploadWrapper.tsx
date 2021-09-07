@@ -4,13 +4,14 @@ import axios from "axios";
 import { createUploadSessionMutation } from "graphql/TransferData/createUploadSession";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import React, { useContext, useEffect, useState } from "react";
+import { useInput } from "src/hooks/useInput";
 
 const UploadWrapper = () => {
   const client: any = useApolloClient();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
 
-  const [folderPath, setFolderPath] = useState<string>(
+  const [folderPath, setFolderPath] = useInput<string>(
     folderCtx?.currentFolderPath || "/"
   );
   const [path, setPath] = useState("H:/");
@@ -85,7 +86,7 @@ const UploadWrapper = () => {
         type="text"
         placeholder="upload location"
         value={folderPath}
-        onChange={(e) => setFolderPath(e.target.value)}
+        onChange={setFolderPath}
       />
       <div style={{ display: "flex" }}>
         {path.split(`/`).map((x, idx) => (

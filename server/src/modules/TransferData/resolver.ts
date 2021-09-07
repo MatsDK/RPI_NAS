@@ -26,9 +26,9 @@ export class TreeResolver {
     returnObj.uploadPath = fsPath.join(dataStore.basePath, uploadPath);
 
     returnObj.hostIp = localNode.ip;
-    returnObj.password = "mats";
-    returnObj.username = "mats";
-    returnObj.port = 22;
+    returnObj.password = localNode.password;
+    returnObj.username = localNode.loginName;
+    returnObj.port = localNode.port;
 
     return returnObj;
   }
@@ -59,15 +59,17 @@ export class TreeResolver {
         break;
 
       case "SSH":
+        const localNode = req.localNode as Node;
+
         returnObj.data = downloadPaths.map(({ path, ...rest }) => ({
           ...rest,
           path: fsPath.join(dataStore.basePath, path),
         }));
 
-        returnObj.hostIp = (req.localNode as Node).ip;
-        returnObj.password = "mats";
-        returnObj.username = "mats";
-        returnObj.port = 22;
+        returnObj.hostIp = localNode.ip;
+        returnObj.password = localNode.password;
+        returnObj.username = localNode.loginName;
+        returnObj.port = localNode.port;
         break;
 
       default:

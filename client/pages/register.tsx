@@ -1,27 +1,28 @@
-import { ApolloClient } from "apollo-boost";
-import { loginMutation } from "graphql/User/login";
-import { FormEvent } from "react";
+import { registerMutation } from "graphql/User/register";
+import React, { FormEvent } from "react";
 import { useApolloClient } from "react-apollo";
 import { useInput } from "src/hooks/useInput";
 
-const login = () => {
-  const client: ApolloClient<object> = useApolloClient();
+const register = () => {
+  const client = useApolloClient();
 
+  const [userNameInput, setUserNameInput] = useInput("");
   const [emailInput, setEmailInput] = useInput("");
   const [passwordInput, setPasswordInput] = useInput("");
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!passwordInput.trim() || !emailInput.trim()) return;
+    if (!userNameInput.trim() || !passwordInput.trim() || !emailInput.trim())
+      return;
 
     const res = await client.mutate({
+      mutation: registerMutation,
       variables: {
-        password: passwordInput,
+        userName: userNameInput,
         email: emailInput,
+        password: passwordInput,
       },
-      mutation: loginMutation,
-      optimisticResponse: true,
     });
 
     console.log(res);
@@ -30,6 +31,12 @@ const login = () => {
   return (
     <div>
       <form onSubmit={submit}>
+        <input
+          type="text"
+          placeholder="userName"
+          value={userNameInput}
+          onChange={setUserNameInput}
+        />
         <input
           type="text"
           placeholder="email"
@@ -42,10 +49,10 @@ const login = () => {
           value={passwordInput}
           onChange={setPasswordInput}
         />
-        <button type="submit">login</button>
+        <button type="submit">register</button>
       </form>
     </div>
   );
 };
 
-export default login;
+export default register;
