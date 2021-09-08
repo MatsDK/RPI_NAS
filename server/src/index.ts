@@ -15,6 +15,9 @@ import { createConnection } from "typeorm";
 dotenv.config();
 
 (async () => {
+  const app = Express();
+  app.use(cookieParser("Authorization"));
+
   const apolloServer = new ApolloServer({
     plugins: [
       process.env.NODE_ENV === "production"
@@ -31,9 +34,6 @@ dotenv.config();
     console.log("> Connected to postgreSQL database")
   );
 
-  const app = Express();
-  app.use(cookieParser());
-
   app.use(
     cors({
       credentials: true,
@@ -47,7 +47,7 @@ dotenv.config();
   await apolloServer.start();
   apolloServer.applyMiddleware({
     app,
-    cors: false,
+    cors: { credentials: true, origin: process.env.CLIENT_URL },
   });
 
   app.listen(4000, () => {

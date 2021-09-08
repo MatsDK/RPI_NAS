@@ -1,6 +1,8 @@
-import { ApolloClient, InMemoryCache } from "apollo-boost";
+import { ApolloClient, ApolloLink, InMemoryCache } from "apollo-boost";
+import { setContext } from "apollo-link-context";
 import { createHttpLink, HttpLink } from "apollo-link-http";
 import { isBrowser } from "./isBrowser";
+import cookieCutter from "cookie-cutter";
 
 let apolloClient: any = null;
 
@@ -15,13 +17,46 @@ const create = (
 ) => {
   const httpLink = createHttpLink({
     ...linkOptions,
-    headers: { Cookie: getToken() },
+    credentials: "include",
+  });
+
+  const authLink = setContext((_, { headers = {} }) => {
+    const token = getToken() || "";
+
+    headers.authorization = token;
+
+    return {
+      headers,
+    };
+  });
+
+  const afterwareLink = new ApolloLink((operation, forward) => {
+    return forward(operation).map((response) => {
+      const context = operation.getContext(),
+        cookies = context.response.headers.get("Cookie");
+
+      if (cookies && isBrowser) {
+        const parsedCookies = cookies
+          .split(";")
+          .map((v: string) => v.split("="));
+
+        for (const [name, value] of parsedCookies) {
+          cookieCutter.set(name.trim(), value.trim());
+        }
+      }
+
+      return response;
+    });
   });
 
   return new ApolloClient({
     connectToDevTools: isBrowser,
     ssrMode: !isBrowser,
-    link: httpLink,
+    link: ApolloLink.from([
+      // place any other links before the line below
+      afterwareLink.concat(authLink.concat(httpLink)),
+    ]),
+    // link: parseResponse.concat(httpLink),
     cache: new InMemoryCache().restore(initialState || {}),
   });
 };

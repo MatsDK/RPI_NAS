@@ -4,13 +4,16 @@ import { MyContext } from "../types";
 import { User } from "../entity/User";
 import { createTokens } from "../utils/createTokens";
 import { MAX_AGE_ACCESS_TOKEN, MAX_AGE_REFRESH_TOKEN } from "../constants";
+import cookie from "cookie";
 
 export const isAuth: MiddlewareFn<MyContext> = async (
   { context: { req, res } },
   next
 ) => {
   const { "access-token": accessToken, "refresh-token": refreshToken } =
-    req.cookies;
+    Object.keys(req.cookies).length
+      ? req.cookies
+      : cookie.parse((req.headers["authorization"] as string) || "");
 
   if (!accessToken && !refreshToken) return null;
 

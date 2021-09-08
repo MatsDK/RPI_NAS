@@ -1,1 +1,1 @@
-export const isBrowser: boolean = (process as any).browser;
+export const isBrowser = !!(process as any).browser;
