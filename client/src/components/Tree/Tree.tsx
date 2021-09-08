@@ -6,9 +6,10 @@ import TreeObjectItem from "./TreeItem";
 
 interface Props {
   path?: string;
+  dataStoreId: number | null;
 }
 
-const Tree: React.FC<Props> = ({ path = "/" }) => {
+const Tree: React.FC<Props> = ({ path = "/", dataStoreId }) => {
   const client: any = useApolloClient();
 
   const { data, loading, error } = useGetDirectoryTreeQueryQuery({
@@ -16,6 +17,7 @@ const Tree: React.FC<Props> = ({ path = "/" }) => {
     variables: {
       depth: 1,
       path,
+      dataStoreId: null,
     },
   });
 

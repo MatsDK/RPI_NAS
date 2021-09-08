@@ -3,6 +3,8 @@ export interface NextFunctionComponent<Props> extends React.FC<Props> {
 }
 
 export interface ApolloContext {
+  req: any;
+  query: any;
   apolloClient: ApolloClient<NormalizedCacheObject>;
 }
 

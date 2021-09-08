@@ -5,9 +5,15 @@ import { createUploadSessionMutation } from "graphql/TransferData/createUploadSe
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import React, { useContext, useEffect, useState } from "react";
 import { useInput } from "src/hooks/useInput";
+import { useRouter } from "next/dist/client/router";
 
 const UploadWrapper = () => {
   const client: any = useApolloClient();
+  const router = useRouter();
+
+  const dataStoreId = router.query.d;
+
+  if (!dataStoreId) return null;
 
   const folderCtx: FolderContextType = useContext(FolderContext);
 
@@ -54,6 +60,7 @@ const UploadWrapper = () => {
       mutation: createUploadSessionMutation,
       variables: {
         uploadPath: folderPath,
+        dataStoreId: Number(dataStoreId),
       },
     });
 

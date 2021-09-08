@@ -9,7 +9,7 @@ const index = () => {
 
   return (
     <div style={{ display: "flex" }}>
-      <Tree />
+      <Tree dataStoreId={Number(router.query.d)} />
       <Folder path={""} dataStoreId={Number(router.query.d)} />
     </div>
   );

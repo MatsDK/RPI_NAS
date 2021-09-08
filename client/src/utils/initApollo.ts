@@ -52,11 +52,7 @@ const create = (
   return new ApolloClient({
     connectToDevTools: isBrowser,
     ssrMode: !isBrowser,
-    link: ApolloLink.from([
-      // place any other links before the line below
-      afterwareLink.concat(authLink.concat(httpLink)),
-    ]),
-    // link: parseResponse.concat(httpLink),
+    link: ApolloLink.from([afterwareLink.concat(authLink.concat(httpLink))]),
     cache: new InMemoryCache().restore(initialState || {}),
   });
 };

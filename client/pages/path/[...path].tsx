@@ -11,27 +11,34 @@ const Folder: NextFunctionComponent<{}> = () => {
     path = ((router.query.path || []) as string[]).join("/"),
     dataStoreId = router?.query?.d ? Number(router.query.d) : null;
 
+  if (!dataStoreId) return null;
+
   return (
     <div style={{ display: "flex" }}>
-      <Tree />
+      <Tree dataStoreId={dataStoreId} />
       <FolderItems path={path} dataStoreId={dataStoreId} />
     </div>
   );
 };
 
 Folder.getInitialProps = async (ctx: ApolloContext) => {
-  const { loading } = await ctx.apolloClient.query({
+  const path = ctx.query.path.join("/"),
+    dataStore = ctx.req
+      ? ctx.req?.query?.d
+        ? Number(ctx.req.query.d)
+        : null
+      : ctx?.query?.d
+      ? Number(ctx.query?.d)
+      : null;
+
+  await ctx.apolloClient.query({
     query: getDirectoryTreeQuery,
     variables: {
       depth: 1,
       path: "/",
+      dataStoreId: null,
     },
   });
-
-  const path = (ctx as any).query.path.join("/"),
-    dataStore = (ctx as any).req?.query?.d
-      ? Number((ctx as any).req.query.d)
-      : null;
 
   await ctx.apolloClient.query({
     query: getTreeQuery,
@@ -41,8 +48,6 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
       dataStoreId: dataStore,
     },
   });
-
-  if (loading) return { tree: null };
 
   return { tree: null };
 };

@@ -11,6 +11,8 @@ interface Props {
 }
 
 const Folder: React.FC<Props> = ({ path, dataStoreId }) => {
+  if (!dataStoreId) return null;
+
   const client: any = useApolloClient();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
