@@ -3,8 +3,16 @@ import React from "react";
 
 export type FolderContextType = FolderContext | null;
 
+export type CurrentFolderType = {
+  path: string | null;
+  dataStoreId: number | null;
+};
+
 interface FolderContext {
-  currentFolderPath?: string;
+  currentFolderPath?: {
+    folderPath: CurrentFolderType;
+    setFolderPath: React.Dispatch<React.SetStateAction<CurrentFolderType>>;
+  };
   selected: {
     selectedItems: Map<string, TreeItem>;
     addSelected: (path: TreeItem) => void;
@@ -13,7 +21,7 @@ interface FolderContext {
   };
 }
 
-export const FolderContextValue: FolderContext = {
+export let FolderContextValue: FolderContext = {
   selected: {
     selectedItems: new Map(),
     addSelected: (item) =>

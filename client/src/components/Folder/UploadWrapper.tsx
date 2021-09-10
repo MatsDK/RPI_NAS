@@ -18,7 +18,7 @@ const UploadWrapper = () => {
   const folderCtx: FolderContextType = useContext(FolderContext);
 
   const [folderPath, setFolderPath] = useInput<string>(
-    folderCtx?.currentFolderPath || "/"
+    folderCtx?.currentFolderPath?.folderPath.path || ""
   );
   const [path, setPath] = useState("H:/");
   const [folderData, setFolderData] = useState<

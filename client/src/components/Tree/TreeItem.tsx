@@ -3,30 +3,53 @@ import {
   useGetDirectoryTreeQueryQuery,
 } from "generated/apolloComponents";
 import { useRouter } from "next/dist/client/router";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useApolloClient } from "react-apollo";
+import { FolderContext } from "src/providers/folderState";
 
 interface Props {
   item: TreeItem;
   dataStoreId?: number | null;
+  showNested?: boolean;
 }
 
-const Item: React.FC<Props> = ({ item, dataStoreId }) => {
+const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
   const [nestedItems, setNestedItems] = useState<TreeItem[] | null>(null);
-  const [showNestedItems, setShowNestedItems] = useState(false);
+  const [showNestedItems, setShowNestedItems] = useState(showNested);
 
   const router = useRouter();
   const client: any = useApolloClient();
+  const FolderCtx = useContext(FolderContext);
 
-  const { refetch: fetchTree } = useGetDirectoryTreeQueryQuery({
+  const {
+    loading,
+    data,
+    error,
+    refetch: fetchTree,
+  } = useGetDirectoryTreeQueryQuery({
     client: client,
-    skip: true,
+    skip: !showNested,
     variables: {
       depth: 1,
       path: item.relativePath,
       dataStoreId,
     },
   });
+
+  useEffect(() => {
+    // if (!showNestedItems) setShowNestedItems(showNested);
+    setShowNestedItems(showNested);
+    if (showNested) {
+      if (loading) return;
+
+      if (error || !data?.directoryTree.tree) {
+        console.log(error);
+        return;
+      }
+
+      setNestedItems(() => data.directoryTree.tree || null);
+    }
+  }, [loading, error, data, showNested]);
 
   return item.isDirectory ? (
     <>
@@ -59,9 +82,21 @@ const Item: React.FC<Props> = ({ item, dataStoreId }) => {
       <div style={{ marginLeft: 20 }}>
         {showNestedItems &&
           nestedItems &&
-          nestedItems.map((i, idx) => (
-            <Item dataStoreId={dataStoreId} item={i} key={idx} />
-          ))}
+          nestedItems.map((i, idx) => {
+            const show =
+              !!FolderCtx?.currentFolderPath?.folderPath.path?.startsWith(
+                i.relativePath.replace(/\\/g, "/")
+              );
+
+            return (
+              <Item
+                dataStoreId={dataStoreId}
+                showNested={show}
+                item={i}
+                key={idx}
+              />
+            );
+          })}
       </div>
     </>
   ) : (

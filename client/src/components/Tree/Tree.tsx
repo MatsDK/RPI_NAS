@@ -1,16 +1,19 @@
-import { useGetDirectoryTreeQueryQuery } from "generated/apolloComponents";
-import React from "react";
+import {
+  TreeItem,
+  useGetDirectoryTreeQueryQuery,
+} from "generated/apolloComponents";
+import React, { useContext } from "react";
 import { useApolloClient } from "react-apollo";
-import { TreeItem } from "generated/apolloComponents";
+import { FolderContext } from "src/providers/folderState";
 import TreeObjectItem from "./TreeItem";
 
 interface Props {
   path?: string;
-  dataStoreId: number | null;
 }
 
-const Tree: React.FC<Props> = ({ path = "/", dataStoreId }) => {
+const Tree: React.FC<Props> = ({ path = "/" }) => {
   const client: any = useApolloClient();
+  const FolderCtx = useContext(FolderContext);
 
   const { data, loading, error } = useGetDirectoryTreeQueryQuery({
     client,
@@ -21,6 +24,12 @@ const Tree: React.FC<Props> = ({ path = "/", dataStoreId }) => {
     },
   });
 
+  // useEffect(() => {
+  //   // console.log(FolderCtx?.currentFolderPath);
+
+  //   return () => {};
+  // }, [FolderCtx?.currentFolderPath?.folderPath]);
+
   if (loading) return <div>loading..</div>;
   if (error) return <div>errors</div>;
 
@@ -28,13 +37,19 @@ const Tree: React.FC<Props> = ({ path = "/", dataStoreId }) => {
 
   return (
     <div style={{ minWidth: 300, overflowY: "auto", height: "100vh" }}>
-      {data.directoryTree.tree.map((item, idx) => (
-        <TreeObjectItem
-          dataStoreId={item.dataStoreId}
-          item={item as TreeItem}
-          key={idx}
-        />
-      ))}
+      {data.directoryTree.tree.map((item, idx) => {
+        return (
+          <TreeObjectItem
+            showNested={
+              FolderCtx?.currentFolderPath?.folderPath.dataStoreId ===
+              item.dataStoreId
+            }
+            dataStoreId={item.dataStoreId}
+            item={item as TreeItem}
+            key={idx}
+          />
+        );
+      })}
     </div>
   );
 };

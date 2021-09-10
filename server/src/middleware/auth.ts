@@ -48,12 +48,17 @@ export const isAuth: MiddlewareFn<MyContext> = async (
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
     createTokens(user);
 
-  res.cookie("refresh-token", newRefreshToken, {
-    maxAge: MAX_AGE_REFRESH_TOKEN,
-  });
-  res.cookie("access-token", newAccessToken, {
-    maxAge: MAX_AGE_ACCESS_TOKEN,
-  });
+  res.setHeader(
+    "Cookie",
+    `refresh-token=${refreshToken}; access-token=${accessToken}`
+  );
+
+  // res.cookie("refresh-token", newRefreshToken, {
+  //   maxAge: MAX_AGE_REFRESH_TOKEN,
+  // });
+  // res.cookie("access-token", newAccessToken, {
+  //   maxAge: MAX_AGE_ACCESS_TOKEN,
+  // });
 
   return next();
 };

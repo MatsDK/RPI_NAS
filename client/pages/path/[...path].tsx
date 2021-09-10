@@ -15,7 +15,7 @@ const Folder: NextFunctionComponent<{}> = () => {
 
   return (
     <div style={{ display: "flex" }}>
-      <Tree dataStoreId={dataStoreId} />
+      <Tree />
       <FolderItems path={path} dataStoreId={dataStoreId} />
     </div>
   );

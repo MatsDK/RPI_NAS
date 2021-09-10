@@ -28,8 +28,10 @@ const Folder: React.FC<Props> = ({ path, dataStoreId }) => {
 
   useEffect(() => {
     if (folderCtx) {
-      folderCtx.selected.selectedItems = new Map();
-      folderCtx.currentFolderPath = path;
+      const { selected, currentFolderPath } = folderCtx;
+
+      selected.selectedItems = new Map();
+      currentFolderPath?.setFolderPath({ path, dataStoreId });
     }
   }, [path]);
 
