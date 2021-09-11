@@ -14,14 +14,27 @@ interface Props {
 
 const TreeWrapper = styled.div`
   min-width: 280px;
-  max-width: 350px;
+  max-width: 280px;
   overflow: auto;
   height: calc(100% - 65px);
   padding: 25px 0 0 30px;
 
-  /* ::-webkit-scrollbar {
-    display: none;
-  } */
+  scrollbar-color: ${(props) => props.theme.lightBgColors[2]} white;
+  scrollbar-width: thin;
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: ${(props) => props.theme.lightBgColors[2]};
+    border-radius: 2px;
+  }
 `;
 
 const TreeContent = styled.div`

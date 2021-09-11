@@ -27,6 +27,7 @@ const DataStoreFolderItem = styled.div`
     line-height: 23px;
 
     color: ${(props) => props.theme.textColors[0]};
+    cursor: pointer;
   }
 `;
 
@@ -48,6 +49,7 @@ const NestedFolderItemsWrapper = styled.div`
 
 const TreeFolder = styled.div`
   color: ${(props) => props.theme.textColors[1]};
+  cursor: pointer;
 `;
 
 const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
