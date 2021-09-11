@@ -1,10 +1,12 @@
 import { useRouter } from "next/dist/client/router";
+import { Layout } from "src/components/Layout";
 import React from "react";
 import Tree from "src/components/Tree/Tree";
 import FolderItems from "src/components/Folder/Folder";
 import { ApolloContext, NextFunctionComponent } from "types/types";
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
+import SideBar from "src/components/SideBar";
 
 const Folder: NextFunctionComponent<{}> = () => {
   const router = useRouter(),
@@ -14,10 +16,13 @@ const Folder: NextFunctionComponent<{}> = () => {
   if (!dataStoreId) return null;
 
   return (
-    <div style={{ display: "flex" }}>
-      <Tree />
-      <FolderItems path={path} dataStoreId={dataStoreId} />
-    </div>
+    <Layout>
+      <SideBar />
+      <div style={{ display: "flex" }}>
+        <Tree />
+        <FolderItems path={path} dataStoreId={dataStoreId} />
+      </div>
+    </Layout>
   );
 };
 

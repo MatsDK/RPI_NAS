@@ -1,6 +1,8 @@
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import Tree from "src/components/Tree/Tree";
 import { NextFunctionComponent, ApolloContext, Maybe } from "types/types";
+import { Layout } from "../src/components/Layout";
+import SideBar from "../src/components/SideBar";
 
 interface Props {
   tree: Maybe<{ [key: string]: any }>;
@@ -8,9 +10,10 @@ interface Props {
 
 const Index: NextFunctionComponent<Props> = () => {
   return (
-    <div>
+    <Layout>
+      <SideBar />
       <Tree />
-    </div>
+    </Layout>
   );
 };
 

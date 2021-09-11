@@ -1,4 +1,5 @@
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
+import { ThemeProvider } from "styled-components";
 import { AppProps } from "next/app";
 import React, { useState } from "react";
 import { ApolloProvider } from "react-apollo";
@@ -9,6 +10,7 @@ import {
   FolderContextValue,
 } from "src/providers/folderState";
 import "../css/global.css";
+import { theme } from "src/utils/theme";
 
 interface Props {
   apolloClient: ApolloClient<NormalizedCacheObject>;
@@ -32,7 +34,9 @@ const MyApp = (props: AppProps & Props) => {
             currentFolderPath: { folderPath, setFolderPath },
           }}
         >
-          <Component {...pageProps} />
+          <ThemeProvider theme={theme}>
+            <Component {...pageProps} />
+          </ThemeProvider>
         </FolderContext.Provider>
       </ApolloProvider>
     </div>

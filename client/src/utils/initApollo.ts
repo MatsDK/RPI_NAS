@@ -36,7 +36,7 @@ const create = (
         cookies = context.response.headers.get("Cookie");
 
       if (cookies && isBrowser) {
-        const parsedCookies = cookies
+        const parsedCookies: Array<string[]> = cookies
           .split(";")
           .map((v: string) => v.split("="));
 
