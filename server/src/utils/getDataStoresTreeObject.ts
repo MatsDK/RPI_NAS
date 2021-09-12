@@ -1,6 +1,8 @@
 import { TreeItem } from "../modules/Tree/TreeItem";
 import fsPath from "path";
 import { Datastore } from "../entity/Datastore";
+import { getConnection } from "typeorm";
+import { SharedDataStore } from "../entity/SharedDataStore";
 
 export const getDataStoresTreeObject = async (
   userOptions: any,
@@ -10,7 +12,14 @@ export const getDataStoresTreeObject = async (
 ): Promise<TreeItem[]> => {
   const { userId } = userOptions;
 
-  const userDataStores = await Datastore.find({ where: { userId } }),
+  // SELECT * FROM datastore d LEFT JOIN shared_data_store s ON s."dataStoreId"=d.id
+  // WHERE d."userId"=$1 OR s.id=$1
+  const userDataStores = await getConnection()
+      .getRepository(Datastore)
+      .createQueryBuilder("d")
+      .leftJoin("shared_data_store", "s", `s."dataStoreId"=d.id`)
+      .where("d.userId=:id OR s.userId=:id", { id: userId })
+      .getMany(),
     items: TreeItem[] = [];
 
   for (const { basePath, name, id } of userDataStores) {
@@ -21,11 +30,16 @@ export const getDataStoresTreeObject = async (
       basePath
     );
 
+    const isShared = !!(await SharedDataStore.count({
+      where: { dataStoreId: id },
+    }));
+
     newItem.name = name;
     newItem.path = basePath;
+    newItem.dataStoreId = id;
     newItem.relativePath = "";
     newItem.isDirectory = true;
-    newItem.dataStoreId = id;
+    newItem.sharedDataStore = isShared;
 
     items.push(newItem);
   }

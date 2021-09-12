@@ -81,12 +81,12 @@ const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
     if (showNested) {
       if (loading) return;
 
-      if (error || !data?.directoryTree.tree) {
+      if (error || !data?.directoryTree?.tree) {
         console.log(error);
         return;
       }
 
-      setNestedItems(() => data.directoryTree.tree || null);
+      setNestedItems(() => data.directoryTree?.tree || null);
     }
   }, [loading, error, data, showNested]);
 
@@ -135,7 +135,9 @@ const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
                 width={24}
                 height={24}
                 viewPort={28}
-                name={"dataStoreIcon"}
+                name={
+                  item.sharedDataStore ? "sharedDataStore" : "dataStoreIcon"
+                }
                 color={{ propName: "bgColors", idx: 2 }}
               />
               <p>{item.name}</p>

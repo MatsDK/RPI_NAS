@@ -14,6 +14,7 @@ export const getDirectoryTreeQuery = gql`
       tree {
         isDirectory
         dataStoreId
+        sharedDataStore
         name
         relativePath
         path

@@ -84,6 +84,7 @@ const Tree: React.FC<Props> = ({ path = "/" }) => {
   });
 
   if (loading) return <div>loading..</div>;
+
   if (error) return <div>errors</div>;
 
   if (!data?.directoryTree?.tree) return <div>Tree not found</div>;

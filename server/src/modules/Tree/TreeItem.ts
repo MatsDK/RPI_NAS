@@ -19,6 +19,9 @@ export class TreeItem {
   @Field(() => Number, { nullable: true })
   dataStoreId: number;
 
+  @Field(() => Boolean, { nullable: true })
+  sharedDataStore: boolean;
+
   @Field(() => Number, { nullable: true })
   size: number;
 

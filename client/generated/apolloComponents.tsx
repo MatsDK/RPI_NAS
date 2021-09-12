@@ -121,6 +121,12 @@ export type RegisterInput = {
   userName: Scalars['String'];
 };
 
+export type SharedDataStore = {
+  __typename?: 'SharedDataStore';
+  id: Scalars['ID'];
+  userId: Scalars['Float'];
+};
+
 export type Tree = {
   __typename?: 'Tree';
   path: Scalars['String'];
@@ -134,6 +140,7 @@ export type TreeItem = {
   relativePath: Scalars['String'];
   isDirectory: Scalars['Boolean'];
   dataStoreId?: Maybe<Scalars['Float']>;
+  sharedDataStore?: Maybe<Scalars['Boolean']>;
   size?: Maybe<Scalars['Float']>;
   tree?: Maybe<Array<TreeItem>>;
 };
@@ -183,7 +190,7 @@ export type GetDirectoryTreeQueryQueryVariables = Exact<{
 }>;
 
 
-export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree?: Maybe<{ __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: Maybe<number>, name: string, relativePath: string, path: string }>> }> };
+export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree?: Maybe<{ __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: Maybe<number>, sharedDataStore?: Maybe<boolean>, name: string, relativePath: string, path: string }>> }> };
 
 export type GetTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
@@ -313,6 +320,7 @@ export const GetDirectoryTreeQueryDocument = gql`
     tree {
       isDirectory
       dataStoreId
+      sharedDataStore
       name
       relativePath
       path

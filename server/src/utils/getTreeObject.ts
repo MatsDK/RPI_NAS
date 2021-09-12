@@ -25,25 +25,27 @@ export const getTreeObject = (
   const items: TreeItem[] = [];
 
   for (const currPath of fs.readdirSync(path)) {
-    const thisPath = fsPath.join(path, currPath);
-    const stats = fs.lstatSync(thisPath);
+    try {
+      const thisPath = fsPath.join(path, currPath);
+      const stats = fs.lstatSync(thisPath);
 
-    if (directoryTree && !stats.isDirectory()) continue;
+      if (directoryTree && !stats.isDirectory()) continue;
 
-    const item = new TreeItem(
-      stats.isDirectory() ? depth - 1 : 0,
-      thisPath,
-      directoryTree,
-      basePath
-    );
+      const item = new TreeItem(
+        stats.isDirectory() ? depth - 1 : 0,
+        thisPath,
+        directoryTree,
+        basePath
+      );
 
-    item.name = currPath;
-    item.size = stats.size;
-    item.path = thisPath;
-    item.relativePath = fsPath.relative(basePath, thisPath);
-    item.isDirectory = stats.isDirectory();
+      item.name = currPath;
+      item.size = stats.size;
+      item.path = thisPath;
+      item.relativePath = fsPath.relative(basePath, thisPath);
+      item.isDirectory = stats.isDirectory();
 
-    items.push(item);
+      items.push(item);
+    } catch (error) {}
   }
 
   return items;
