@@ -7,8 +7,9 @@ import { ApolloContext, NextFunctionComponent } from "types/types";
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import SideBar from "src/components/SideBar";
+import { withAuth } from "src/HOC/withAuth";
 
-const Folder: NextFunctionComponent<{}> = () => {
+const Folder: NextFunctionComponent<{}> = (props) => {
   const router = useRouter(),
     path = ((router.query.path || []) as string[]).join("/"),
     dataStoreId = router?.query?.d ? Number(router.query.d) : null;
@@ -57,4 +58,4 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
   return { tree: null };
 };
 
-export default Folder;
+export default withAuth(Folder);

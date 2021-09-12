@@ -1,14 +1,16 @@
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import Tree from "src/components/Tree/Tree";
-import { NextFunctionComponent, ApolloContext, Maybe } from "types/types";
+import { withAuth } from "src/HOC/withAuth";
+import { ApolloContext, Maybe, NextFunctionComponent } from "types/types";
 import { Layout } from "../src/components/Layout";
 import SideBar from "../src/components/SideBar";
 
 interface Props {
   tree: Maybe<{ [key: string]: any }>;
+  me?: { userName: string; id: number; email: string };
 }
 
-const Index: NextFunctionComponent<Props> = () => {
+const Page: NextFunctionComponent<Props> = ({ me }) => {
   return (
     <Layout>
       <SideBar />
@@ -17,12 +19,13 @@ const Index: NextFunctionComponent<Props> = () => {
   );
 };
 
-Index.getInitialProps = async (ctx: ApolloContext) => {
+Page.getInitialProps = async (ctx: ApolloContext) => {
   const { loading, data } = await ctx.apolloClient.query({
     query: getDirectoryTreeQuery,
     variables: {
       depth: 1,
       path: "/",
+      dataStoreId: null,
     },
   });
 
@@ -31,4 +34,4 @@ Index.getInitialProps = async (ctx: ApolloContext) => {
   return { tree: data.tree };
 };
 
-export default Index;
+export default withAuth(Page);

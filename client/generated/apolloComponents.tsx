@@ -60,7 +60,7 @@ export type GetTreeInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   createUploadSession?: Maybe<UploadSessionReturn>;
-  createDownloadSession: DownloadSessionReturn;
+  createDownloadSession?: Maybe<DownloadSessionReturn>;
   login?: Maybe<User>;
   logout?: Maybe<Scalars['Boolean']>;
   register: User;
@@ -92,13 +92,17 @@ export type Node = {
   id: Scalars['ID'];
   name: Scalars['String'];
   ip: Scalars['String'];
-  host?: Maybe<Scalars['String']>;
+  loginName: Scalars['String'];
+  password: Scalars['String'];
+  port: Scalars['Float'];
+  host: Scalars['String'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  tree: Tree;
-  directoryTree: Tree;
+  tree?: Maybe<Tree>;
+  directoryTree?: Maybe<Tree>;
+  me?: Maybe<User>;
 };
 
 
@@ -162,7 +166,7 @@ export type CreateSessionMutationVariables = Exact<{
 }>;
 
 
-export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSession: { __typename?: 'DownloadSessionReturn', hostIp?: Maybe<string>, username?: Maybe<string>, password?: Maybe<string>, port?: Maybe<number>, id?: Maybe<string>, data?: Maybe<Array<{ __typename?: 'DownloadSessionObject', type: string, path: string }>> } };
+export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSession?: Maybe<{ __typename?: 'DownloadSessionReturn', hostIp?: Maybe<string>, username?: Maybe<string>, password?: Maybe<string>, port?: Maybe<number>, id?: Maybe<string>, data?: Maybe<Array<{ __typename?: 'DownloadSessionObject', type: string, path: string }>> }> };
 
 export type CreateUploadSessionMutationMutationVariables = Exact<{
   uploadPath: Scalars['String'];
@@ -179,7 +183,7 @@ export type GetDirectoryTreeQueryQueryVariables = Exact<{
 }>;
 
 
-export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree: { __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: Maybe<number>, name: string, relativePath: string, path: string }>> } };
+export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree?: Maybe<{ __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: Maybe<number>, name: string, relativePath: string, path: string }>> }> };
 
 export type GetTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
@@ -188,7 +192,34 @@ export type GetTreeQueryQueryVariables = Exact<{
 }>;
 
 
-export type GetTreeQueryQuery = { __typename?: 'Query', tree: { __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string }>> } };
+export type GetTreeQueryQuery = { __typename?: 'Query', tree?: Maybe<{ __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string }>> }> };
+
+export type LoginMutationMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type LoginMutationMutation = { __typename?: 'Mutation', login?: Maybe<{ __typename?: 'User', id: string }> };
+
+export type LogoutMutationMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutationMutation = { __typename?: 'Mutation', logout?: Maybe<boolean> };
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', email: string, id: string, userName: string }> };
+
+export type RegisterMutationMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+  userName: Scalars['String'];
+}>;
+
+
+export type RegisterMutationMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string } };
 
 
 export const CreateSessionDocument = gql`
@@ -365,3 +396,138 @@ export function useGetTreeQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type GetTreeQueryQueryHookResult = ReturnType<typeof useGetTreeQueryQuery>;
 export type GetTreeQueryLazyQueryHookResult = ReturnType<typeof useGetTreeQueryLazyQuery>;
 export type GetTreeQueryQueryResult = Apollo.QueryResult<GetTreeQueryQuery, GetTreeQueryQueryVariables>;
+export const LoginMutationDocument = gql`
+    mutation loginMutation($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    id
+  }
+}
+    `;
+export type LoginMutationMutationFn = Apollo.MutationFunction<LoginMutationMutation, LoginMutationMutationVariables>;
+
+/**
+ * __useLoginMutationMutation__
+ *
+ * To run a mutation, you first call `useLoginMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginMutationMutation, { data, loading, error }] = useLoginMutationMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useLoginMutationMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutationMutation, LoginMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginMutationMutation, LoginMutationMutationVariables>(LoginMutationDocument, options);
+      }
+export type LoginMutationMutationHookResult = ReturnType<typeof useLoginMutationMutation>;
+export type LoginMutationMutationResult = Apollo.MutationResult<LoginMutationMutation>;
+export type LoginMutationMutationOptions = Apollo.BaseMutationOptions<LoginMutationMutation, LoginMutationMutationVariables>;
+export const LogoutMutationDocument = gql`
+    mutation logoutMutation {
+  logout
+}
+    `;
+export type LogoutMutationMutationFn = Apollo.MutationFunction<LogoutMutationMutation, LogoutMutationMutationVariables>;
+
+/**
+ * __useLogoutMutationMutation__
+ *
+ * To run a mutation, you first call `useLogoutMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLogoutMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [logoutMutationMutation, { data, loading, error }] = useLogoutMutationMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLogoutMutationMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutationMutation, LogoutMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LogoutMutationMutation, LogoutMutationMutationVariables>(LogoutMutationDocument, options);
+      }
+export type LogoutMutationMutationHookResult = ReturnType<typeof useLogoutMutationMutation>;
+export type LogoutMutationMutationResult = Apollo.MutationResult<LogoutMutationMutation>;
+export type LogoutMutationMutationOptions = Apollo.BaseMutationOptions<LogoutMutationMutation, LogoutMutationMutationVariables>;
+export const MeDocument = gql`
+    query me {
+  me {
+    email
+    id
+    userName
+  }
+}
+    `;
+
+/**
+ * __useMeQuery__
+ *
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+      }
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+        }
+export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
+export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
+export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const RegisterMutationDocument = gql`
+    mutation registerMutation($email: String!, $password: String!, $userName: String!) {
+  register(data: {email: $email, password: $password, userName: $userName}) {
+    id
+  }
+}
+    `;
+export type RegisterMutationMutationFn = Apollo.MutationFunction<RegisterMutationMutation, RegisterMutationMutationVariables>;
+
+/**
+ * __useRegisterMutationMutation__
+ *
+ * To run a mutation, you first call `useRegisterMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRegisterMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [registerMutationMutation, { data, loading, error }] = useRegisterMutationMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      password: // value for 'password'
+ *      userName: // value for 'userName'
+ *   },
+ * });
+ */
+export function useRegisterMutationMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutationMutation, RegisterMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RegisterMutationMutation, RegisterMutationMutationVariables>(RegisterMutationDocument, options);
+      }
+export type RegisterMutationMutationHookResult = ReturnType<typeof useRegisterMutationMutation>;
+export type RegisterMutationMutationResult = Apollo.MutationResult<RegisterMutationMutation>;
+export type RegisterMutationMutationOptions = Apollo.BaseMutationOptions<RegisterMutationMutation, RegisterMutationMutationVariables>;

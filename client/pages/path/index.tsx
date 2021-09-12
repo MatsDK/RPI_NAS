@@ -4,8 +4,9 @@ import Folder from "src/components/Folder/Folder";
 import { useRouter } from "next/dist/client/router";
 import { Layout } from "src/components/Layout";
 import SideBar from "src/components/SideBar";
+import { withAuth } from "src/HOC/withAuth";
 
-const index = () => {
+const Page: React.FC = () => {
   const router = useRouter();
   if (!router.query.d) return null;
 
@@ -20,4 +21,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default withAuth(Page);
