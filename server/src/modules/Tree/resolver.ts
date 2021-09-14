@@ -4,6 +4,12 @@ import { MyContext } from "../../types";
 import { buildTreeObject } from "./buildTreeObject";
 import { GetTreeInput } from "./GetTreeInput";
 import { Tree } from "./TreeObject";
+import { Datastore } from "../../entity/Datastore";
+import { SharedDataStore } from "../../entity/SharedDataStore";
+import { Any, getConnection, Not } from "typeorm";
+import { User } from "../../entity/User";
+import { getUserDataStores } from "../../utils/getUserDataStores";
+import { getUser } from "../../middleware/getUser";
 
 @Resolver()
 export class TreeResolver {
@@ -43,5 +49,49 @@ export class TreeResolver {
     });
 
     return res;
+  }
+
+  @UseMiddleware(isAuth)
+  @Query(() => [Datastore], { nullable: true })
+  async getDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
+    const dataStores = await getUserDataStores((req as any).userId);
+
+    const sharedDataStores = await SharedDataStore.find({
+      where: {
+        dataStoreId: Any(dataStores.map((v) => v.id)),
+      },
+    });
+
+    const users = await User.find({
+      where: {
+        id: Any(
+          Array.from(
+            new Set([
+              (req as any).userId,
+              ...sharedDataStores.map(({ userId }) => userId),
+              ...dataStores.map(({ userId }) => userId),
+            ])
+          )
+        ),
+      },
+    });
+
+    const sharedUsersMap: Map<number, User[]> = new Map();
+
+    sharedDataStores.forEach((sharedDatastore) => {
+      const thisUser = users.find(({ id }) => id === sharedDatastore.userId);
+
+      if (thisUser)
+        sharedUsersMap.set(sharedDatastore.dataStoreId, [
+          ...(sharedUsersMap.get(sharedDatastore.dataStoreId) || []),
+          thisUser,
+        ]);
+    });
+
+    return dataStores.map((dataStore) => ({
+      ...dataStore,
+      sharedUsers: sharedUsersMap.get(dataStore.id) || [],
+      owner: users.find(({ id }) => id === dataStore.userId),
+    })) as any;
   }
 }

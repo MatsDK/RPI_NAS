@@ -1,8 +1,7 @@
-import { TreeItem } from "../modules/Tree/TreeItem";
 import fsPath from "path";
-import { Datastore } from "../entity/Datastore";
-import { getConnection } from "typeorm";
 import { SharedDataStore } from "../entity/SharedDataStore";
+import { TreeItem } from "../modules/Tree/TreeItem";
+import { getUserDataStores } from "./getUserDataStores";
 
 export const getDataStoresTreeObject = async (
   userOptions: any,
@@ -12,14 +11,7 @@ export const getDataStoresTreeObject = async (
 ): Promise<TreeItem[]> => {
   const { userId } = userOptions;
 
-  // SELECT * FROM datastore d LEFT JOIN shared_data_store s ON s."dataStoreId"=d.id
-  // WHERE d."userId"=$1 OR s.id=$1
-  const userDataStores = await getConnection()
-      .getRepository(Datastore)
-      .createQueryBuilder("d")
-      .leftJoin("shared_data_store", "s", `s."dataStoreId"=d.id`)
-      .where("d.userId=:id OR s.userId=:id", { id: userId })
-      .getMany(),
+  const userDataStores = await getUserDataStores(userId),
     items: TreeItem[] = [];
 
   for (const { basePath, name, id } of userDataStores) {
