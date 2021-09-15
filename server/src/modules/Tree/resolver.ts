@@ -1,15 +1,14 @@
 import { Arg, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
+import { Any } from "typeorm";
+import { Datastore } from "../../entity/Datastore";
+import { SharedDataStore } from "../../entity/SharedDataStore";
+import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
 import { MyContext } from "../../types";
+import { getUserDataStores } from "../../utils/getUserDataStores";
 import { buildTreeObject } from "./buildTreeObject";
 import { GetTreeInput } from "./GetTreeInput";
 import { Tree } from "./TreeObject";
-import { Datastore } from "../../entity/Datastore";
-import { SharedDataStore } from "../../entity/SharedDataStore";
-import { Any, getConnection, Not } from "typeorm";
-import { User } from "../../entity/User";
-import { getUserDataStores } from "../../utils/getUserDataStores";
-import { getUser } from "../../middleware/getUser";
 
 @Resolver()
 export class TreeResolver {

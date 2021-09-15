@@ -1,3 +1,4 @@
+import { compare, hash } from "bcrypt";
 import {
   Arg,
   Ctx,
@@ -7,13 +8,11 @@ import {
   UseMiddleware,
 } from "type-graphql";
 import { User } from "../../entity/User";
-import { compare, hash } from "bcrypt";
+import { isAuth } from "../../middleware/auth";
+import { getUser } from "../../middleware/getUser";
 import { MyContext } from "../../types";
 import { createTokens } from "../../utils/createTokens";
-import { MAX_AGE_ACCESS_TOKEN, MAX_AGE_REFRESH_TOKEN } from "../../constants";
-import { isAuth } from "../../middleware/auth";
 import { RegisterInput } from "./RegisterInput";
-import { getUser } from "../../middleware/getUser";
 
 @Resolver()
 export class UserResolver {

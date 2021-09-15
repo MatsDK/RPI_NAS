@@ -6,11 +6,11 @@ import { User } from "./User";
 @Entity()
 export class Datastore extends BaseEntity {
   @Field(() => ID)
-  @PrimaryColumn("int")
+  @PrimaryColumn("int", { generated: true })
   id: number;
 
   @Field()
-  @Column("text")
+  @Column("text", { unique: true })
   name: string;
 
   @Field()

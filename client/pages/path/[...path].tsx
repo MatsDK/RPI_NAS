@@ -1,15 +1,18 @@
-import { useRouter } from "next/dist/client/router";
-import { Layout } from "src/components/Layout";
-import React from "react";
-import Tree from "src/components/Tree/Tree";
-import FolderItems from "src/components/Folder/Folder";
-import { ApolloContext, NextFunctionComponent } from "types/types";
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
+import { useRouter } from "next/dist/client/router";
+import React from "react";
+import FolderItems from "src/components/Folder/Folder";
+import { Layout } from "src/components/Layout";
 import SideBar from "src/components/SideBar";
+import Tree from "src/components/Tree/Tree";
 import { withAuth } from "src/HOC/withAuth";
+import { useMeState } from "src/hooks/useMeState";
+import { ApolloContext, NextFunctionComponentWithAuth } from "types/types";
 
-const Folder: NextFunctionComponent<{}> = (props) => {
+const Folder: NextFunctionComponentWithAuth = ({ me }) => {
+  useMeState(me);
+
   const router = useRouter(),
     path = ((router.query.path || []) as string[]).join("/"),
     dataStoreId = router?.query?.d ? Number(router.query.d) : null;

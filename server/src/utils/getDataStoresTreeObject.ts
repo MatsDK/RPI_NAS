@@ -4,13 +4,11 @@ import { TreeItem } from "../modules/Tree/TreeItem";
 import { getUserDataStores } from "./getUserDataStores";
 
 export const getDataStoresTreeObject = async (
-  userOptions: any,
+  { userId }: { userId: number },
   depth: number,
   path: string,
   directoryTree: boolean
 ): Promise<TreeItem[]> => {
-  const { userId } = userOptions;
-
   const userDataStores = await getUserDataStores(userId),
     items: TreeItem[] = [];
 

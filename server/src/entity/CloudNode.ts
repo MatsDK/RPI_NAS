@@ -31,4 +31,12 @@ export class Node extends BaseEntity {
   @Field()
   @Column("text")
   host: string;
+
+  @Field()
+  @Column("text")
+  basePath: string;
+
+  @Field()
+  @Column("bool", { default: false })
+  hostNode: boolean;
 }

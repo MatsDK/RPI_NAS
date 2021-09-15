@@ -1,16 +1,22 @@
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import Tree from "src/components/Tree/Tree";
 import { withAuth } from "src/HOC/withAuth";
-import { ApolloContext, Maybe, NextFunctionComponent } from "types/types";
+import { useMeState } from "src/hooks/useMeState";
+import {
+  ApolloContext,
+  Maybe,
+  NextFunctionComponentWithAuth,
+} from "types/types";
 import { Layout } from "../src/components/Layout";
 import SideBar from "../src/components/SideBar";
 
 interface Props {
   tree: Maybe<{ [key: string]: any }>;
-  me?: { userName: string; id: number; email: string };
 }
 
-const Page: NextFunctionComponent<Props> = ({ me }) => {
+const Page: NextFunctionComponentWithAuth<Props> = ({ me }) => {
+  useMeState(me);
+
   return (
     <Layout>
       <SideBar />

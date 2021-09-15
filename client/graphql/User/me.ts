@@ -6,6 +6,7 @@ export const meQuery = gql`
       email
       id
       userName
+      isAdmin
     }
   }
 `;

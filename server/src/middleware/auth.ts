@@ -50,7 +50,7 @@ export const isAuth: MiddlewareFn<MyContext> = async (
 
   res.setHeader(
     "Cookie",
-    `refresh-token=${refreshToken}; access-token=${accessToken}`
+    `refresh-token=${newRefreshToken}; access-token=${newAccessToken}`
   );
 
   // res.cookie("refresh-token", newRefreshToken, {

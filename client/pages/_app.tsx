@@ -11,6 +11,7 @@ import {
 } from "src/providers/folderState";
 import "../css/global.css";
 import { theme } from "src/utils/theme";
+import { MeContext } from "src/providers/meState";
 
 interface Props {
   apolloClient: ApolloClient<NormalizedCacheObject>;
@@ -25,6 +26,8 @@ const MyApp = (props: AppProps & Props) => {
     dataStoreId: null,
   });
 
+  const [me, setMe] = useState<any>(null);
+
   return (
     <div>
       <ApolloProvider client={apolloClient}>
@@ -34,9 +37,11 @@ const MyApp = (props: AppProps & Props) => {
             currentFolderPath: { folderPath, setFolderPath },
           }}
         >
-          <ThemeProvider theme={theme}>
-            <Component {...pageProps} />
-          </ThemeProvider>
+          <MeContext.Provider value={{ me, setMe }}>
+            <ThemeProvider theme={theme}>
+              <Component {...pageProps} />
+            </ThemeProvider>
+          </MeContext.Provider>
         </FolderContext.Provider>
       </ApolloProvider>
     </div>
