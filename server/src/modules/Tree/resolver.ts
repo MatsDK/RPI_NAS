@@ -4,6 +4,7 @@ import { Datastore } from "../../entity/Datastore";
 import { SharedDataStore } from "../../entity/SharedDataStore";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
+import { checkPermissions } from "../../middleware/checkPermissions";
 import { MyContext } from "../../types";
 import { getUserDataStores } from "../../utils/getUserDataStores";
 import { buildTreeObject } from "./buildTreeObject";
@@ -12,7 +13,7 @@ import { Tree } from "./TreeObject";
 
 @Resolver()
 export class TreeResolver {
-  @UseMiddleware(isAuth)
+  @UseMiddleware(isAuth, checkPermissions)
   @Query(() => Tree, { nullable: true })
   async tree(
     @Arg("data", () => GetTreeInput)
@@ -30,7 +31,7 @@ export class TreeResolver {
     });
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(isAuth, checkPermissions)
   @Query(() => Tree, { nullable: true })
   async directoryTree(
     @Arg("data", () => GetTreeInput)
