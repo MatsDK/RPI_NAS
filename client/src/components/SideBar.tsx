@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import styled from "styled-components";
 
@@ -9,7 +10,12 @@ const SideBar = styled.div`
 `;
 
 const sideBar = () => {
-  return <SideBar></SideBar>;
+  return (
+    <SideBar>
+      <Link href={"/"}>Files</Link>
+      <Link href={"/datastores"}>DataStores</Link>
+    </SideBar>
+  );
 };
 
 export default sideBar;

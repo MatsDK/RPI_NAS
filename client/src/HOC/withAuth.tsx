@@ -1,7 +1,6 @@
 import { meQuery } from "graphql/User/me";
-import { NextPageContext } from "next";
 import React from "react";
-import { redirect } from "src/utils/redirect";
+import { redirectToLogin } from "src/utils/redirect";
 import { NextContextWithApollo, NextFunctionComponent } from "types/types";
 import { MeQuery } from "../../generated/apolloComponents";
 
@@ -38,11 +37,3 @@ export const withAuth = <T extends object>(
       return <Component {...this.props} />;
     }
   };
-
-const redirectToLogin = (ctx: NextPageContext) => {
-  redirect(ctx, "/login");
-
-  return {
-    me: null,
-  };
-};

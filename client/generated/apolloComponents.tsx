@@ -181,6 +181,35 @@ export type User = {
   isAdmin: Scalars["Boolean"];
 };
 
+export type GetDataStoresQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetDataStoresQuery = {
+  __typename?: "Query";
+  getDataStores?: Maybe<
+    Array<{
+      __typename?: "Datastore";
+      id: string;
+      name: string;
+      userId: number;
+      localHostNodeId: number;
+      localNodeId: number;
+      basePath: string;
+      owner?: Maybe<{
+        __typename?: "User";
+        id: string;
+        userName: string;
+        isAdmin: boolean;
+      }>;
+      sharedUsers: Array<{
+        __typename?: "User";
+        userName: string;
+        isAdmin: boolean;
+        id: string;
+      }>;
+    }>
+  >;
+};
+
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadPathsInput> | DownloadPathsInput;
   type: Scalars["String"];
@@ -312,6 +341,78 @@ export type RegisterMutationMutation = {
   register: { __typename?: "User"; id: string };
 };
 
+export const GetDataStoresDocument = gql`
+  query GetDataStores {
+    getDataStores {
+      id
+      name
+      userId
+      localHostNodeId
+      localNodeId
+      basePath
+      owner {
+        id
+        userName
+        isAdmin
+      }
+      sharedUsers {
+        userName
+        isAdmin
+        id
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetDataStoresQuery__
+ *
+ * To run a query within a React component, call `useGetDataStoresQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDataStoresQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDataStoresQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetDataStoresQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetDataStoresQuery,
+    GetDataStoresQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetDataStoresQuery, GetDataStoresQueryVariables>(
+    GetDataStoresDocument,
+    options
+  );
+}
+export function useGetDataStoresLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetDataStoresQuery,
+    GetDataStoresQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetDataStoresQuery, GetDataStoresQueryVariables>(
+    GetDataStoresDocument,
+    options
+  );
+}
+export type GetDataStoresQueryHookResult = ReturnType<
+  typeof useGetDataStoresQuery
+>;
+export type GetDataStoresLazyQueryHookResult = ReturnType<
+  typeof useGetDataStoresLazyQuery
+>;
+export type GetDataStoresQueryResult = Apollo.QueryResult<
+  GetDataStoresQuery,
+  GetDataStoresQueryVariables
+>;
 export const CreateSessionDocument = gql`
   mutation createSession(
     $data: [DownloadPathsInput!]!

@@ -7,3 +7,11 @@ export const redirect = (context: NextPageContext, target: string) => {
     context.res.end();
   } else Router.replace(target);
 };
+
+export const redirectToLogin = (ctx: NextPageContext) => {
+  redirect(ctx, "/login");
+
+  return {
+    me: null,
+  };
+};
