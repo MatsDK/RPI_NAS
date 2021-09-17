@@ -1,6 +1,7 @@
 import { useGetDataStoresQuery } from "generated/apolloComponents";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import NewDataStoreWrapper from "./NewDataStoreWrapper";
 import { useApolloClient } from "react-apollo";
 import { useMeState } from "src/hooks/useMeState";
 
@@ -9,6 +10,8 @@ const DataStoresContainer: React.FC = () => {
 
   const client: any = useApolloClient();
   const { loading, data, error } = useGetDataStoresQuery({ client });
+
+  const [showNewDataStoreForm, setShowNewDataStoreForm] = useState(false);
 
   if (loading) return <div>Loading</div>;
 
@@ -20,6 +23,14 @@ const DataStoresContainer: React.FC = () => {
 
   return (
     <div>
+      {showNewDataStoreForm && (
+        <NewDataStoreWrapper hide={() => setShowNewDataStoreForm(false)} />
+      )}
+      {me?.isAdmin && (
+        <button onClick={() => setShowNewDataStoreForm((show) => !show)}>
+          create datastore
+        </button>
+      )}
       {data?.getDataStores?.map((dataStore, idx) => (
         <div key={idx} style={{ margin: 15 }}>
           <span>{dataStore.name}</span>

@@ -1,4 +1,5 @@
 import { useApolloClient } from "react-apollo";
+import MenuOverlay from "../MenuOverlay";
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
 import axios from "axios";
 import { createUploadSessionMutation } from "graphql/TransferData/createUploadSession";
@@ -7,7 +8,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { useInput } from "src/hooks/useInput";
 import { useRouter } from "next/dist/client/router";
 
-const UploadWrapper = () => {
+interface Props {
+  hide: () => any;
+}
+
+const UploadWrapper: React.FC<Props> = ({ hide }) => {
   const client: any = useApolloClient();
   const router = useRouter();
 
@@ -78,16 +83,7 @@ const UploadWrapper = () => {
   };
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        right: 0,
-        top: 0,
-        height: "100vh",
-        minWidth: "35vw",
-        borderLeft: "1px solid black",
-      }}
-    >
+    <MenuOverlay hide={hide}>
       <h1>upload</h1>
       <input
         type="text"
@@ -159,7 +155,7 @@ const UploadWrapper = () => {
         </div>
       ))}
       <button onClick={upload}>Upload</button>
-    </div>
+    </MenuOverlay>
   );
 };
 

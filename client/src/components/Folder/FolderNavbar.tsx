@@ -93,7 +93,9 @@ const FolderNavbar = () => {
 
   return (
     <div>
-      {showUploadForm && <UploadWrapper />}
+      {showUploadForm && (
+        <UploadWrapper hide={() => setShowUploadForm(false)} />
+      )}
       <button onClick={() => createDownloadSession()}>Download</button>
       <button onClick={() => createSSHDownloadSession()}>Download SSH</button>
       <button

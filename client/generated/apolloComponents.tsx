@@ -181,6 +181,16 @@ export type User = {
   isAdmin: Scalars["Boolean"];
 };
 
+export type CreateDataStoreMutionMutationVariables = Exact<{
+  localNodeId: Scalars["Float"];
+  name: Scalars["String"];
+}>;
+
+export type CreateDataStoreMutionMutation = {
+  __typename?: "Mutation";
+  createDataStore?: Maybe<{ __typename?: "Datastore"; id: string }>;
+};
+
 export type GetDataStoresQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetDataStoresQuery = {
@@ -341,6 +351,57 @@ export type RegisterMutationMutation = {
   register: { __typename?: "User"; id: string };
 };
 
+export const CreateDataStoreMutionDocument = gql`
+  mutation CreateDataStoreMution($localNodeId: Float!, $name: String!) {
+    createDataStore(data: { localNodeId: $localNodeId, name: $name }) {
+      id
+    }
+  }
+`;
+export type CreateDataStoreMutionMutationFn = Apollo.MutationFunction<
+  CreateDataStoreMutionMutation,
+  CreateDataStoreMutionMutationVariables
+>;
+
+/**
+ * __useCreateDataStoreMutionMutation__
+ *
+ * To run a mutation, you first call `useCreateDataStoreMutionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDataStoreMutionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDataStoreMutionMutation, { data, loading, error }] = useCreateDataStoreMutionMutation({
+ *   variables: {
+ *      localNodeId: // value for 'localNodeId'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useCreateDataStoreMutionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateDataStoreMutionMutation,
+    CreateDataStoreMutionMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateDataStoreMutionMutation,
+    CreateDataStoreMutionMutationVariables
+  >(CreateDataStoreMutionDocument, options);
+}
+export type CreateDataStoreMutionMutationHookResult = ReturnType<
+  typeof useCreateDataStoreMutionMutation
+>;
+export type CreateDataStoreMutionMutationResult =
+  Apollo.MutationResult<CreateDataStoreMutionMutation>;
+export type CreateDataStoreMutionMutationOptions = Apollo.BaseMutationOptions<
+  CreateDataStoreMutionMutation,
+  CreateDataStoreMutionMutationVariables
+>;
 export const GetDataStoresDocument = gql`
   query GetDataStores {
     getDataStores {
