@@ -23,6 +23,11 @@ export type CreateDataStoreInput = {
   name: Scalars["String"];
 };
 
+export type CreateSharedDataStoreInput = {
+  userIds: Array<Scalars["Float"]>;
+  dataStoreIds: Array<Scalars["Float"]>;
+};
+
 export type Datastore = {
   __typename?: "Datastore";
   id: Scalars["ID"];
@@ -71,6 +76,7 @@ export type GetTreeInput = {
 export type Mutation = {
   __typename?: "Mutation";
   createDataStore?: Maybe<Datastore>;
+  createSharedDataStore?: Maybe<Scalars["Boolean"]>;
   createUploadSession?: Maybe<UploadSessionReturn>;
   createDownloadSession?: Maybe<DownloadSessionReturn>;
   login?: Maybe<User>;
@@ -80,6 +86,10 @@ export type Mutation = {
 
 export type MutationCreateDataStoreArgs = {
   data: CreateDataStoreInput;
+};
+
+export type MutationCreateSharedDataStoreArgs = {
+  data: CreateSharedDataStoreInput;
 };
 
 export type MutationCreateUploadSessionArgs = {
@@ -118,6 +128,8 @@ export type Query = {
   directoryTree?: Maybe<Tree>;
   getDataStores?: Maybe<Array<Datastore>>;
   me?: Maybe<User>;
+  friends: Array<User>;
+  getMyDataStores: Array<Datastore>;
 };
 
 export type QueryTreeArgs = {
@@ -179,6 +191,7 @@ export type User = {
   email: Scalars["String"];
   userName: Scalars["String"];
   isAdmin: Scalars["Boolean"];
+  friends: Array<User>;
 };
 
 export type CreateDataStoreMutionMutationVariables = Exact<{
@@ -189,6 +202,16 @@ export type CreateDataStoreMutionMutationVariables = Exact<{
 export type CreateDataStoreMutionMutation = {
   __typename?: "Mutation";
   createDataStore?: Maybe<{ __typename?: "Datastore"; id: string }>;
+};
+
+export type CreateSharedDataStoresMutaionMutationVariables = Exact<{
+  userIds: Array<Scalars["Float"]> | Scalars["Float"];
+  dataStoreIds: Array<Scalars["Float"]> | Scalars["Float"];
+}>;
+
+export type CreateSharedDataStoresMutaionMutation = {
+  __typename?: "Mutation";
+  createSharedDataStore?: Maybe<boolean>;
 };
 
 export type GetDataStoresQueryVariables = Exact<{ [key: string]: never }>;
@@ -310,6 +333,29 @@ export type GetTreeQueryQuery = {
   }>;
 };
 
+export type GetFriendsQueryQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetFriendsQueryQuery = {
+  __typename?: "Query";
+  friends: Array<{
+    __typename?: "User";
+    id: string;
+    email: string;
+    userName: string;
+  }>;
+};
+
+export type GetMyDataStoresQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetMyDataStoresQuery = {
+  __typename?: "Query";
+  getMyDataStores: Array<{
+    __typename?: "Datastore";
+    id: string;
+    name: string;
+  }>;
+};
+
 export type LoginMutationMutationVariables = Exact<{
   email: Scalars["String"];
   password: Scalars["String"];
@@ -402,6 +448,61 @@ export type CreateDataStoreMutionMutationOptions = Apollo.BaseMutationOptions<
   CreateDataStoreMutionMutation,
   CreateDataStoreMutionMutationVariables
 >;
+export const CreateSharedDataStoresMutaionDocument = gql`
+  mutation CreateSharedDataStoresMutaion(
+    $userIds: [Float!]!
+    $dataStoreIds: [Float!]!
+  ) {
+    createSharedDataStore(
+      data: { userIds: $userIds, dataStoreIds: $dataStoreIds }
+    )
+  }
+`;
+export type CreateSharedDataStoresMutaionMutationFn = Apollo.MutationFunction<
+  CreateSharedDataStoresMutaionMutation,
+  CreateSharedDataStoresMutaionMutationVariables
+>;
+
+/**
+ * __useCreateSharedDataStoresMutaionMutation__
+ *
+ * To run a mutation, you first call `useCreateSharedDataStoresMutaionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSharedDataStoresMutaionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSharedDataStoresMutaionMutation, { data, loading, error }] = useCreateSharedDataStoresMutaionMutation({
+ *   variables: {
+ *      userIds: // value for 'userIds'
+ *      dataStoreIds: // value for 'dataStoreIds'
+ *   },
+ * });
+ */
+export function useCreateSharedDataStoresMutaionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateSharedDataStoresMutaionMutation,
+    CreateSharedDataStoresMutaionMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateSharedDataStoresMutaionMutation,
+    CreateSharedDataStoresMutaionMutationVariables
+  >(CreateSharedDataStoresMutaionDocument, options);
+}
+export type CreateSharedDataStoresMutaionMutationHookResult = ReturnType<
+  typeof useCreateSharedDataStoresMutaionMutation
+>;
+export type CreateSharedDataStoresMutaionMutationResult =
+  Apollo.MutationResult<CreateSharedDataStoresMutaionMutation>;
+export type CreateSharedDataStoresMutaionMutationOptions =
+  Apollo.BaseMutationOptions<
+    CreateSharedDataStoresMutaionMutation,
+    CreateSharedDataStoresMutaionMutationVariables
+  >;
 export const GetDataStoresDocument = gql`
   query GetDataStores {
     getDataStores {
@@ -744,6 +845,123 @@ export type GetTreeQueryLazyQueryHookResult = ReturnType<
 export type GetTreeQueryQueryResult = Apollo.QueryResult<
   GetTreeQueryQuery,
   GetTreeQueryQueryVariables
+>;
+export const GetFriendsQueryDocument = gql`
+  query GetFriendsQuery {
+    friends {
+      id
+      email
+      userName
+    }
+  }
+`;
+
+/**
+ * __useGetFriendsQueryQuery__
+ *
+ * To run a query within a React component, call `useGetFriendsQueryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFriendsQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFriendsQueryQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetFriendsQueryQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetFriendsQueryQuery,
+    GetFriendsQueryQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetFriendsQueryQuery, GetFriendsQueryQueryVariables>(
+    GetFriendsQueryDocument,
+    options
+  );
+}
+export function useGetFriendsQueryLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetFriendsQueryQuery,
+    GetFriendsQueryQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetFriendsQueryQuery,
+    GetFriendsQueryQueryVariables
+  >(GetFriendsQueryDocument, options);
+}
+export type GetFriendsQueryQueryHookResult = ReturnType<
+  typeof useGetFriendsQueryQuery
+>;
+export type GetFriendsQueryLazyQueryHookResult = ReturnType<
+  typeof useGetFriendsQueryLazyQuery
+>;
+export type GetFriendsQueryQueryResult = Apollo.QueryResult<
+  GetFriendsQueryQuery,
+  GetFriendsQueryQueryVariables
+>;
+export const GetMyDataStoresDocument = gql`
+  query getMyDataStores {
+    getMyDataStores {
+      id
+      name
+    }
+  }
+`;
+
+/**
+ * __useGetMyDataStoresQuery__
+ *
+ * To run a query within a React component, call `useGetMyDataStoresQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyDataStoresQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyDataStoresQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyDataStoresQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetMyDataStoresQuery,
+    GetMyDataStoresQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetMyDataStoresQuery, GetMyDataStoresQueryVariables>(
+    GetMyDataStoresDocument,
+    options
+  );
+}
+export function useGetMyDataStoresLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetMyDataStoresQuery,
+    GetMyDataStoresQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetMyDataStoresQuery,
+    GetMyDataStoresQueryVariables
+  >(GetMyDataStoresDocument, options);
+}
+export type GetMyDataStoresQueryHookResult = ReturnType<
+  typeof useGetMyDataStoresQuery
+>;
+export type GetMyDataStoresLazyQueryHookResult = ReturnType<
+  typeof useGetMyDataStoresLazyQuery
+>;
+export type GetMyDataStoresQueryResult = Apollo.QueryResult<
+  GetMyDataStoresQuery,
+  GetMyDataStoresQueryVariables
 >;
 export const LoginMutationDocument = gql`
   mutation loginMutation($email: String!, $password: String!) {

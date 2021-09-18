@@ -7,6 +7,8 @@ import { isAuth } from "../../middleware/auth";
 import { MyContext } from "../../types";
 import { CreateDataStoreInput } from "./CreateDataStoreInput";
 import { nanoid } from "nanoid";
+import { SharedDataStore } from "../../entity/SharedDataStore";
+import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 
 @Resolver()
 export class DataStoreResolver {
@@ -24,6 +26,7 @@ export class DataStoreResolver {
     const path = fsPath.join(thisNode.basePath, nanoid(10));
     try {
       fs.mkdirSync(path);
+      fs.chownSync(path, 1000, 1000);
     } catch (error) {
       console.log(error);
       return null;
@@ -36,5 +39,26 @@ export class DataStoreResolver {
       localNodeId,
       name,
     }).save();
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Boolean, { nullable: true })
+  async createSharedDataStore(
+    @Arg("data")
+    { dataStoreIds, userIds: sharedUserIds }: CreateSharedDataStoreInput,
+    @Ctx() { req }: MyContext
+  ): Promise<boolean | null> {
+    const { userId } = req as any;
+    console.log(dataStoreIds, sharedUserIds);
+
+    for (const dataStoreId of dataStoreIds) {
+      const dataStore = await Datastore.findOne({ where: { id: dataStoreId } });
+      if (!dataStore || dataStore.userId != userId) return null;
+
+      for (const userId of sharedUserIds)
+        await SharedDataStore.create({ userId, dataStoreId }).save();
+    }
+
+    return true;
   }
 }

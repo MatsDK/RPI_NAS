@@ -1,5 +1,5 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, In, PrimaryColumn } from "typeorm";
 
 @ObjectType()
 @Entity()
@@ -22,4 +22,12 @@ export class User extends BaseEntity {
 
   @Column("text")
   password: string;
+
+  @Column("int", { array: true, default: [] })
+  friendsIds: number[];
+
+  @Field(() => [User])
+  friends() {
+    return User.find({ where: { id: In(this.friendsIds) } });
+  }
 }

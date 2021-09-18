@@ -1,8 +1,8 @@
 import React, { FormEvent } from "react";
 import MenuOverlay from "../MenuOverlay";
 import { Mutation } from "react-apollo";
-import { CreateDataStoreMutation } from "graphql/DataStores/CreateDataStore";
 import { useInput } from "src/hooks/useInput";
+import { CreateDataStoreMutation } from "graphql/DataStores/CreateDataStore";
 
 interface Props {
   hide: () => any;
@@ -24,6 +24,7 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
             const res = await mutate({
               variables: { name: nameInput, localNodeId: Number(nodeIdInput) },
             });
+
             console.log(res);
           };
 

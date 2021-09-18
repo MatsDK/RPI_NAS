@@ -7,6 +7,8 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
+import { In } from "typeorm";
+import { Datastore } from "../../entity/Datastore";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
 import { getUser } from "../../middleware/getUser";
@@ -71,5 +73,17 @@ export class UserResolver {
   @Query(() => User, { nullable: true })
   me(@Ctx() { req }: MyContext) {
     return (req as any).user;
+  }
+
+  @UseMiddleware(isAuth, getUser)
+  @Query(() => [User])
+  friends(@Ctx() { req }: MyContext): Promise<User[]> {
+    return User.find({ where: { id: In((req as any).user.friendsIds) } });
+  }
+
+  @UseMiddleware(isAuth)
+  @Query(() => [Datastore])
+  getMyDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
+    return Datastore.find({ where: { userId: (req as any).userId } });
   }
 }
