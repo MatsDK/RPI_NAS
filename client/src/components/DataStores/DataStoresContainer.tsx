@@ -1,4 +1,4 @@
-import { useGetDataStoresQuery } from "generated/apolloComponents";
+import { Datastore, useGetDataStoresQuery } from "generated/apolloComponents";
 import Link from "next/link";
 import React, { useState } from "react";
 import NewDataStoreWrapper from "./NewDataStoreWrapper";
@@ -33,6 +33,11 @@ const DataStoresContainer: React.FC = () => {
       {showShareDataStoreForm && (
         <ShareDataStoreWrapper
           dataStoreId={dataStoreId}
+          dataStores={
+            (data?.getDataStores as Datastore[]).filter(
+              (d) => d.userId == me.id
+            ) || null
+          }
           hide={() => setShowShareDataStoreForm(false)}
         />
       )}

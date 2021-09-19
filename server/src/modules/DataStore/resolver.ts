@@ -44,20 +44,20 @@ export class DataStoreResolver {
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
   async createSharedDataStore(
-    @Arg("data")
-    { dataStoreIds, userIds: sharedUserIds }: CreateSharedDataStoreInput,
+    @Arg("data") { ids }: CreateSharedDataStoreInput,
     @Ctx() { req }: MyContext
   ): Promise<boolean | null> {
-    const { userId } = req as any;
-    console.log(dataStoreIds, sharedUserIds);
+    const { userId } = req as any,
+      dataStoreIds: Set<number> = new Set();
+
+    ids.forEach((i) => dataStoreIds.add(i.dataStoreId));
 
     for (const dataStoreId of dataStoreIds) {
       const dataStore = await Datastore.findOne({ where: { id: dataStoreId } });
       if (!dataStore || dataStore.userId != userId) return null;
-
-      for (const userId of sharedUserIds)
-        await SharedDataStore.create({ userId, dataStoreId }).save();
     }
+
+    await SharedDataStore.insert(ids);
 
     return true;
   }
