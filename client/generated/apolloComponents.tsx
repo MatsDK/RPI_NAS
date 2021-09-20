@@ -24,8 +24,7 @@ export type CreateDataStoreInput = {
 };
 
 export type CreateSharedDataStoreInput = {
-  userIds: Array<Scalars["Float"]>;
-  dataStoreIds: Array<Scalars["Float"]>;
+  ids: Array<SharedDataStoresIdsInput>;
 };
 
 export type Datastore = {
@@ -77,6 +76,7 @@ export type Mutation = {
   __typename?: "Mutation";
   createDataStore?: Maybe<Datastore>;
   createSharedDataStore?: Maybe<Scalars["Boolean"]>;
+  createFolder?: Maybe<Scalars["Boolean"]>;
   createUploadSession?: Maybe<UploadSessionReturn>;
   createDownloadSession?: Maybe<DownloadSessionReturn>;
   login?: Maybe<User>;
@@ -90,6 +90,11 @@ export type MutationCreateDataStoreArgs = {
 
 export type MutationCreateSharedDataStoreArgs = {
   data: CreateSharedDataStoreInput;
+};
+
+export type MutationCreateFolderArgs = {
+  path: Scalars["String"];
+  dataStoreId: Scalars["Float"];
 };
 
 export type MutationCreateUploadSessionArgs = {
@@ -153,6 +158,11 @@ export type SharedDataStore = {
   dataStoreId: Scalars["Float"];
 };
 
+export type SharedDataStoresIdsInput = {
+  userId: Scalars["Float"];
+  dataStoreId: Scalars["Float"];
+};
+
 export type Tree = {
   __typename?: "Tree";
   path: Scalars["String"];
@@ -205,8 +215,7 @@ export type CreateDataStoreMutionMutation = {
 };
 
 export type CreateSharedDataStoresMutaionMutationVariables = Exact<{
-  userIds: Array<Scalars["Float"]> | Scalars["Float"];
-  dataStoreIds: Array<Scalars["Float"]> | Scalars["Float"];
+  ids: Array<SharedDataStoresIdsInput> | SharedDataStoresIdsInput;
 }>;
 
 export type CreateSharedDataStoresMutaionMutation = {
@@ -241,6 +250,16 @@ export type GetDataStoresQuery = {
       }>;
     }>
   >;
+};
+
+export type CreateFolderMutationMutationVariables = Exact<{
+  path: Scalars["String"];
+  dataStoreId: Scalars["Float"];
+}>;
+
+export type CreateFolderMutationMutation = {
+  __typename?: "Mutation";
+  createFolder?: Maybe<boolean>;
 };
 
 export type CreateSessionMutationVariables = Exact<{
@@ -449,13 +468,8 @@ export type CreateDataStoreMutionMutationOptions = Apollo.BaseMutationOptions<
   CreateDataStoreMutionMutationVariables
 >;
 export const CreateSharedDataStoresMutaionDocument = gql`
-  mutation CreateSharedDataStoresMutaion(
-    $userIds: [Float!]!
-    $dataStoreIds: [Float!]!
-  ) {
-    createSharedDataStore(
-      data: { userIds: $userIds, dataStoreIds: $dataStoreIds }
-    )
+  mutation CreateSharedDataStoresMutaion($ids: [SharedDataStoresIdsInput!]!) {
+    createSharedDataStore(data: { ids: $ids })
   }
 `;
 export type CreateSharedDataStoresMutaionMutationFn = Apollo.MutationFunction<
@@ -476,8 +490,7 @@ export type CreateSharedDataStoresMutaionMutationFn = Apollo.MutationFunction<
  * @example
  * const [createSharedDataStoresMutaionMutation, { data, loading, error }] = useCreateSharedDataStoresMutaionMutation({
  *   variables: {
- *      userIds: // value for 'userIds'
- *      dataStoreIds: // value for 'dataStoreIds'
+ *      ids: // value for 'ids'
  *   },
  * });
  */
@@ -574,6 +587,55 @@ export type GetDataStoresLazyQueryHookResult = ReturnType<
 export type GetDataStoresQueryResult = Apollo.QueryResult<
   GetDataStoresQuery,
   GetDataStoresQueryVariables
+>;
+export const CreateFolderMutationDocument = gql`
+  mutation CreateFolderMutation($path: String!, $dataStoreId: Float!) {
+    createFolder(path: $path, dataStoreId: $dataStoreId)
+  }
+`;
+export type CreateFolderMutationMutationFn = Apollo.MutationFunction<
+  CreateFolderMutationMutation,
+  CreateFolderMutationMutationVariables
+>;
+
+/**
+ * __useCreateFolderMutationMutation__
+ *
+ * To run a mutation, you first call `useCreateFolderMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateFolderMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createFolderMutationMutation, { data, loading, error }] = useCreateFolderMutationMutation({
+ *   variables: {
+ *      path: // value for 'path'
+ *      dataStoreId: // value for 'dataStoreId'
+ *   },
+ * });
+ */
+export function useCreateFolderMutationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateFolderMutationMutation,
+    CreateFolderMutationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateFolderMutationMutation,
+    CreateFolderMutationMutationVariables
+  >(CreateFolderMutationDocument, options);
+}
+export type CreateFolderMutationMutationHookResult = ReturnType<
+  typeof useCreateFolderMutationMutation
+>;
+export type CreateFolderMutationMutationResult =
+  Apollo.MutationResult<CreateFolderMutationMutation>;
+export type CreateFolderMutationMutationOptions = Apollo.BaseMutationOptions<
+  CreateFolderMutationMutation,
+  CreateFolderMutationMutationVariables
 >;
 export const CreateSessionDocument = gql`
   mutation createSession(

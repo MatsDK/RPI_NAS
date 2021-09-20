@@ -25,6 +25,7 @@ const MyApp = (props: AppProps & Props) => {
     path: null,
     dataStoreId: null,
   });
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
 
   const [me, setMe] = useState<any>(null);
 
@@ -35,6 +36,10 @@ const MyApp = (props: AppProps & Props) => {
           value={{
             ...FolderContextValue,
             currentFolderPath: { folderPath, setFolderPath },
+            newFolderInput: {
+              showNewFolderInput,
+              setShowNewFolderInput,
+            },
           }}
         >
           <MeContext.Provider value={{ me, setMe }}>

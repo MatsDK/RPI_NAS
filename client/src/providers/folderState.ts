@@ -13,6 +13,10 @@ interface FolderContext {
     folderPath: CurrentFolderType;
     setFolderPath: React.Dispatch<React.SetStateAction<CurrentFolderType>>;
   };
+  newFolderInput?: {
+    showNewFolderInput: boolean;
+    setShowNewFolderInput: React.Dispatch<React.SetStateAction<boolean>>;
+  };
   selected: {
     selectedItems: Map<string, TreeItem>;
     addSelected: (path: TreeItem) => void;

@@ -53,7 +53,7 @@ const DataStoresContainer: React.FC = () => {
           <div key={idx} style={{ margin: 15 }}>
             <span>{dataStore.name}</span>
             <Link href={`/path?d=${dataStore.id}`}>
-              <div>{dataStore.basePath}</div>
+              <button>Go to</button>
             </Link>
             <div>
               {dataStore.owner?.userName}

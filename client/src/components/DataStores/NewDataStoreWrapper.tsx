@@ -2,7 +2,7 @@ import React, { FormEvent } from "react";
 import MenuOverlay from "../MenuOverlay";
 import { Mutation } from "react-apollo";
 import { useInput } from "src/hooks/useInput";
-import { CreateDataStoreMutation } from "graphql/DataStores/CreateDataStore";
+import { CreateDataStoreMutation } from "graphql/DataStores/createDataStore";
 
 interface Props {
   hide: () => any;

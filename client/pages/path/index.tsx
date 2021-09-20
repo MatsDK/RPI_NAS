@@ -17,7 +17,7 @@ const Page: NextFunctionComponentWithAuth = ({ me }) => {
   return (
     <Layout>
       <SideBar />
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", width: "100%" }}>
         <Tree />
         <Folder path={""} dataStoreId={Number(router.query.d)} />
       </div>
