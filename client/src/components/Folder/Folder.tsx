@@ -1,4 +1,5 @@
 import { TreeItem, useGetTreeQueryQuery } from "generated/apolloComponents";
+import { FolderItemWrapper, IconWrapper } from "./FolderItem";
 import fsPath from "path";
 import { useApolloClient } from "react-apollo";
 import React, { FormEvent, useContext, useEffect, useState } from "react";
@@ -7,6 +8,7 @@ import { FolderContext, FolderContextType } from "src/providers/folderState";
 import FolderNavbar from "./FolderNavbar";
 import styled from "styled-components";
 import { CreateFolderMutation } from "graphql/Folder/createFolder";
+import Icon from "../../ui/Icon";
 
 interface Props {
   path: string;
@@ -76,21 +78,34 @@ const Folder: React.FC<Props> = ({ path, dataStoreId }) => {
       <FolderNavbar />
       <FolderContent>
         {folderCtx?.newFolderInput?.showNewFolderInput && (
-          <form onSubmit={createNewFolder}>
-            <input
-              type="text"
-              value={folderNameInput}
-              onChange={(e) => setFolderNameInput(e.target.value)}
-            />
-          </form>
+          <FolderItemWrapper>
+            <IconWrapper>
+              <Icon
+                color={{ idx: 2, propName: "bgColors" }}
+                width={24}
+                height={22}
+                viewPort={30}
+                name="folderIcon"
+              />
+            </IconWrapper>
+            <form onSubmit={createNewFolder}>
+              <input
+                type="text"
+                value={folderNameInput}
+                onChange={(e) => setFolderNameInput(e.target.value)}
+              />
+            </form>
+          </FolderItemWrapper>
         )}
-        {data.tree.tree.map((item, idx) => (
-          <FolderItem
-            dataStoreId={dataStoreId}
-            item={item as TreeItem}
-            key={idx}
-          />
-        ))}
+        {data.tree.tree
+          .sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
+          .map((item, idx) => (
+            <FolderItem
+              dataStoreId={dataStoreId}
+              item={item as TreeItem}
+              key={idx}
+            />
+          ))}
       </FolderContent>
     </div>
   );

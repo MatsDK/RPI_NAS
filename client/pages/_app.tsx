@@ -12,6 +12,7 @@ import {
 import "../css/global.css";
 import { theme } from "src/utils/theme";
 import { MeContext } from "src/providers/meState";
+import { TreeItem } from "generated/apolloComponents";
 
 interface Props {
   apolloClient: ApolloClient<NormalizedCacheObject>;
@@ -28,6 +29,15 @@ const MyApp = (props: AppProps & Props) => {
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
 
   const [me, setMe] = useState<any>(null);
+  const [selectedItems, setSelected] = useState<Map<string, TreeItem>>(
+    new Map()
+  );
+
+  const Selected = {
+    ...FolderContextValue.selected,
+    selectedItems,
+    setSelected,
+  };
 
   return (
     <div>
@@ -36,6 +46,7 @@ const MyApp = (props: AppProps & Props) => {
           value={{
             ...FolderContextValue,
             currentFolderPath: { folderPath, setFolderPath },
+            selected: Selected,
             newFolderInput: {
               showNewFolderInput,
               setShowNewFolderInput,

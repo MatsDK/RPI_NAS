@@ -29,6 +29,6 @@ export const BgButton = styled.button`
   transition: box-shadow 0.15s ease-in-out;
 
   :hover {
-    box-shadow: 4px 4px 10px 0 #00000030;
+    box-shadow: 4px 4px 7px 0 #00000030;
   }
 `;

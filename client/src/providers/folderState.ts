@@ -19,20 +19,15 @@ interface FolderContext {
   };
   selected: {
     selectedItems: Map<string, TreeItem>;
-    addSelected: (path: TreeItem) => void;
-    removeSelected: (path: string) => void;
-    isSelected: (path: string) => boolean;
+    // addSelected: (path: TreeItem) => void;
+    // removeSelected: (path: string) => void;
+    setSelected?: React.Dispatch<React.SetStateAction<Map<string, TreeItem>>>;
   };
 }
 
 export let FolderContextValue: FolderContext = {
   selected: {
     selectedItems: new Map(),
-    addSelected: (item) =>
-      FolderContextValue.selected.selectedItems.set(item.path, item),
-    removeSelected: (path) =>
-      FolderContextValue.selected.selectedItems.delete(path),
-    isSelected: (path) => FolderContextValue.selected.selectedItems.has(path),
   },
 };
 export const FolderContext = React.createContext<FolderContextType>(null);

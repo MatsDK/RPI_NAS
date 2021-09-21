@@ -3,7 +3,7 @@ import { Button, BgButton } from "src/ui/Button";
 import axios from "axios";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useApolloClient } from "react-apollo";
 import UploadWrapper from "./UploadWrapper";
 import { useRouter } from "next/dist/client/router";
@@ -23,6 +23,10 @@ const FolderNavbar = () => {
   const router = useRouter();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
+
+  useEffect(() => {
+    console.log(folderCtx?.selected.selectedItems);
+  }, [folderCtx?.selected.selectedItems]);
 
   const [showUploadForm, setShowUploadForm] = useState(false);
 
@@ -74,6 +78,8 @@ const FolderNavbar = () => {
     const selected = Array.from(folderCtx.selected.selectedItems).map(
       ([_, v]) => v
     );
+
+    console.log(folderCtx.selected.selectedItems);
 
     if (!router.query.d) return;
 
