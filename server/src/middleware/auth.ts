@@ -3,13 +3,13 @@ import { verify } from "jsonwebtoken";
 import { MyContext } from "../types";
 import { User } from "../entity/User";
 import { createTokens } from "../utils/createTokens";
-import { MAX_AGE_ACCESS_TOKEN, MAX_AGE_REFRESH_TOKEN } from "../constants";
 import cookie from "cookie";
 
 export const isAuth: MiddlewareFn<MyContext> = async (
   { context: { req, res } },
   next
 ) => {
+  console.log(req.headers);
   const { "access-token": accessToken, "refresh-token": refreshToken } =
     Object.keys(req.cookies).length
       ? req.cookies
