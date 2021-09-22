@@ -53,6 +53,8 @@ export class UserResolver {
     res.clearCookie("refresh-token");
     res.clearCookie("access-token");
 
+    res.setHeader("Cookie", `refresh-token=; access-token=`);
+
     return true;
   }
 

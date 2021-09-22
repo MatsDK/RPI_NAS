@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { useMeState } from "src/hooks/useMeState";
 import styled from "styled-components";
 
@@ -16,6 +17,7 @@ const Navbar = () => {
     <NavBar>
       {me?.userName}
       {me?.isAdmin && "ADMIN"}
+      {me && <Link href={"/logout"}>logout</Link>}
     </NavBar>
   );
 };
