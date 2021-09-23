@@ -4,7 +4,8 @@ import React from "react";
 
 export type ParamList = {
   Home: undefined;
-  DataStore: undefined;
+  DataStore: { name: string; id: string };
+  Login: undefined;
 };
 
 export type RouteProps<T extends keyof ParamList, P = {}> = React.FC<

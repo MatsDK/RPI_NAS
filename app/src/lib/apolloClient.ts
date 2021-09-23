@@ -1,4 +1,10 @@
-import { ApolloClient, InMemoryCache, from, HttpLink } from "@apollo/client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  HttpLink,
+  ApolloLink,
+} from "@apollo/client";
+import { AsyncStorage } from "react-native";
 import { setContext } from "apollo-link-context";
 
 const GRAPHQL_ENDPOINT = "http://192.168.0.209:4000/graphql";
@@ -9,19 +15,40 @@ const apolloClient = () => {
   });
 
   const authLink = setContext((_, { headers }) => {
-    const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzMjMyNDQzOCwiZXhwIjoxNjMyMzI1MzM4fQ.eDdvaixNkR6UY85uyG2H3-mEUVvdccwxW5aXUbC9pJ0";
+    return AsyncStorage.getItem("access-token").then((access) => {
+      return AsyncStorage.getItem("refresh-token").then((refresh) => {
+        return {
+          headers: {
+            ...headers,
+            authorization: `${access && `access-token=${access}`}; ${
+              refresh && `refresh-token=${refresh}`
+            }`,
+          },
+        };
+      });
+    });
+  });
 
-    return {
-      headers: {
-        ...headers,
-        authorization: token ? `access-token=${token}` : "",
-      },
-    };
+  const afterware = new ApolloLink((operation, forward) => {
+    return forward(operation).map((response) => {
+      const res = operation.getContext(),
+        cookies = res.response.headers.get("cookie");
+
+      if (cookies) {
+        const parsedCookies: Array<string[]> = cookies
+          .split(";")
+          .map((v: string) => v.split("="));
+
+        for (const [name, value] of parsedCookies)
+          AsyncStorage.setItem(name.trim(), value.trim());
+      }
+
+      return response;
+    });
   });
 
   return new ApolloClient({
-    link: authLink.concat(link as any) as any,
+    link: afterware.concat(authLink.concat(link as any) as any),
     cache: new InMemoryCache(),
   });
 };

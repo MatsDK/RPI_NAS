@@ -1,14 +1,15 @@
+import gql from "graphql-tag";
 import React from "react";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { Query } from "react-apollo";
 import {
+  AsyncStorage,
+  Button,
+  FlatList,
   StyleSheet,
-  View,
   Text,
   TouchableOpacity,
-  FlatList,
+  View,
 } from "react-native";
-import gql from "graphql-tag";
-import { Query } from "react-apollo";
 import { RouteProps } from "../lib/RoutesTypes";
 
 export const getMyDataStoresQuery = gql`
@@ -20,37 +21,64 @@ export const getMyDataStoresQuery = gql`
   }
 `;
 
+export const logoutMutation = gql`
+  mutation logoutMutation {
+    logout
+  }
+`;
+
 const Home: RouteProps<"Home"> = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <View>
-        <Query query={getMyDataStoresQuery}>
-          {(res: any) => {
-            if (res.loading) return <Text>loading</Text>;
+      <Query query={getMyDataStoresQuery}>
+        {(res: any) => {
+          if (res.loading) return <Text>loading</Text>;
 
-            if (res.error || !res.data?.getMyDataStores) {
-              console.log(res.error);
-              return <Text>error</Text>;
-            }
-
+          if (res.error || !res.data?.getMyDataStores) {
             return (
-              <FlatList
-                data={res.data.getMyDataStores}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.item}
-                    onPress={() => {
-                      navigation.navigate("DataStore");
-                    }}
-                  >
-                    <Text>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-              />
+              <View>
+                <Button
+                  title={"Login"}
+                  onPress={() => navigation.navigate("Login")}
+                />
+                <Text>Error</Text>
+              </View>
             );
-          }}
-        </Query>
-      </View>
+          }
+
+          return (
+            <>
+              <View>
+                <Button
+                  title={"Logout"}
+                  onPress={async () => {
+                    await AsyncStorage.setItem("access-token", "");
+                    await AsyncStorage.setItem("refresh-token", "");
+
+                    await res.client.resetStore();
+                  }}
+                />
+                <FlatList
+                  data={res.data.getMyDataStores}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.item}
+                      onPress={() => {
+                        navigation.navigate("DataStore", {
+                          name: item.name,
+                          id: item.id,
+                        });
+                      }}
+                    >
+                      <Text>{item.name}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+            </>
+          );
+        }}
+      </Query>
     </View>
   );
 };

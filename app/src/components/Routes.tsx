@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import Home from "./Home";
 import { DataStore } from "./DataStore";
 import { ParamList } from "../lib/RoutesTypes";
+import { Login } from "./Login";
 
 interface RoutesProps {}
 
@@ -23,6 +24,7 @@ export const Routes: React.FC<RoutesProps> = ({}) => {
           name="DataStore"
           component={DataStore}
         />
+        <Stack.Screen name="Login" component={Login} />
       </Stack.Navigator>
     </NavigationContainer>
   );

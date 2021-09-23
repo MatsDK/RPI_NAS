@@ -9,7 +9,6 @@ export const isAuth: MiddlewareFn<MyContext> = async (
   { context: { req, res } },
   next
 ) => {
-  console.log(req.headers);
   const { "access-token": accessToken, "refresh-token": refreshToken } =
     Object.keys(req.cookies).length
       ? req.cookies
