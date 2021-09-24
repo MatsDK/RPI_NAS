@@ -4,18 +4,10 @@ import { useState } from "react";
 import { Button } from "react-native";
 import { View, Text, TextInput } from "react-native";
 import { RouteProps } from "../lib/RoutesTypes";
-import gql from "graphql-tag";
-import { getMyDataStoresQuery } from "./Home";
+import { loginMutation } from "../graphql/User/login";
+import { getMyDataStoresQuery } from "../graphql/Folder/getDataStores";
 
 interface LoginProps {}
-
-const loginMutation = gql`
-  mutation login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      id
-    }
-  }
-`;
 
 export const Login: RouteProps<"Login", LoginProps> = ({ navigation }) => {
   const [emailInput, setEmailInput] = useState("");

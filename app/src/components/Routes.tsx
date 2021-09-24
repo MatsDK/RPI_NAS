@@ -2,6 +2,7 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import Home from "./Home";
+import path from "path";
 import { DataStore } from "./DataStore";
 import { ParamList } from "../lib/RoutesTypes";
 import { Login } from "./Login";
@@ -20,7 +21,13 @@ export const Routes: React.FC<RoutesProps> = ({}) => {
           component={Home}
         />
         <Stack.Screen
-          options={{ title: "dataStore view" }}
+          // options={{ title: "dataStore view" }}
+          options={({ route }) => ({
+            title:
+              route.params.path == "/"
+                ? route.params.name
+                : route.params.path.split(/\\/g).pop(),
+          })}
           name="DataStore"
           component={DataStore}
         />

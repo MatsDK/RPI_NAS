@@ -4,7 +4,7 @@ import React from "react";
 
 export type ParamList = {
   Home: undefined;
-  DataStore: { name: string; id: string };
+  DataStore: { name: string; id: string; path: string };
   Login: undefined;
 };
 

@@ -10,22 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { getMyDataStoresQuery } from "../graphql/Folder/getDataStores";
 import { RouteProps } from "../lib/RoutesTypes";
-
-export const getMyDataStoresQuery = gql`
-  query getMyDataStores {
-    getMyDataStores {
-      id
-      name
-    }
-  }
-`;
-
-export const logoutMutation = gql`
-  mutation logoutMutation {
-    logout
-  }
-`;
 
 const Home: RouteProps<"Home"> = ({ navigation }) => {
   return (
@@ -67,6 +53,7 @@ const Home: RouteProps<"Home"> = ({ navigation }) => {
                         navigation.navigate("DataStore", {
                           name: item.name,
                           id: item.id,
+                          path: "/",
                         });
                       }}
                     >
