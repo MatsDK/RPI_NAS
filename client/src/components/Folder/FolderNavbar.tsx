@@ -1,9 +1,9 @@
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
-import { Button, BgButton } from "src/ui/Button";
+import { Button, BgButton, ConditionButton } from "src/ui/Button";
 import axios from "axios";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useApolloClient } from "react-apollo";
 import UploadWrapper from "./UploadWrapper";
 import { useRouter } from "next/dist/client/router";
@@ -23,10 +23,6 @@ const FolderNavbar = () => {
   const router = useRouter();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
-
-  useEffect(() => {
-    console.log(folderCtx?.selected.selectedItems);
-  }, [folderCtx?.selected.selectedItems]);
 
   const [showUploadForm, setShowUploadForm] = useState(false);
 
@@ -122,13 +118,20 @@ const FolderNavbar = () => {
       >
         New Folder
       </BgButton>
-      <Button onClick={() => createDownloadSession()}>Download</Button>
       <Button
         onClick={() => setShowUploadForm((showUploadForm) => !showUploadForm)}
       >
         Upload
       </Button>
-      <Button onClick={() => createSSHDownloadSession()}>Download SSH</Button>
+      <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+        <Button onClick={() => createDownloadSession()}>Download</Button>
+      </ConditionButton>
+      <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+        <Button onClick={() => createSSHDownloadSession()}>Download SSH</Button>
+      </ConditionButton>
+      <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+        <Button onClick={() => {}}>Delete</Button>
+      </ConditionButton>
     </FolderNavbarWrapper>
   );
 };

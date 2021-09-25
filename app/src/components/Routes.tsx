@@ -21,7 +21,6 @@ export const Routes: React.FC<RoutesProps> = ({}) => {
           component={Home}
         />
         <Stack.Screen
-          // options={{ title: "dataStore view" }}
           options={({ route }) => ({
             title:
               route.params.path == "/"

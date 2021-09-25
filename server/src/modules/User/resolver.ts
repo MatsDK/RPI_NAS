@@ -7,7 +7,7 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { In } from "typeorm";
+import { ILike, In, Not } from "typeorm";
 import { Datastore } from "../../entity/Datastore";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
@@ -87,5 +87,16 @@ export class UserResolver {
   @Query(() => [Datastore], { nullable: true })
   getMyDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
     return Datastore.find({ where: { userId: (req as any).userId } });
+  }
+
+  @UseMiddleware(isAuth)
+  @Query(() => [User], { nullable: true })
+  getUsersByName(
+    @Arg("name") userName: string,
+    @Ctx() { req }: MyContext
+  ): Promise<User[]> {
+    return User.find({
+      where: { userName: ILike(`${userName}%`), id: Not((req as any).userId) },
+    });
   }
 }

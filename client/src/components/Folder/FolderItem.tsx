@@ -30,8 +30,8 @@ export const IconWrapper = styled.div`
 `;
 
 const SelectButtonWrapper = styled.div`
-  margin-right: 15px;
-  margin-left: 10px;
+  padding-right: 15px;
+  padding-left: 10px;
 
   button {
     width: 10px;
@@ -67,26 +67,24 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
         else folderCtx?.selected.setSelected?.(new Map([[item.path, item]]));
       }}
     >
-      <SelectButtonWrapper>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
+      <SelectButtonWrapper
+        onClick={(e) => {
+          e.stopPropagation();
 
-            if (!folderCtx?.selected.selectedItems.has(item.path))
-              folderCtx?.selected.setSelected?.(
-                (m) => new Map(m.set(item.path, item))
-              );
-            else
-              folderCtx?.selected.setSelected?.((m) => {
-                m.delete(item.path);
-                return new Map(m);
-              });
+          if (!folderCtx?.selected.selectedItems.has(item.path))
+            folderCtx?.selected.setSelected?.(
+              (m) => new Map(m.set(item.path, item))
+            );
+          else
+            folderCtx?.selected.setSelected?.((m) => {
+              m.delete(item.path);
+              return new Map(m);
+            });
 
-            setSelected((s) => !s);
-          }}
-        >
-          {selected ? "remove" : "select"}
-        </button>
+          setSelected((s) => !s);
+        }}
+      >
+        <input type="checkbox" checked={selected} />
       </SelectButtonWrapper>
       <IconWrapper>
         {item.isDirectory ? (

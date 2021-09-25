@@ -32,3 +32,19 @@ export const BgButton = styled.button`
     box-shadow: 4px 4px 7px 0 #00000030;
   }
 `;
+
+interface Props {
+  condition: boolean;
+}
+
+export const ConditionButton: React.FC<Props> = ({ children, condition }) => (
+  <div
+    style={{
+      transition: ".1s ease-in-out",
+      opacity: condition ? 1 : 0.7,
+      pointerEvents: condition ? "all" : "none",
+    }}
+  >
+    {children}
+  </div>
+);

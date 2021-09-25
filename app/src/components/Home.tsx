@@ -1,4 +1,3 @@
-import gql from "graphql-tag";
 import React from "react";
 import { Query } from "react-apollo";
 import {
@@ -38,8 +37,8 @@ const Home: RouteProps<"Home"> = ({ navigation }) => {
                 <Button
                   title={"Logout"}
                   onPress={async () => {
-                    await AsyncStorage.setItem("access-token", "");
-                    await AsyncStorage.setItem("refresh-token", "");
+                    await AsyncStorage.removeItem("access-token");
+                    await AsyncStorage.removeItem("refresh-token");
 
                     await res.client.resetStore();
                   }}

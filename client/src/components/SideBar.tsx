@@ -7,6 +7,8 @@ const SideBar = styled.div`
   width: 70px;
   background-color: ${(props) => props.theme.bgColors[0]};
   border-top: 2px solid ${(props) => props.theme.bgColors[2]};
+  display: flex;
+  flex-direction: column;
 `;
 
 const sideBar = () => {
@@ -14,6 +16,7 @@ const sideBar = () => {
     <SideBar>
       <Link href={"/"}>Files</Link>
       <Link href={"/datastores"}>DataStores</Link>
+      <Link href={"/friends"}>Friends</Link>
     </SideBar>
   );
 };
