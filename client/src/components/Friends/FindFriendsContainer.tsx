@@ -51,7 +51,16 @@ export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
         ? null
         : !foundUsers.length
         ? "no users found"
-        : foundUsers.map((u, idx) => <div key={idx}>{u.userName}</div>)}
+        : foundUsers.map((u, idx) => (
+            <div key={idx}>
+              <span>{u.userName}</span>
+              {friendsIds.includes(u.id) ? (
+                "already your friend"
+              ) : (
+                <button type="submit">send friend request</button>
+              )}
+            </div>
+          ))}
     </div>
   );
 };

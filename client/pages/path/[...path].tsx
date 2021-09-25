@@ -1,7 +1,7 @@
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import { useRouter } from "next/dist/client/router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FolderItems from "src/components/Folder/Folder";
 import { Layout } from "src/components/Layout";
 import SideBar from "src/components/SideBar";
@@ -10,21 +10,38 @@ import { withAuth } from "src/HOC/withAuth";
 import { useMeState } from "src/hooks/useMeState";
 import { ApolloContext, NextFunctionComponentWithAuth } from "types/types";
 
-const Folder: NextFunctionComponentWithAuth = ({ me }) => {
+interface Props {
+  tree: any;
+}
+
+const Folder: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
   useMeState(me);
+
+  const [dataStoreName, setDataStoreName] = useState<string>("");
 
   const router = useRouter(),
     path = ((router.query.path || []) as string[]).join("/"),
     dataStoreId = router?.query?.d ? Number(router.query.d) : null;
 
-  if (!dataStoreId) return null;
+  if (dataStoreId == null) return null;
+
+  useEffect(() => {
+    setDataStoreName(
+      tree?.directoryTree?.tree?.find((d) => d.dataStoreId == dataStoreId)
+        ?.name || ""
+    );
+  }, [path, dataStoreId]);
 
   return (
     <Layout>
       <SideBar />
       <div style={{ display: "flex", width: "100%" }}>
         <Tree />
-        <FolderItems path={path} dataStoreId={dataStoreId} />
+        <FolderItems
+          path={path}
+          dataStoreId={dataStoreId}
+          dataStoreName={dataStoreName}
+        />
       </div>
     </Layout>
   );
@@ -40,7 +57,7 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
       ? Number(ctx.query?.d)
       : null;
 
-  await ctx.apolloClient.query({
+  const res = await ctx.apolloClient.query({
     query: getDirectoryTreeQuery,
     variables: {
       depth: 1,
@@ -58,7 +75,7 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
     },
   });
 
-  return { tree: null };
+  return { tree: res.data };
 };
 
 export default withAuth(Folder);

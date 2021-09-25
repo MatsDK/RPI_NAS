@@ -9,18 +9,25 @@ import FolderNavbar from "./FolderNavbar";
 import styled from "styled-components";
 import { CreateFolderMutation } from "graphql/Folder/createFolder";
 import Icon from "../../ui/Icon";
+import { FolderPath } from "./FolderPath";
 
 interface Props {
   path: string;
   dataStoreId: number | null;
+  dataStoreName: string;
 }
 
 const FolderContent = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const FolderContainer = styled.div`
   overflow: scroll;
   height: 100%;
 `;
 
-const Folder: React.FC<Props> = ({ path, dataStoreId }) => {
+const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
   if (!dataStoreId) return null;
 
   const client: any = useApolloClient();
@@ -43,7 +50,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId }) => {
       const { selected, currentFolderPath } = folderCtx;
 
       selected.selectedItems = new Map();
-      currentFolderPath?.setFolderPath({ path, dataStoreId });
+      currentFolderPath?.setFolderPath({ path, dataStoreId, dataStoreName });
     }
   }, [path]);
 
@@ -76,37 +83,46 @@ const Folder: React.FC<Props> = ({ path, dataStoreId }) => {
   return (
     <div style={{ width: "100%" }}>
       <FolderNavbar />
-      <FolderContent>
-        {folderCtx?.newFolderInput?.showNewFolderInput && (
-          <FolderItemWrapper>
-            <IconWrapper>
-              <Icon
-                color={{ idx: 2, propName: "bgColors" }}
-                width={24}
-                height={22}
-                viewPort={30}
-                name="folderIcon"
+      <FolderContainer>
+        <FolderPath
+          path={path.split("/")}
+          dataStore={{
+            id: dataStoreId,
+            name: dataStoreName,
+          }}
+        />
+        <FolderContent>
+          {folderCtx?.newFolderInput?.showNewFolderInput && (
+            <FolderItemWrapper>
+              <IconWrapper>
+                <Icon
+                  color={{ idx: 2, propName: "bgColors" }}
+                  width={24}
+                  height={22}
+                  viewPort={30}
+                  name="folderIcon"
+                />
+              </IconWrapper>
+              <form onSubmit={createNewFolder}>
+                <input
+                  type="text"
+                  value={folderNameInput}
+                  onChange={(e) => setFolderNameInput(e.target.value)}
+                />
+              </form>
+            </FolderItemWrapper>
+          )}
+          {data.tree.tree
+            .sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
+            .map((item, idx) => (
+              <FolderItem
+                dataStoreId={dataStoreId}
+                item={item as TreeItem}
+                key={idx}
               />
-            </IconWrapper>
-            <form onSubmit={createNewFolder}>
-              <input
-                type="text"
-                value={folderNameInput}
-                onChange={(e) => setFolderNameInput(e.target.value)}
-              />
-            </form>
-          </FolderItemWrapper>
-        )}
-        {data.tree.tree
-          .sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
-          .map((item, idx) => (
-            <FolderItem
-              dataStoreId={dataStoreId}
-              item={item as TreeItem}
-              key={idx}
-            />
-          ))}
-      </FolderContent>
+            ))}
+        </FolderContent>
+      </FolderContainer>
     </div>
   );
 };

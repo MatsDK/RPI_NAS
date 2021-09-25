@@ -97,6 +97,15 @@ export class UserResolver {
   ): Promise<User[]> {
     return User.find({
       where: { userName: ILike(`${userName}%`), id: Not((req as any).userId) },
+      take: 25,
     });
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Boolean, { nullable: true })
+  sendFriendRequest(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
+    console.log(userId, (req as any).userId);
+
+    return false;
   }
 }

@@ -6,6 +6,7 @@ export type FolderContextType = FolderContext | null;
 export type CurrentFolderType = {
   path: string | null;
   dataStoreId: number | null;
+  dataStoreName: string | null;
 };
 
 interface FolderContext {
@@ -19,8 +20,6 @@ interface FolderContext {
   };
   selected: {
     selectedItems: Map<string, TreeItem>;
-    // addSelected: (path: TreeItem) => void;
-    // removeSelected: (path: string) => void;
     setSelected?: React.Dispatch<React.SetStateAction<Map<string, TreeItem>>>;
   };
 }

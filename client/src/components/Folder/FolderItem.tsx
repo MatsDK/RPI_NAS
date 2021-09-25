@@ -84,7 +84,11 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
           setSelected((s) => !s);
         }}
       >
-        <input type="checkbox" checked={selected} />
+        <input
+          type="checkbox"
+          checked={selected || false}
+          onChange={() => {}}
+        />
       </SelectButtonWrapper>
       <IconWrapper>
         {item.isDirectory ? (
@@ -109,9 +113,11 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
       </IconWrapper>
       <div style={{ minWidth: 200 }}>
         {item.isDirectory ? (
-          <Link href={`/path/${item.relativePath}?d=${dataStoreId}`}>
-            <FolderButtonItem>{item.name}</FolderButtonItem>
-          </Link>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Link href={`/path/${item.relativePath}?d=${dataStoreId}`}>
+              <FolderButtonItem>{item.name}</FolderButtonItem>
+            </Link>
+          </div>
         ) : (
           <p>{item.name}</p>
         )}

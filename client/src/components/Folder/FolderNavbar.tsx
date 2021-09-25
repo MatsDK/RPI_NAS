@@ -75,8 +75,6 @@ const FolderNavbar = () => {
       ([_, v]) => v
     );
 
-    console.log(folderCtx.selected.selectedItems);
-
     if (!router.query.d) return;
 
     if (!selected.length) return;

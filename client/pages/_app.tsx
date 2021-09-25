@@ -25,6 +25,7 @@ const MyApp = (props: AppProps & Props) => {
   const [folderPath, setFolderPath] = useState<CurrentFolderType>({
     path: null,
     dataStoreId: null,
+    dataStoreName: null,
   });
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
 
