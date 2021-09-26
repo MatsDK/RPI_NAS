@@ -19,20 +19,24 @@ export const FolderPath: React.FC<FolderPathProps> = ({
   return (
     <PathWrapper>
       <span>
-        <Link href={`/path?d=${id}`}>{name}</Link>/
+        {path.length && path[0] ? (
+          <Link href={`/path?d=${id}`}>
+            <span>{name}/</span>
+          </Link>
+        ) : (
+          name
+        )}
       </span>
       {path.map((p, idx) => {
-        const isNotCurrentPath = idx < path.length - 1;
+        const isNotCurrentPath = idx < path.length - 1,
+          relativePath = path.slice(0, idx + 1).join("/");
 
         return (
-          <div>
+          <div key={idx}>
             {!isNotCurrentPath ? (
               p
             ) : (
-              <Link
-                key={idx}
-                href={`/path/${path.slice(0, idx + 1).join("/")}?d=${id}`}
-              >
+              <Link href={`/path/${relativePath}?d=${id}`}>
                 <span>{p}</span>
               </Link>
             )}

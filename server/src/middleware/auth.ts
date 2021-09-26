@@ -22,7 +22,7 @@ export const isAuth: MiddlewareFn<MyContext> = async (
       process.env.ACCESS_TOKEN_SECRET as string
     );
 
-    (req as any).userId = decoded.userId;
+    req.userId = decoded.userId;
     return next();
   } catch {}
 
@@ -37,7 +37,7 @@ export const isAuth: MiddlewareFn<MyContext> = async (
     return null;
   }
 
-  if (decodedRefreshToken) (req as any).userId = decodedRefreshToken.userId;
+  if (decodedRefreshToken) req.userId = decodedRefreshToken.userId;
 
   const user = await User.findOne(decodedRefreshToken.userId);
   if (!user) return null;

@@ -1,14 +1,10 @@
-import { gql } from "@apollo/client";
-import * as Apollo from "@apollo/client";
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
-  { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
-  { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions = {};
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+const defaultOptions =  {}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -19,8 +15,8 @@ export type Scalars = {
 };
 
 export type CreateDataStoreInput = {
-  localNodeId: Scalars["Float"];
-  name: Scalars["String"];
+  localNodeId: Scalars['Float'];
+  name: Scalars['String'];
 };
 
 export type CreateSharedDataStoreInput = {
@@ -28,405 +24,352 @@ export type CreateSharedDataStoreInput = {
 };
 
 export type Datastore = {
-  __typename?: "Datastore";
-  id: Scalars["ID"];
-  name: Scalars["String"];
-  userId: Scalars["Float"];
-  localHostNodeId: Scalars["Float"];
-  localNodeId: Scalars["Float"];
-  basePath: Scalars["String"];
+  __typename?: 'Datastore';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  userId: Scalars['Float'];
+  localHostNodeId: Scalars['Float'];
+  localNodeId: Scalars['Float'];
+  basePath: Scalars['String'];
   sharedUsers: Array<User>;
   owner?: Maybe<User>;
 };
 
 export type DownloadPathsInput = {
-  path: Scalars["String"];
-  type: Scalars["String"];
+  path: Scalars['String'];
+  type: Scalars['String'];
 };
 
 export type DownloadSessionInput = {
-  type: Scalars["String"];
+  type: Scalars['String'];
   downloadPaths: Array<DownloadPathsInput>;
-  dataStoreId: Scalars["Float"];
+  dataStoreId: Scalars['Float'];
 };
 
 export type DownloadSessionObject = {
-  __typename?: "DownloadSessionObject";
-  path: Scalars["String"];
-  type: Scalars["String"];
+  __typename?: 'DownloadSessionObject';
+  path: Scalars['String'];
+  type: Scalars['String'];
 };
 
 export type DownloadSessionReturn = {
-  __typename?: "DownloadSessionReturn";
-  id?: Maybe<Scalars["String"]>;
+  __typename?: 'DownloadSessionReturn';
+  id?: Maybe<Scalars['String']>;
   data?: Maybe<Array<DownloadSessionObject>>;
-  hostIp?: Maybe<Scalars["String"]>;
-  username?: Maybe<Scalars["String"]>;
-  port?: Maybe<Scalars["Float"]>;
-  password?: Maybe<Scalars["String"]>;
+  hostIp?: Maybe<Scalars['String']>;
+  username?: Maybe<Scalars['String']>;
+  port?: Maybe<Scalars['Float']>;
+  password?: Maybe<Scalars['String']>;
+};
+
+export type FriendRequest = {
+  __typename?: 'FriendRequest';
+  id: Scalars['ID'];
+  userId1: Scalars['Float'];
+  userId2: Scalars['Float'];
+};
+
+export type FriendsQueryReturn = {
+  __typename?: 'FriendsQueryReturn';
+  friends: Array<User>;
+  friendsRequest: Array<User>;
 };
 
 export type GetTreeInput = {
-  path: Scalars["String"];
-  dataStoreId?: Maybe<Scalars["Float"]>;
-  depth?: Maybe<Scalars["Float"]>;
+  path: Scalars['String'];
+  dataStoreId?: Maybe<Scalars['Float']>;
+  depth?: Maybe<Scalars['Float']>;
 };
 
 export type Mutation = {
-  __typename?: "Mutation";
+  __typename?: 'Mutation';
   createDataStore?: Maybe<Datastore>;
-  createSharedDataStore?: Maybe<Scalars["Boolean"]>;
-  createFolder?: Maybe<Scalars["Boolean"]>;
+  createSharedDataStore?: Maybe<Scalars['Boolean']>;
+  createFolder?: Maybe<Scalars['Boolean']>;
   createUploadSession?: Maybe<UploadSessionReturn>;
   createDownloadSession?: Maybe<DownloadSessionReturn>;
   login?: Maybe<User>;
-  logout?: Maybe<Scalars["Boolean"]>;
+  logout?: Maybe<Scalars['Boolean']>;
   register: User;
+  sendFriendRequest?: Maybe<Scalars['Boolean']>;
+  acceptFriendRequest?: Maybe<Scalars['Boolean']>;
 };
+
 
 export type MutationCreateDataStoreArgs = {
   data: CreateDataStoreInput;
 };
 
+
 export type MutationCreateSharedDataStoreArgs = {
   data: CreateSharedDataStoreInput;
 };
 
+
 export type MutationCreateFolderArgs = {
-  path: Scalars["String"];
-  dataStoreId: Scalars["Float"];
+  path: Scalars['String'];
+  dataStoreId: Scalars['Float'];
 };
+
 
 export type MutationCreateUploadSessionArgs = {
   data: UploadSessionInput;
 };
 
+
 export type MutationCreateDownloadSessionArgs = {
   data: DownloadSessionInput;
 };
 
+
 export type MutationLoginArgs = {
-  password: Scalars["String"];
-  email: Scalars["String"];
+  password: Scalars['String'];
+  email: Scalars['String'];
 };
+
 
 export type MutationRegisterArgs = {
   data: RegisterInput;
 };
 
+
+export type MutationSendFriendRequestArgs = {
+  userId: Scalars['Float'];
+};
+
+
+export type MutationAcceptFriendRequestArgs = {
+  userId: Scalars['Float'];
+};
+
 export type Node = {
-  __typename?: "Node";
-  id: Scalars["ID"];
-  name: Scalars["String"];
-  ip: Scalars["String"];
-  loginName: Scalars["String"];
-  password: Scalars["String"];
-  port: Scalars["Float"];
-  host: Scalars["String"];
-  basePath: Scalars["String"];
-  hostNode: Scalars["Boolean"];
+  __typename?: 'Node';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  ip: Scalars['String'];
+  loginName: Scalars['String'];
+  password: Scalars['String'];
+  port: Scalars['Float'];
+  host: Scalars['String'];
+  basePath: Scalars['String'];
+  hostNode: Scalars['Boolean'];
 };
 
 export type Query = {
-  __typename?: "Query";
+  __typename?: 'Query';
   tree?: Maybe<Tree>;
   directoryTree?: Maybe<Tree>;
   getDataStores?: Maybe<Array<Datastore>>;
   me?: Maybe<User>;
-  friends: Array<User>;
-  getMyDataStores: Array<Datastore>;
+  friends?: Maybe<FriendsQueryReturn>;
+  getMyDataStores?: Maybe<Array<Datastore>>;
+  getUsersByName?: Maybe<Array<User>>;
 };
+
 
 export type QueryTreeArgs = {
   data: GetTreeInput;
 };
 
+
 export type QueryDirectoryTreeArgs = {
   data: GetTreeInput;
 };
 
+
+export type QueryGetUsersByNameArgs = {
+  name: Scalars['String'];
+};
+
 export type RegisterInput = {
-  email: Scalars["String"];
-  password: Scalars["String"];
-  userName: Scalars["String"];
+  email: Scalars['String'];
+  password: Scalars['String'];
+  userName: Scalars['String'];
 };
 
 export type SharedDataStore = {
-  __typename?: "SharedDataStore";
-  id: Scalars["ID"];
-  userId: Scalars["Float"];
-  dataStoreId: Scalars["Float"];
+  __typename?: 'SharedDataStore';
+  id: Scalars['ID'];
+  userId: Scalars['Float'];
+  dataStoreId: Scalars['Float'];
 };
 
 export type SharedDataStoresIdsInput = {
-  userId: Scalars["Float"];
-  dataStoreId: Scalars["Float"];
+  userId: Scalars['Float'];
+  dataStoreId: Scalars['Float'];
 };
 
 export type Tree = {
-  __typename?: "Tree";
-  path: Scalars["String"];
+  __typename?: 'Tree';
+  path: Scalars['String'];
   tree?: Maybe<Array<TreeItem>>;
 };
 
 export type TreeItem = {
-  __typename?: "TreeItem";
-  name: Scalars["String"];
-  path: Scalars["String"];
-  relativePath: Scalars["String"];
-  isDirectory: Scalars["Boolean"];
-  dataStoreId?: Maybe<Scalars["Float"]>;
-  sharedDataStore?: Maybe<Scalars["Boolean"]>;
-  size?: Maybe<Scalars["Float"]>;
+  __typename?: 'TreeItem';
+  name: Scalars['String'];
+  path: Scalars['String'];
+  relativePath: Scalars['String'];
+  isDirectory: Scalars['Boolean'];
+  dataStoreId?: Maybe<Scalars['Float']>;
+  sharedDataStore?: Maybe<Scalars['Boolean']>;
+  size?: Maybe<Scalars['Float']>;
   tree?: Maybe<Array<TreeItem>>;
 };
 
 export type UploadSessionInput = {
-  uploadPath: Scalars["String"];
-  dataStoreId: Scalars["Float"];
+  uploadPath: Scalars['String'];
+  dataStoreId: Scalars['Float'];
 };
 
 export type UploadSessionReturn = {
-  __typename?: "UploadSessionReturn";
-  uploadPath: Scalars["String"];
-  hostIp: Scalars["String"];
-  username: Scalars["String"];
-  port: Scalars["Float"];
-  password: Scalars["String"];
+  __typename?: 'UploadSessionReturn';
+  uploadPath: Scalars['String'];
+  hostIp: Scalars['String'];
+  username: Scalars['String'];
+  port: Scalars['Float'];
+  password: Scalars['String'];
 };
 
 export type User = {
-  __typename?: "User";
-  id: Scalars["ID"];
-  email: Scalars["String"];
-  userName: Scalars["String"];
-  isAdmin: Scalars["Boolean"];
+  __typename?: 'User';
+  id: Scalars['ID'];
+  email: Scalars['String'];
+  userName: Scalars['String'];
+  isAdmin: Scalars['Boolean'];
   friends: Array<User>;
 };
 
 export type CreateDataStoreMutionMutationVariables = Exact<{
-  localNodeId: Scalars["Float"];
-  name: Scalars["String"];
+  localNodeId: Scalars['Float'];
+  name: Scalars['String'];
 }>;
 
-export type CreateDataStoreMutionMutation = {
-  __typename?: "Mutation";
-  createDataStore?: Maybe<{ __typename?: "Datastore"; id: string }>;
-};
+
+export type CreateDataStoreMutionMutation = { __typename?: 'Mutation', createDataStore?: Maybe<{ __typename?: 'Datastore', id: string }> };
 
 export type CreateSharedDataStoresMutaionMutationVariables = Exact<{
   ids: Array<SharedDataStoresIdsInput> | SharedDataStoresIdsInput;
 }>;
 
-export type CreateSharedDataStoresMutaionMutation = {
-  __typename?: "Mutation";
-  createSharedDataStore?: Maybe<boolean>;
-};
 
-export type GetDataStoresQueryVariables = Exact<{ [key: string]: never }>;
+export type CreateSharedDataStoresMutaionMutation = { __typename?: 'Mutation', createSharedDataStore?: Maybe<boolean> };
 
-export type GetDataStoresQuery = {
-  __typename?: "Query";
-  getDataStores?: Maybe<
-    Array<{
-      __typename?: "Datastore";
-      id: string;
-      name: string;
-      userId: number;
-      localHostNodeId: number;
-      localNodeId: number;
-      basePath: string;
-      owner?: Maybe<{
-        __typename?: "User";
-        id: string;
-        userName: string;
-        isAdmin: boolean;
-      }>;
-      sharedUsers: Array<{
-        __typename?: "User";
-        userName: string;
-        isAdmin: boolean;
-        id: string;
-      }>;
-    }>
-  >;
-};
+export type GetDataStoresQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Maybe<Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }>> };
 
 export type CreateFolderMutationMutationVariables = Exact<{
-  path: Scalars["String"];
-  dataStoreId: Scalars["Float"];
+  path: Scalars['String'];
+  dataStoreId: Scalars['Float'];
 }>;
 
-export type CreateFolderMutationMutation = {
-  __typename?: "Mutation";
-  createFolder?: Maybe<boolean>;
-};
+
+export type CreateFolderMutationMutation = { __typename?: 'Mutation', createFolder?: Maybe<boolean> };
+
+export type AcceptFriendRequestMutationVariables = Exact<{
+  userId: Scalars['Float'];
+}>;
+
+
+export type AcceptFriendRequestMutation = { __typename?: 'Mutation', acceptFriendRequest?: Maybe<boolean> };
+
+export type GetFriendsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetFriendsQueryQuery = { __typename?: 'Query', friends?: Maybe<{ __typename?: 'FriendsQueryReturn', friends: Array<{ __typename?: 'User', id: string, userName: string }>, friendsRequest: Array<{ __typename?: 'User', id: string, userName: string }> }> };
+
+export type SendFriendRequestMutationVariables = Exact<{
+  userId: Scalars['Float'];
+}>;
+
+
+export type SendFriendRequestMutation = { __typename?: 'Mutation', sendFriendRequest?: Maybe<boolean> };
 
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadPathsInput> | DownloadPathsInput;
-  type: Scalars["String"];
-  dataStoreId: Scalars["Float"];
+  type: Scalars['String'];
+  dataStoreId: Scalars['Float'];
 }>;
 
-export type CreateSessionMutation = {
-  __typename?: "Mutation";
-  createDownloadSession?: Maybe<{
-    __typename?: "DownloadSessionReturn";
-    hostIp?: Maybe<string>;
-    username?: Maybe<string>;
-    password?: Maybe<string>;
-    port?: Maybe<number>;
-    id?: Maybe<string>;
-    data?: Maybe<
-      Array<{
-        __typename?: "DownloadSessionObject";
-        type: string;
-        path: string;
-      }>
-    >;
-  }>;
-};
+
+export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSession?: Maybe<{ __typename?: 'DownloadSessionReturn', hostIp?: Maybe<string>, username?: Maybe<string>, password?: Maybe<string>, port?: Maybe<number>, id?: Maybe<string>, data?: Maybe<Array<{ __typename?: 'DownloadSessionObject', type: string, path: string }>> }> };
 
 export type CreateUploadSessionMutationMutationVariables = Exact<{
-  uploadPath: Scalars["String"];
-  dataStoreId: Scalars["Float"];
+  uploadPath: Scalars['String'];
+  dataStoreId: Scalars['Float'];
 }>;
 
-export type CreateUploadSessionMutationMutation = {
-  __typename?: "Mutation";
-  createUploadSession?: Maybe<{
-    __typename?: "UploadSessionReturn";
-    uploadPath: string;
-    hostIp: string;
-    username: string;
-    port: number;
-    password: string;
-  }>;
-};
+
+export type CreateUploadSessionMutationMutation = { __typename?: 'Mutation', createUploadSession?: Maybe<{ __typename?: 'UploadSessionReturn', uploadPath: string, hostIp: string, username: string, port: number, password: string }> };
 
 export type GetDirectoryTreeQueryQueryVariables = Exact<{
-  path: Scalars["String"];
-  depth: Scalars["Float"];
-  dataStoreId?: Maybe<Scalars["Float"]>;
+  path: Scalars['String'];
+  depth: Scalars['Float'];
+  dataStoreId?: Maybe<Scalars['Float']>;
 }>;
 
-export type GetDirectoryTreeQueryQuery = {
-  __typename?: "Query";
-  directoryTree?: Maybe<{
-    __typename: "Tree";
-    path: string;
-    tree?: Maybe<
-      Array<{
-        __typename: "TreeItem";
-        isDirectory: boolean;
-        dataStoreId?: Maybe<number>;
-        sharedDataStore?: Maybe<boolean>;
-        name: string;
-        relativePath: string;
-        path: string;
-      }>
-    >;
-  }>;
-};
+
+export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree?: Maybe<{ __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: Maybe<number>, sharedDataStore?: Maybe<boolean>, name: string, relativePath: string, path: string }>> }> };
 
 export type GetTreeQueryQueryVariables = Exact<{
-  path: Scalars["String"];
-  depth: Scalars["Float"];
-  dataStoreId?: Maybe<Scalars["Float"]>;
+  path: Scalars['String'];
+  depth: Scalars['Float'];
+  dataStoreId?: Maybe<Scalars['Float']>;
 }>;
 
-export type GetTreeQueryQuery = {
-  __typename?: "Query";
-  tree?: Maybe<{
-    __typename: "Tree";
-    path: string;
-    tree?: Maybe<
-      Array<{
-        __typename: "TreeItem";
-        relativePath: string;
-        isDirectory: boolean;
-        name: string;
-        path: string;
-      }>
-    >;
-  }>;
-};
 
-export type GetFriendsQueryQueryVariables = Exact<{ [key: string]: never }>;
+export type GetTreeQueryQuery = { __typename?: 'Query', tree?: Maybe<{ __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string }>> }> };
 
-export type GetFriendsQueryQuery = {
-  __typename?: "Query";
-  friends: Array<{
-    __typename?: "User";
-    id: string;
-    email: string;
-    userName: string;
-  }>;
-};
+export type GetUserNameByNameQueryVariables = Exact<{
+  name: Scalars['String'];
+}>;
 
-export type GetMyDataStoresQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetMyDataStoresQuery = {
-  __typename?: "Query";
-  getMyDataStores: Array<{
-    __typename?: "Datastore";
-    id: string;
-    name: string;
-  }>;
-};
+export type GetUserNameByNameQuery = { __typename?: 'Query', getUsersByName?: Maybe<Array<{ __typename?: 'User', userName: string, id: string }>> };
+
+export type GetMyDataStoresQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyDataStoresQuery = { __typename?: 'Query', getMyDataStores?: Maybe<Array<{ __typename?: 'Datastore', id: string, name: string }>> };
 
 export type LoginMutationMutationVariables = Exact<{
-  email: Scalars["String"];
-  password: Scalars["String"];
+  email: Scalars['String'];
+  password: Scalars['String'];
 }>;
 
-export type LoginMutationMutation = {
-  __typename?: "Mutation";
-  login?: Maybe<{ __typename?: "User"; id: string }>;
-};
 
-export type LogoutMutationMutationVariables = Exact<{ [key: string]: never }>;
+export type LoginMutationMutation = { __typename?: 'Mutation', login?: Maybe<{ __typename?: 'User', id: string }> };
 
-export type LogoutMutationMutation = {
-  __typename?: "Mutation";
-  logout?: Maybe<boolean>;
-};
+export type LogoutMutationMutationVariables = Exact<{ [key: string]: never; }>;
 
-export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
-export type MeQuery = {
-  __typename?: "Query";
-  me?: Maybe<{
-    __typename?: "User";
-    email: string;
-    id: string;
-    userName: string;
-    isAdmin: boolean;
-  }>;
-};
+export type LogoutMutationMutation = { __typename?: 'Mutation', logout?: Maybe<boolean> };
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', email: string, id: string, userName: string, isAdmin: boolean }> };
 
 export type RegisterMutationMutationVariables = Exact<{
-  email: Scalars["String"];
-  password: Scalars["String"];
-  userName: Scalars["String"];
+  email: Scalars['String'];
+  password: Scalars['String'];
+  userName: Scalars['String'];
 }>;
 
-export type RegisterMutationMutation = {
-  __typename?: "Mutation";
-  register: { __typename?: "User"; id: string };
-};
+
+export type RegisterMutationMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string } };
+
 
 export const CreateDataStoreMutionDocument = gql`
-  mutation CreateDataStoreMution($localNodeId: Float!, $name: String!) {
-    createDataStore(data: { localNodeId: $localNodeId, name: $name }) {
-      id
-    }
+    mutation CreateDataStoreMution($localNodeId: Float!, $name: String!) {
+  createDataStore(data: {localNodeId: $localNodeId, name: $name}) {
+    id
   }
-`;
-export type CreateDataStoreMutionMutationFn = Apollo.MutationFunction<
-  CreateDataStoreMutionMutation,
-  CreateDataStoreMutionMutationVariables
->;
+}
+    `;
+export type CreateDataStoreMutionMutationFn = Apollo.MutationFunction<CreateDataStoreMutionMutation, CreateDataStoreMutionMutationVariables>;
 
 /**
  * __useCreateDataStoreMutionMutation__
@@ -446,36 +389,19 @@ export type CreateDataStoreMutionMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreateDataStoreMutionMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateDataStoreMutionMutation,
-    CreateDataStoreMutionMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateDataStoreMutionMutation,
-    CreateDataStoreMutionMutationVariables
-  >(CreateDataStoreMutionDocument, options);
-}
-export type CreateDataStoreMutionMutationHookResult = ReturnType<
-  typeof useCreateDataStoreMutionMutation
->;
-export type CreateDataStoreMutionMutationResult =
-  Apollo.MutationResult<CreateDataStoreMutionMutation>;
-export type CreateDataStoreMutionMutationOptions = Apollo.BaseMutationOptions<
-  CreateDataStoreMutionMutation,
-  CreateDataStoreMutionMutationVariables
->;
+export function useCreateDataStoreMutionMutation(baseOptions?: Apollo.MutationHookOptions<CreateDataStoreMutionMutation, CreateDataStoreMutionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDataStoreMutionMutation, CreateDataStoreMutionMutationVariables>(CreateDataStoreMutionDocument, options);
+      }
+export type CreateDataStoreMutionMutationHookResult = ReturnType<typeof useCreateDataStoreMutionMutation>;
+export type CreateDataStoreMutionMutationResult = Apollo.MutationResult<CreateDataStoreMutionMutation>;
+export type CreateDataStoreMutionMutationOptions = Apollo.BaseMutationOptions<CreateDataStoreMutionMutation, CreateDataStoreMutionMutationVariables>;
 export const CreateSharedDataStoresMutaionDocument = gql`
-  mutation CreateSharedDataStoresMutaion($ids: [SharedDataStoresIdsInput!]!) {
-    createSharedDataStore(data: { ids: $ids })
-  }
-`;
-export type CreateSharedDataStoresMutaionMutationFn = Apollo.MutationFunction<
-  CreateSharedDataStoresMutaionMutation,
-  CreateSharedDataStoresMutaionMutationVariables
->;
+    mutation CreateSharedDataStoresMutaion($ids: [SharedDataStoresIdsInput!]!) {
+  createSharedDataStore(data: {ids: $ids})
+}
+    `;
+export type CreateSharedDataStoresMutaionMutationFn = Apollo.MutationFunction<CreateSharedDataStoresMutaionMutation, CreateSharedDataStoresMutaionMutationVariables>;
 
 /**
  * __useCreateSharedDataStoresMutaionMutation__
@@ -494,50 +420,35 @@ export type CreateSharedDataStoresMutaionMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreateSharedDataStoresMutaionMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateSharedDataStoresMutaionMutation,
-    CreateSharedDataStoresMutaionMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateSharedDataStoresMutaionMutation,
-    CreateSharedDataStoresMutaionMutationVariables
-  >(CreateSharedDataStoresMutaionDocument, options);
-}
-export type CreateSharedDataStoresMutaionMutationHookResult = ReturnType<
-  typeof useCreateSharedDataStoresMutaionMutation
->;
-export type CreateSharedDataStoresMutaionMutationResult =
-  Apollo.MutationResult<CreateSharedDataStoresMutaionMutation>;
-export type CreateSharedDataStoresMutaionMutationOptions =
-  Apollo.BaseMutationOptions<
-    CreateSharedDataStoresMutaionMutation,
-    CreateSharedDataStoresMutaionMutationVariables
-  >;
+export function useCreateSharedDataStoresMutaionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSharedDataStoresMutaionMutation, CreateSharedDataStoresMutaionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateSharedDataStoresMutaionMutation, CreateSharedDataStoresMutaionMutationVariables>(CreateSharedDataStoresMutaionDocument, options);
+      }
+export type CreateSharedDataStoresMutaionMutationHookResult = ReturnType<typeof useCreateSharedDataStoresMutaionMutation>;
+export type CreateSharedDataStoresMutaionMutationResult = Apollo.MutationResult<CreateSharedDataStoresMutaionMutation>;
+export type CreateSharedDataStoresMutaionMutationOptions = Apollo.BaseMutationOptions<CreateSharedDataStoresMutaionMutation, CreateSharedDataStoresMutaionMutationVariables>;
 export const GetDataStoresDocument = gql`
-  query GetDataStores {
-    getDataStores {
+    query GetDataStores {
+  getDataStores {
+    id
+    name
+    userId
+    localHostNodeId
+    localNodeId
+    basePath
+    owner {
       id
-      name
-      userId
-      localHostNodeId
-      localNodeId
-      basePath
-      owner {
-        id
-        userName
-        isAdmin
-      }
-      sharedUsers {
-        userName
-        isAdmin
-        id
-      }
+      userName
+      isAdmin
+    }
+    sharedUsers {
+      userName
+      isAdmin
+      id
     }
   }
-`;
+}
+    `;
 
 /**
  * __useGetDataStoresQuery__
@@ -554,49 +465,23 @@ export const GetDataStoresDocument = gql`
  *   },
  * });
  */
-export function useGetDataStoresQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GetDataStoresQuery,
-    GetDataStoresQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetDataStoresQuery, GetDataStoresQueryVariables>(
-    GetDataStoresDocument,
-    options
-  );
-}
-export function useGetDataStoresLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetDataStoresQuery,
-    GetDataStoresQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetDataStoresQuery, GetDataStoresQueryVariables>(
-    GetDataStoresDocument,
-    options
-  );
-}
-export type GetDataStoresQueryHookResult = ReturnType<
-  typeof useGetDataStoresQuery
->;
-export type GetDataStoresLazyQueryHookResult = ReturnType<
-  typeof useGetDataStoresLazyQuery
->;
-export type GetDataStoresQueryResult = Apollo.QueryResult<
-  GetDataStoresQuery,
-  GetDataStoresQueryVariables
->;
+export function useGetDataStoresQuery(baseOptions?: Apollo.QueryHookOptions<GetDataStoresQuery, GetDataStoresQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDataStoresQuery, GetDataStoresQueryVariables>(GetDataStoresDocument, options);
+      }
+export function useGetDataStoresLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDataStoresQuery, GetDataStoresQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDataStoresQuery, GetDataStoresQueryVariables>(GetDataStoresDocument, options);
+        }
+export type GetDataStoresQueryHookResult = ReturnType<typeof useGetDataStoresQuery>;
+export type GetDataStoresLazyQueryHookResult = ReturnType<typeof useGetDataStoresLazyQuery>;
+export type GetDataStoresQueryResult = Apollo.QueryResult<GetDataStoresQuery, GetDataStoresQueryVariables>;
 export const CreateFolderMutationDocument = gql`
-  mutation CreateFolderMutation($path: String!, $dataStoreId: Float!) {
-    createFolder(path: $path, dataStoreId: $dataStoreId)
-  }
-`;
-export type CreateFolderMutationMutationFn = Apollo.MutationFunction<
-  CreateFolderMutationMutation,
-  CreateFolderMutationMutationVariables
->;
+    mutation CreateFolderMutation($path: String!, $dataStoreId: Float!) {
+  createFolder(path: $path, dataStoreId: $dataStoreId)
+}
+    `;
+export type CreateFolderMutationMutationFn = Apollo.MutationFunction<CreateFolderMutationMutation, CreateFolderMutationMutationVariables>;
 
 /**
  * __useCreateFolderMutationMutation__
@@ -616,52 +501,134 @@ export type CreateFolderMutationMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreateFolderMutationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateFolderMutationMutation,
-    CreateFolderMutationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateFolderMutationMutation,
-    CreateFolderMutationMutationVariables
-  >(CreateFolderMutationDocument, options);
-}
-export type CreateFolderMutationMutationHookResult = ReturnType<
-  typeof useCreateFolderMutationMutation
->;
-export type CreateFolderMutationMutationResult =
-  Apollo.MutationResult<CreateFolderMutationMutation>;
-export type CreateFolderMutationMutationOptions = Apollo.BaseMutationOptions<
-  CreateFolderMutationMutation,
-  CreateFolderMutationMutationVariables
->;
-export const CreateSessionDocument = gql`
-  mutation createSession(
-    $data: [DownloadPathsInput!]!
-    $type: String!
-    $dataStoreId: Float!
-  ) {
-    createDownloadSession(
-      data: { type: $type, downloadPaths: $data, dataStoreId: $dataStoreId }
-    ) {
-      data {
-        type
-        path
+export function useCreateFolderMutationMutation(baseOptions?: Apollo.MutationHookOptions<CreateFolderMutationMutation, CreateFolderMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateFolderMutationMutation, CreateFolderMutationMutationVariables>(CreateFolderMutationDocument, options);
       }
-      hostIp
-      username
-      password
-      port
+export type CreateFolderMutationMutationHookResult = ReturnType<typeof useCreateFolderMutationMutation>;
+export type CreateFolderMutationMutationResult = Apollo.MutationResult<CreateFolderMutationMutation>;
+export type CreateFolderMutationMutationOptions = Apollo.BaseMutationOptions<CreateFolderMutationMutation, CreateFolderMutationMutationVariables>;
+export const AcceptFriendRequestDocument = gql`
+    mutation AcceptFriendRequest($userId: Float!) {
+  acceptFriendRequest(userId: $userId)
+}
+    `;
+export type AcceptFriendRequestMutationFn = Apollo.MutationFunction<AcceptFriendRequestMutation, AcceptFriendRequestMutationVariables>;
+
+/**
+ * __useAcceptFriendRequestMutation__
+ *
+ * To run a mutation, you first call `useAcceptFriendRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAcceptFriendRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [acceptFriendRequestMutation, { data, loading, error }] = useAcceptFriendRequestMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useAcceptFriendRequestMutation(baseOptions?: Apollo.MutationHookOptions<AcceptFriendRequestMutation, AcceptFriendRequestMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AcceptFriendRequestMutation, AcceptFriendRequestMutationVariables>(AcceptFriendRequestDocument, options);
+      }
+export type AcceptFriendRequestMutationHookResult = ReturnType<typeof useAcceptFriendRequestMutation>;
+export type AcceptFriendRequestMutationResult = Apollo.MutationResult<AcceptFriendRequestMutation>;
+export type AcceptFriendRequestMutationOptions = Apollo.BaseMutationOptions<AcceptFriendRequestMutation, AcceptFriendRequestMutationVariables>;
+export const GetFriendsQueryDocument = gql`
+    query GetFriendsQuery {
+  friends {
+    friends {
       id
+      userName
+    }
+    friendsRequest {
+      id
+      userName
     }
   }
-`;
-export type CreateSessionMutationFn = Apollo.MutationFunction<
-  CreateSessionMutation,
-  CreateSessionMutationVariables
->;
+}
+    `;
+
+/**
+ * __useGetFriendsQueryQuery__
+ *
+ * To run a query within a React component, call `useGetFriendsQueryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFriendsQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFriendsQueryQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetFriendsQueryQuery(baseOptions?: Apollo.QueryHookOptions<GetFriendsQueryQuery, GetFriendsQueryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFriendsQueryQuery, GetFriendsQueryQueryVariables>(GetFriendsQueryDocument, options);
+      }
+export function useGetFriendsQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFriendsQueryQuery, GetFriendsQueryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFriendsQueryQuery, GetFriendsQueryQueryVariables>(GetFriendsQueryDocument, options);
+        }
+export type GetFriendsQueryQueryHookResult = ReturnType<typeof useGetFriendsQueryQuery>;
+export type GetFriendsQueryLazyQueryHookResult = ReturnType<typeof useGetFriendsQueryLazyQuery>;
+export type GetFriendsQueryQueryResult = Apollo.QueryResult<GetFriendsQueryQuery, GetFriendsQueryQueryVariables>;
+export const SendFriendRequestDocument = gql`
+    mutation SendFriendRequest($userId: Float!) {
+  sendFriendRequest(userId: $userId)
+}
+    `;
+export type SendFriendRequestMutationFn = Apollo.MutationFunction<SendFriendRequestMutation, SendFriendRequestMutationVariables>;
+
+/**
+ * __useSendFriendRequestMutation__
+ *
+ * To run a mutation, you first call `useSendFriendRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendFriendRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendFriendRequestMutation, { data, loading, error }] = useSendFriendRequestMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useSendFriendRequestMutation(baseOptions?: Apollo.MutationHookOptions<SendFriendRequestMutation, SendFriendRequestMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendFriendRequestMutation, SendFriendRequestMutationVariables>(SendFriendRequestDocument, options);
+      }
+export type SendFriendRequestMutationHookResult = ReturnType<typeof useSendFriendRequestMutation>;
+export type SendFriendRequestMutationResult = Apollo.MutationResult<SendFriendRequestMutation>;
+export type SendFriendRequestMutationOptions = Apollo.BaseMutationOptions<SendFriendRequestMutation, SendFriendRequestMutationVariables>;
+export const CreateSessionDocument = gql`
+    mutation createSession($data: [DownloadPathsInput!]!, $type: String!, $dataStoreId: Float!) {
+  createDownloadSession(
+    data: {type: $type, downloadPaths: $data, dataStoreId: $dataStoreId}
+  ) {
+    data {
+      type
+      path
+    }
+    hostIp
+    username
+    password
+    port
+    id
+  }
+}
+    `;
+export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutation, CreateSessionMutationVariables>;
 
 /**
  * __useCreateSessionMutation__
@@ -682,47 +649,25 @@ export type CreateSessionMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreateSessionMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateSessionMutation,
-    CreateSessionMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateSessionMutation,
-    CreateSessionMutationVariables
-  >(CreateSessionDocument, options);
-}
-export type CreateSessionMutationHookResult = ReturnType<
-  typeof useCreateSessionMutation
->;
-export type CreateSessionMutationResult =
-  Apollo.MutationResult<CreateSessionMutation>;
-export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<
-  CreateSessionMutation,
-  CreateSessionMutationVariables
->;
+export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, options);
+      }
+export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
+export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
+export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
 export const CreateUploadSessionMutationDocument = gql`
-  mutation createUploadSessionMutation(
-    $uploadPath: String!
-    $dataStoreId: Float!
-  ) {
-    createUploadSession(
-      data: { uploadPath: $uploadPath, dataStoreId: $dataStoreId }
-    ) {
-      uploadPath
-      hostIp
-      username
-      port
-      password
-    }
+    mutation createUploadSessionMutation($uploadPath: String!, $dataStoreId: Float!) {
+  createUploadSession(data: {uploadPath: $uploadPath, dataStoreId: $dataStoreId}) {
+    uploadPath
+    hostIp
+    username
+    port
+    password
   }
-`;
-export type CreateUploadSessionMutationMutationFn = Apollo.MutationFunction<
-  CreateUploadSessionMutationMutation,
-  CreateUploadSessionMutationMutationVariables
->;
+}
+    `;
+export type CreateUploadSessionMutationMutationFn = Apollo.MutationFunction<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>;
 
 /**
  * __useCreateUploadSessionMutationMutation__
@@ -742,51 +687,30 @@ export type CreateUploadSessionMutationMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreateUploadSessionMutationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateUploadSessionMutationMutation,
-    CreateUploadSessionMutationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateUploadSessionMutationMutation,
-    CreateUploadSessionMutationMutationVariables
-  >(CreateUploadSessionMutationDocument, options);
-}
-export type CreateUploadSessionMutationMutationHookResult = ReturnType<
-  typeof useCreateUploadSessionMutationMutation
->;
-export type CreateUploadSessionMutationMutationResult =
-  Apollo.MutationResult<CreateUploadSessionMutationMutation>;
-export type CreateUploadSessionMutationMutationOptions =
-  Apollo.BaseMutationOptions<
-    CreateUploadSessionMutationMutation,
-    CreateUploadSessionMutationMutationVariables
-  >;
+export function useCreateUploadSessionMutationMutation(baseOptions?: Apollo.MutationHookOptions<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>(CreateUploadSessionMutationDocument, options);
+      }
+export type CreateUploadSessionMutationMutationHookResult = ReturnType<typeof useCreateUploadSessionMutationMutation>;
+export type CreateUploadSessionMutationMutationResult = Apollo.MutationResult<CreateUploadSessionMutationMutation>;
+export type CreateUploadSessionMutationMutationOptions = Apollo.BaseMutationOptions<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>;
 export const GetDirectoryTreeQueryDocument = gql`
-  query getDirectoryTreeQuery(
-    $path: String!
-    $depth: Float!
-    $dataStoreId: Float
-  ) {
-    directoryTree(
-      data: { path: $path, depth: $depth, dataStoreId: $dataStoreId }
-    ) {
+    query getDirectoryTreeQuery($path: String!, $depth: Float!, $dataStoreId: Float) {
+  directoryTree(data: {path: $path, depth: $depth, dataStoreId: $dataStoreId}) {
+    path
+    __typename
+    tree {
+      isDirectory
+      dataStoreId
+      sharedDataStore
+      name
+      relativePath
       path
       __typename
-      tree {
-        isDirectory
-        dataStoreId
-        sharedDataStore
-        name
-        relativePath
-        path
-        __typename
-      }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useGetDirectoryTreeQueryQuery__
@@ -806,55 +730,32 @@ export const GetDirectoryTreeQueryDocument = gql`
  *   },
  * });
  */
-export function useGetDirectoryTreeQueryQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GetDirectoryTreeQueryQuery,
-    GetDirectoryTreeQueryQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GetDirectoryTreeQueryQuery,
-    GetDirectoryTreeQueryQueryVariables
-  >(GetDirectoryTreeQueryDocument, options);
-}
-export function useGetDirectoryTreeQueryLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetDirectoryTreeQueryQuery,
-    GetDirectoryTreeQueryQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetDirectoryTreeQueryQuery,
-    GetDirectoryTreeQueryQueryVariables
-  >(GetDirectoryTreeQueryDocument, options);
-}
-export type GetDirectoryTreeQueryQueryHookResult = ReturnType<
-  typeof useGetDirectoryTreeQueryQuery
->;
-export type GetDirectoryTreeQueryLazyQueryHookResult = ReturnType<
-  typeof useGetDirectoryTreeQueryLazyQuery
->;
-export type GetDirectoryTreeQueryQueryResult = Apollo.QueryResult<
-  GetDirectoryTreeQueryQuery,
-  GetDirectoryTreeQueryQueryVariables
->;
+export function useGetDirectoryTreeQueryQuery(baseOptions: Apollo.QueryHookOptions<GetDirectoryTreeQueryQuery, GetDirectoryTreeQueryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDirectoryTreeQueryQuery, GetDirectoryTreeQueryQueryVariables>(GetDirectoryTreeQueryDocument, options);
+      }
+export function useGetDirectoryTreeQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDirectoryTreeQueryQuery, GetDirectoryTreeQueryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDirectoryTreeQueryQuery, GetDirectoryTreeQueryQueryVariables>(GetDirectoryTreeQueryDocument, options);
+        }
+export type GetDirectoryTreeQueryQueryHookResult = ReturnType<typeof useGetDirectoryTreeQueryQuery>;
+export type GetDirectoryTreeQueryLazyQueryHookResult = ReturnType<typeof useGetDirectoryTreeQueryLazyQuery>;
+export type GetDirectoryTreeQueryQueryResult = Apollo.QueryResult<GetDirectoryTreeQueryQuery, GetDirectoryTreeQueryQueryVariables>;
 export const GetTreeQueryDocument = gql`
-  query getTreeQuery($path: String!, $depth: Float!, $dataStoreId: Float) {
-    tree(data: { path: $path, dataStoreId: $dataStoreId, depth: $depth }) {
+    query getTreeQuery($path: String!, $depth: Float!, $dataStoreId: Float) {
+  tree(data: {path: $path, dataStoreId: $dataStoreId, depth: $depth}) {
+    path
+    __typename
+    tree {
+      relativePath
+      isDirectory
+      name
       path
       __typename
-      tree {
-        relativePath
-        isDirectory
-        name
-        path
-        __typename
-      }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useGetTreeQueryQuery__
@@ -874,107 +775,61 @@ export const GetTreeQueryDocument = gql`
  *   },
  * });
  */
-export function useGetTreeQueryQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GetTreeQueryQuery,
-    GetTreeQueryQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetTreeQueryQuery, GetTreeQueryQueryVariables>(
-    GetTreeQueryDocument,
-    options
-  );
-}
-export function useGetTreeQueryLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetTreeQueryQuery,
-    GetTreeQueryQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetTreeQueryQuery, GetTreeQueryQueryVariables>(
-    GetTreeQueryDocument,
-    options
-  );
-}
-export type GetTreeQueryQueryHookResult = ReturnType<
-  typeof useGetTreeQueryQuery
->;
-export type GetTreeQueryLazyQueryHookResult = ReturnType<
-  typeof useGetTreeQueryLazyQuery
->;
-export type GetTreeQueryQueryResult = Apollo.QueryResult<
-  GetTreeQueryQuery,
-  GetTreeQueryQueryVariables
->;
-export const GetFriendsQueryDocument = gql`
-  query GetFriendsQuery {
-    friends {
-      id
-      email
-      userName
-    }
+export function useGetTreeQueryQuery(baseOptions: Apollo.QueryHookOptions<GetTreeQueryQuery, GetTreeQueryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTreeQueryQuery, GetTreeQueryQueryVariables>(GetTreeQueryDocument, options);
+      }
+export function useGetTreeQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTreeQueryQuery, GetTreeQueryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTreeQueryQuery, GetTreeQueryQueryVariables>(GetTreeQueryDocument, options);
+        }
+export type GetTreeQueryQueryHookResult = ReturnType<typeof useGetTreeQueryQuery>;
+export type GetTreeQueryLazyQueryHookResult = ReturnType<typeof useGetTreeQueryLazyQuery>;
+export type GetTreeQueryQueryResult = Apollo.QueryResult<GetTreeQueryQuery, GetTreeQueryQueryVariables>;
+export const GetUserNameByNameDocument = gql`
+    query getUserNameByName($name: String!) {
+  getUsersByName(name: $name) {
+    userName
+    id
   }
-`;
+}
+    `;
 
 /**
- * __useGetFriendsQueryQuery__
+ * __useGetUserNameByNameQuery__
  *
- * To run a query within a React component, call `useGetFriendsQueryQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetFriendsQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetUserNameByNameQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserNameByNameQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetFriendsQueryQuery({
+ * const { data, loading, error } = useGetUserNameByNameQuery({
  *   variables: {
+ *      name: // value for 'name'
  *   },
  * });
  */
-export function useGetFriendsQueryQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GetFriendsQueryQuery,
-    GetFriendsQueryQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetFriendsQueryQuery, GetFriendsQueryQueryVariables>(
-    GetFriendsQueryDocument,
-    options
-  );
-}
-export function useGetFriendsQueryLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetFriendsQueryQuery,
-    GetFriendsQueryQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetFriendsQueryQuery,
-    GetFriendsQueryQueryVariables
-  >(GetFriendsQueryDocument, options);
-}
-export type GetFriendsQueryQueryHookResult = ReturnType<
-  typeof useGetFriendsQueryQuery
->;
-export type GetFriendsQueryLazyQueryHookResult = ReturnType<
-  typeof useGetFriendsQueryLazyQuery
->;
-export type GetFriendsQueryQueryResult = Apollo.QueryResult<
-  GetFriendsQueryQuery,
-  GetFriendsQueryQueryVariables
->;
+export function useGetUserNameByNameQuery(baseOptions: Apollo.QueryHookOptions<GetUserNameByNameQuery, GetUserNameByNameQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserNameByNameQuery, GetUserNameByNameQueryVariables>(GetUserNameByNameDocument, options);
+      }
+export function useGetUserNameByNameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserNameByNameQuery, GetUserNameByNameQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserNameByNameQuery, GetUserNameByNameQueryVariables>(GetUserNameByNameDocument, options);
+        }
+export type GetUserNameByNameQueryHookResult = ReturnType<typeof useGetUserNameByNameQuery>;
+export type GetUserNameByNameLazyQueryHookResult = ReturnType<typeof useGetUserNameByNameLazyQuery>;
+export type GetUserNameByNameQueryResult = Apollo.QueryResult<GetUserNameByNameQuery, GetUserNameByNameQueryVariables>;
 export const GetMyDataStoresDocument = gql`
-  query getMyDataStores {
-    getMyDataStores {
-      id
-      name
-    }
+    query getMyDataStores {
+  getMyDataStores {
+    id
+    name
   }
-`;
+}
+    `;
 
 /**
  * __useGetMyDataStoresQuery__
@@ -991,51 +846,25 @@ export const GetMyDataStoresDocument = gql`
  *   },
  * });
  */
-export function useGetMyDataStoresQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GetMyDataStoresQuery,
-    GetMyDataStoresQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetMyDataStoresQuery, GetMyDataStoresQueryVariables>(
-    GetMyDataStoresDocument,
-    options
-  );
-}
-export function useGetMyDataStoresLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetMyDataStoresQuery,
-    GetMyDataStoresQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetMyDataStoresQuery,
-    GetMyDataStoresQueryVariables
-  >(GetMyDataStoresDocument, options);
-}
-export type GetMyDataStoresQueryHookResult = ReturnType<
-  typeof useGetMyDataStoresQuery
->;
-export type GetMyDataStoresLazyQueryHookResult = ReturnType<
-  typeof useGetMyDataStoresLazyQuery
->;
-export type GetMyDataStoresQueryResult = Apollo.QueryResult<
-  GetMyDataStoresQuery,
-  GetMyDataStoresQueryVariables
->;
+export function useGetMyDataStoresQuery(baseOptions?: Apollo.QueryHookOptions<GetMyDataStoresQuery, GetMyDataStoresQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMyDataStoresQuery, GetMyDataStoresQueryVariables>(GetMyDataStoresDocument, options);
+      }
+export function useGetMyDataStoresLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyDataStoresQuery, GetMyDataStoresQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMyDataStoresQuery, GetMyDataStoresQueryVariables>(GetMyDataStoresDocument, options);
+        }
+export type GetMyDataStoresQueryHookResult = ReturnType<typeof useGetMyDataStoresQuery>;
+export type GetMyDataStoresLazyQueryHookResult = ReturnType<typeof useGetMyDataStoresLazyQuery>;
+export type GetMyDataStoresQueryResult = Apollo.QueryResult<GetMyDataStoresQuery, GetMyDataStoresQueryVariables>;
 export const LoginMutationDocument = gql`
-  mutation loginMutation($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      id
-    }
+    mutation loginMutation($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    id
   }
-`;
-export type LoginMutationMutationFn = Apollo.MutationFunction<
-  LoginMutationMutation,
-  LoginMutationMutationVariables
->;
+}
+    `;
+export type LoginMutationMutationFn = Apollo.MutationFunction<LoginMutationMutation, LoginMutationMutationVariables>;
 
 /**
  * __useLoginMutationMutation__
@@ -1055,36 +884,19 @@ export type LoginMutationMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useLoginMutationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    LoginMutationMutation,
-    LoginMutationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    LoginMutationMutation,
-    LoginMutationMutationVariables
-  >(LoginMutationDocument, options);
-}
-export type LoginMutationMutationHookResult = ReturnType<
-  typeof useLoginMutationMutation
->;
-export type LoginMutationMutationResult =
-  Apollo.MutationResult<LoginMutationMutation>;
-export type LoginMutationMutationOptions = Apollo.BaseMutationOptions<
-  LoginMutationMutation,
-  LoginMutationMutationVariables
->;
+export function useLoginMutationMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutationMutation, LoginMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginMutationMutation, LoginMutationMutationVariables>(LoginMutationDocument, options);
+      }
+export type LoginMutationMutationHookResult = ReturnType<typeof useLoginMutationMutation>;
+export type LoginMutationMutationResult = Apollo.MutationResult<LoginMutationMutation>;
+export type LoginMutationMutationOptions = Apollo.BaseMutationOptions<LoginMutationMutation, LoginMutationMutationVariables>;
 export const LogoutMutationDocument = gql`
-  mutation logoutMutation {
-    logout
-  }
-`;
-export type LogoutMutationMutationFn = Apollo.MutationFunction<
-  LogoutMutationMutation,
-  LogoutMutationMutationVariables
->;
+    mutation logoutMutation {
+  logout
+}
+    `;
+export type LogoutMutationMutationFn = Apollo.MutationFunction<LogoutMutationMutation, LogoutMutationMutationVariables>;
 
 /**
  * __useLogoutMutationMutation__
@@ -1102,37 +914,23 @@ export type LogoutMutationMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useLogoutMutationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    LogoutMutationMutation,
-    LogoutMutationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    LogoutMutationMutation,
-    LogoutMutationMutationVariables
-  >(LogoutMutationDocument, options);
-}
-export type LogoutMutationMutationHookResult = ReturnType<
-  typeof useLogoutMutationMutation
->;
-export type LogoutMutationMutationResult =
-  Apollo.MutationResult<LogoutMutationMutation>;
-export type LogoutMutationMutationOptions = Apollo.BaseMutationOptions<
-  LogoutMutationMutation,
-  LogoutMutationMutationVariables
->;
+export function useLogoutMutationMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutationMutation, LogoutMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LogoutMutationMutation, LogoutMutationMutationVariables>(LogoutMutationDocument, options);
+      }
+export type LogoutMutationMutationHookResult = ReturnType<typeof useLogoutMutationMutation>;
+export type LogoutMutationMutationResult = Apollo.MutationResult<LogoutMutationMutation>;
+export type LogoutMutationMutationOptions = Apollo.BaseMutationOptions<LogoutMutationMutation, LogoutMutationMutationVariables>;
 export const MeDocument = gql`
-  query me {
-    me {
-      email
-      id
-      userName
-      isAdmin
-    }
+    query me {
+  me {
+    email
+    id
+    userName
+    isAdmin
   }
-`;
+}
+    `;
 
 /**
  * __useMeQuery__
@@ -1149,38 +947,25 @@ export const MeDocument = gql`
  *   },
  * });
  */
-export function useMeQuery(
-  baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-}
-export function useMeLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-}
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+      }
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+        }
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const RegisterMutationDocument = gql`
-  mutation registerMutation(
-    $email: String!
-    $password: String!
-    $userName: String!
-  ) {
-    register(
-      data: { email: $email, password: $password, userName: $userName }
-    ) {
-      id
-    }
+    mutation registerMutation($email: String!, $password: String!, $userName: String!) {
+  register(data: {email: $email, password: $password, userName: $userName}) {
+    id
   }
-`;
-export type RegisterMutationMutationFn = Apollo.MutationFunction<
-  RegisterMutationMutation,
-  RegisterMutationMutationVariables
->;
+}
+    `;
+export type RegisterMutationMutationFn = Apollo.MutationFunction<RegisterMutationMutation, RegisterMutationMutationVariables>;
 
 /**
  * __useRegisterMutationMutation__
@@ -1201,24 +986,10 @@ export type RegisterMutationMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useRegisterMutationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RegisterMutationMutation,
-    RegisterMutationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RegisterMutationMutation,
-    RegisterMutationMutationVariables
-  >(RegisterMutationDocument, options);
-}
-export type RegisterMutationMutationHookResult = ReturnType<
-  typeof useRegisterMutationMutation
->;
-export type RegisterMutationMutationResult =
-  Apollo.MutationResult<RegisterMutationMutation>;
-export type RegisterMutationMutationOptions = Apollo.BaseMutationOptions<
-  RegisterMutationMutation,
-  RegisterMutationMutationVariables
->;
+export function useRegisterMutationMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutationMutation, RegisterMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RegisterMutationMutation, RegisterMutationMutationVariables>(RegisterMutationDocument, options);
+      }
+export type RegisterMutationMutationHookResult = ReturnType<typeof useRegisterMutationMutation>;
+export type RegisterMutationMutationResult = Apollo.MutationResult<RegisterMutationMutation>;
+export type RegisterMutationMutationOptions = Apollo.BaseMutationOptions<RegisterMutationMutation, RegisterMutationMutationVariables>;

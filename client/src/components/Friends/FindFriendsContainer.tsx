@@ -1,4 +1,5 @@
 import { FindUsersQuery } from "graphql/User/findUsers";
+import { SendFriendRequestMutation } from "graphql/Friends/sendFriendRequest";
 import React, { FormEvent, useState } from "react";
 import { useApolloClient } from "react-apollo";
 import { useTimeoutInput } from "src/hooks/useTimeoutInput";
@@ -41,6 +42,19 @@ export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
     cb(nameInput);
   };
 
+  const sendFriendRequest = async (userId: number) => {
+    const { errors, data } = await client.mutate({
+      mutation: SendFriendRequestMutation,
+      variables: { userId },
+    });
+
+    if (errors) {
+      console.log(errors);
+    }
+
+    console.log(data);
+  };
+
   return (
     <div>
       <form onSubmit={search}>
@@ -57,7 +71,12 @@ export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
               {friendsIds.includes(u.id) ? (
                 "already your friend"
               ) : (
-                <button type="submit">send friend request</button>
+                <button
+                  type="submit"
+                  onClick={() => sendFriendRequest(Number(u.id))}
+                >
+                  send friend request
+                </button>
               )}
             </div>
           ))}

@@ -75,7 +75,7 @@ const ShareDataStoreWrapper: React.FC<Props> = ({
     <MenuOverlay hide={hide}>
       <b>friends</b>
       {!friendsLoading &&
-        friends?.friends.map((friend, idx) => (
+        friends?.friends?.friends.map((friend, idx) => (
           <div key={idx}>
             {friend.userName}
             {selectedUsers.has(Number(friend.id)) ? (
