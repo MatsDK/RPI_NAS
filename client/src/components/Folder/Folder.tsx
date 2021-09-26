@@ -23,8 +23,11 @@ const FolderContent = styled.div`
 `;
 
 const FolderContainer = styled.div`
-  overflow: scroll;
+  overflow-y: auto;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 `;
 
 const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
@@ -81,7 +84,11 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <div
+      style={{
+        width: "100%",
+      }}
+    >
       <FolderNavbar />
       <FolderContainer>
         <FolderPath
@@ -122,6 +129,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
               />
             ))}
         </FolderContent>
+        <div style={{ minHeight: 300, flex: 1 }}></div>
       </FolderContainer>
     </div>
   );

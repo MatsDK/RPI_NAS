@@ -8,8 +8,12 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
   let path = (req.query.path as string[]).join("/");
   if (!path.endsWith("/")) path += "/";
 
-  const pathStats = fs.lstatSync(path);
-  if (!pathStats.isDirectory()) return res.status(400);
+  try {
+    const pathStats = fs.lstatSync(path);
+    if (!pathStats.isDirectory()) return res.status(400);
+  } catch {
+    res.status(200).json({ data: [] });
+  }
 
   const returnArr: Array<{ path: string; isDirectory: boolean; name: string }> =
       [],

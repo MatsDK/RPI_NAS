@@ -1,4 +1,5 @@
 import { useApolloClient } from "react-apollo";
+import fsPath from "path";
 import MenuOverlay from "../MenuOverlay";
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
 import axios from "axios";
@@ -25,7 +26,9 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
   const [folderPath, setFolderPath] = useInput<string>(
     folderCtx?.currentFolderPath?.folderPath.path || ""
   );
-  const [path, setPath] = useState("H:/");
+  const [path, setPath] = useState<null | string>(null);
+  const [drives, setDrives] = useState<string[]>([]);
+  const [selectedDrive, setSelectedDrive] = useState<string | null>(null);
   const [folderData, setFolderData] = useState<
     Array<{ name: string; path: string; isDirectory: boolean }>
   >([]);
@@ -35,10 +38,21 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
 
   useEffect(() => {
     updateUploadFolderView();
-  }, [path]);
+  }, [path, selectedDrive]);
+
+  useEffect(() => {
+    axios.get("/api/getdrives").then((res) => {
+      setDrives(res.data.drives.map((d: any) => d.mountpoints[0].path));
+      setSelectedDrive(res.data.drives[0]?.mountpoints[0].path || null);
+    });
+  }, []);
 
   const updateUploadFolderView = async () => {
-    const { data, status } = await axios.get(`/api/path/${path}`);
+    if (!selectedDrive) return;
+
+    const { data, status } = await axios.get(
+      `/api/path/${fsPath.join(selectedDrive.replace(/\\/g, "/"), path || "")}`
+    );
 
     if (status === 200) setFolderData(data.data);
   };
@@ -84,77 +98,111 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
 
   return (
     <MenuOverlay hide={hide}>
-      <h1>upload</h1>
-      <input
-        type="text"
-        placeholder="upload location"
-        value={folderPath}
-        onChange={setFolderPath}
-      />
-      <div style={{ display: "flex" }}>
-        {path.split(`/`).map((x, idx) => (
-          <div
-            onClick={() => {
-              const newPath = path
-                .split("/")
-                .slice(0, idx + 1)
-                .join("/");
+      <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        <div>
+          <h1>upload</h1>
 
-              setPath(newPath);
+          <input
+            type="text"
+            placeholder="upload location"
+            value={folderPath}
+            onChange={setFolderPath}
+          />
+          <select
+            name="drive"
+            onChange={(e) => {
+              setPath("/");
+              setSelectedDrive(e.target.value);
             }}
-            key={idx}
           >
-            {x}/
+            {drives.map((d, idx) => (
+              <option value={d} key={idx}>
+                {d}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div style={{ display: "flex" }}>
+          {selectedDrive &&
+            fsPath
+              .join(selectedDrive, path || "")
+              .split(`/`)
+              .map((x, idx) => (
+                <div
+                  onClick={() => {
+                    const newPath = (path || "")
+                      .split("/")
+                      .slice(0, idx)
+                      .join("/");
+
+                    setPath(newPath);
+                  }}
+                  key={idx}
+                >
+                  {x}/
+                </div>
+              ))}
+        </div>
+        <div style={{ flex: 1, overflow: "auto" }}>
+          {folderData.map((item, idx) => (
+            <div key={idx} style={{ display: "flex" }}>
+              {item.isDirectory ? (
+                <p
+                  style={{ cursor: "pointer", width: "fit-content" }}
+                  onClick={() => {
+                    selectedDrive &&
+                      setPath(
+                        fsPath.relative(
+                          selectedDrive.replace(/\\/g, "/"),
+                          item.path.replace(/\\/g, "/")
+                        )
+                      );
+                  }}
+                >
+                  {item.name}
+                </p>
+              ) : (
+                <p style={{ width: "fit-content" }}>{item.name}</p>
+              )}
+
+              <button
+                onClick={() => {
+                  if (!selectedPaths.has(item.path)) {
+                    setSelectedPaths(
+                      (selectedPaths) =>
+                        new Map(
+                          selectedPaths.set(item.path, {
+                            isDir: item.isDirectory,
+                          })
+                        )
+                    );
+                  } else {
+                    selectedPaths.delete(item.path);
+                    setSelectedPaths((selectedPaths) => new Map(selectedPaths));
+                  }
+                }}
+              >
+                {selectedPaths.has(item.path) ? "remove" : "select"}
+              </button>
+            </div>
+          ))}
+        </div>
+        <h1>selected</h1>
+        {Array.from(selectedPaths).map((path, idx) => (
+          <div key={idx}>
+            {path[0]}
+            <button
+              onClick={() => {
+                selectedPaths.delete(path[0]);
+                setSelectedPaths((selectedPaths) => new Map(selectedPaths));
+              }}
+            >
+              remove
+            </button>
           </div>
         ))}
+        <button onClick={upload}>Upload</button>
       </div>
-      {folderData.map((item, idx) => (
-        <div key={idx} style={{ display: "flex" }}>
-          {item.isDirectory ? (
-            <p
-              style={{ cursor: "pointer", width: "fit-content" }}
-              onClick={() => setPath(item.path.replace(/\\/g, "/"))}
-            >
-              {item.name}
-            </p>
-          ) : (
-            <p style={{ width: "fit-content" }}>{item.name}</p>
-          )}
-
-          <button
-            onClick={() => {
-              if (!selectedPaths.has(item.path)) {
-                setSelectedPaths(
-                  (selectedPaths) =>
-                    new Map(
-                      selectedPaths.set(item.path, { isDir: item.isDirectory })
-                    )
-                );
-              } else {
-                selectedPaths.delete(item.path);
-                setSelectedPaths((selectedPaths) => new Map(selectedPaths));
-              }
-            }}
-          >
-            {selectedPaths.has(item.path) ? "remove" : "select"}
-          </button>
-        </div>
-      ))}
-      <h1>selected</h1>
-      {Array.from(selectedPaths).map((path, idx) => (
-        <div key={idx}>
-          {path[0]}
-          <button
-            onClick={() => {
-              selectedPaths.delete(path[0]);
-              setSelectedPaths((selectedPaths) => new Map(selectedPaths));
-            }}
-          >
-            remove
-          </button>
-        </div>
-      ))}
-      <button onClick={upload}>Upload</button>
     </MenuOverlay>
   );
 };

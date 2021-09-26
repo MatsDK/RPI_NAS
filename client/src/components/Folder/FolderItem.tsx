@@ -15,6 +15,10 @@ export const FolderItemWrapper = styled.div`
   display: flex;
   padding: 2px 3px;
   align-items: center;
+
+  :hover input[type="checkbox"] {
+    opacity: 1;
+  }
 `;
 
 export const IconWrapper = styled.div`
@@ -33,8 +37,8 @@ const SelectButtonWrapper = styled.div`
   padding-right: 15px;
   padding-left: 10px;
 
-  button {
-    width: 10px;
+  input:not(:checked) {
+    opacity: 0;
   }
 `;
 

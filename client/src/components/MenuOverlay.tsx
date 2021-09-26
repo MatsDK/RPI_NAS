@@ -7,6 +7,7 @@ const Overlay = styled.div`
   top: 0;
   height: 100vh;
   min-width: 35vw;
+  max-width: 40vw;
   background-color: ${(props) => props.theme.bgColors[1]};
   color: ${(props) => props.theme.textColors[3]};
 `;

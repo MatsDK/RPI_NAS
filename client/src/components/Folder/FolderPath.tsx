@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import styled from "styled-components";
+import Icon from "src/ui/Icon";
 
 interface FolderPathProps {
   path: string[];
@@ -8,8 +9,27 @@ interface FolderPathProps {
 }
 
 const PathWrapper = styled.div`
-  padding: 4px 10px;
+  padding: 6px 10px;
   display: flex;
+  color: ${(props) => props.theme.textColors[1]};
+  font-size: 18px;
+`;
+
+const CurrentPath = styled.span`
+  color: ${(props) => props.theme.textColors[0]};
+  font-weight: 600;
+  cursor: default;
+`;
+
+const Path = styled.span`
+  cursor: pointer;
+`;
+
+const PathArrow = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 3px;
 `;
 
 export const FolderPath: React.FC<FolderPathProps> = ({
@@ -21,10 +41,20 @@ export const FolderPath: React.FC<FolderPathProps> = ({
       <span>
         {path.length && path[0] ? (
           <Link href={`/path?d=${id}`}>
-            <span>{name}/</span>
+            <div style={{ display: "flex" }}>
+              <Path>{name}</Path>
+              <PathArrow>
+                <Icon
+                  name={"folderArrow"}
+                  color={{ idx: 2, propName: "textColors" }}
+                  height={16}
+                  width={16}
+                />
+              </PathArrow>
+            </div>
           </Link>
         ) : (
-          name
+          <CurrentPath>{name}</CurrentPath>
         )}
       </span>
       {path.map((p, idx) => {
@@ -32,15 +62,24 @@ export const FolderPath: React.FC<FolderPathProps> = ({
           relativePath = path.slice(0, idx + 1).join("/");
 
         return (
-          <div key={idx}>
+          <div key={idx} style={{ display: "flex" }}>
             {!isNotCurrentPath ? (
-              p
+              <CurrentPath>{p}</CurrentPath>
             ) : (
               <Link href={`/path/${relativePath}?d=${id}`}>
-                <span>{p}</span>
+                <Path>{p}</Path>
               </Link>
             )}
-            {isNotCurrentPath && "/"}
+            {isNotCurrentPath && (
+              <PathArrow>
+                <Icon
+                  name={"folderArrow"}
+                  color={{ idx: 2, propName: "textColors" }}
+                  height={16}
+                  width={16}
+                />
+              </PathArrow>
+            )}
           </div>
         );
       })}

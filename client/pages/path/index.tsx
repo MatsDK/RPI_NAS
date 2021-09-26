@@ -68,7 +68,7 @@ Page.getInitialProps = async (ctx: ApolloContext) => {
     query: getTreeQuery,
     variables: {
       depth: 1,
-      path: "/",
+      path: "",
       dataStoreId: dataStore,
     },
   });
