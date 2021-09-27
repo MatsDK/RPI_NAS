@@ -20,6 +20,10 @@ export class User extends BaseEntity {
   @Column("bool", { default: false })
   isAdmin: boolean;
 
+  @Field({ nullable: true })
+  @Column("text", { nullable: true })
+  defaultDownloadPath: string;
+
   @Column("text")
   password: string;
 

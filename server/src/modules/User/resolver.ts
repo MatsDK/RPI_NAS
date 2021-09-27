@@ -118,6 +118,17 @@ export class UserResolver {
 
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
+  async setDefaultDownloadPath(
+    @Arg("path") path: string,
+    @Ctx() { req }: MyContext
+  ): Promise<boolean> {
+    await User.update({ id: req.userId }, { defaultDownloadPath: path });
+
+    return true;
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Boolean, { nullable: true })
   async sendFriendRequest(
     @Arg("userId") userId: number,
     @Ctx() { req }: MyContext

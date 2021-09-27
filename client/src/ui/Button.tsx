@@ -8,11 +8,25 @@ export const Button = styled.button`
   cursor: pointer;
   padding: 4px 9px 4px 10px;
   border: 0;
-  /* border-right: 1px solid ${(props) => props.theme.textColors[3]}; */
   transition: color 0.15s ease-in-out;
 
   :hover {
     color: ${(props) => props.theme.textColors[0]};
+  }
+`;
+
+export const LightButton = styled.button`
+  background: transparent;
+  border: 0;
+  color: ${(props) => props.theme.textColors[2]};
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 9px 4px 10px;
+  border: 0;
+  transition: color 0.15s ease-in-out;
+
+  :hover {
+    color: ${(props) => props.theme.textColors[3]};
   }
 `;
 
@@ -25,7 +39,6 @@ export const BgButton = styled.button`
   cursor: pointer;
   padding: 5px 9px 5px 10px;
   border: 0;
-  /* border-right: 1px solid ${(props) => props.theme.textColors[3]}; */
   transition: box-shadow 0.15s ease-in-out;
 
   :hover {

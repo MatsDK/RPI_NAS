@@ -13,6 +13,9 @@ interface Props {
   hide: () => any;
 }
 
+type FolderData = Array<{ name: string; path: string; isDirectory: boolean }>;
+type SelectedPaths = Map<string, { isDir: boolean }>;
+
 const UploadWrapper: React.FC<Props> = ({ hide }) => {
   const client: any = useApolloClient();
   const router = useRouter();
@@ -29,12 +32,8 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
   const [path, setPath] = useState<null | string>(null);
   const [drives, setDrives] = useState<string[]>([]);
   const [selectedDrive, setSelectedDrive] = useState<string | null>(null);
-  const [folderData, setFolderData] = useState<
-    Array<{ name: string; path: string; isDirectory: boolean }>
-  >([]);
-  const [selectedPaths, setSelectedPaths] = useState<
-    Map<string, { isDir: boolean }>
-  >(new Map());
+  const [folderData, setFolderData] = useState<FolderData>([]);
+  const [selectedPaths, setSelectedPaths] = useState<SelectedPaths>(new Map());
 
   useEffect(() => {
     updateUploadFolderView();
@@ -43,7 +42,8 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
   useEffect(() => {
     axios.get("/api/getdrives").then((res) => {
       setDrives(res.data.drives.map((d: any) => d.mountpoints[0].path));
-      setSelectedDrive(res.data.drives[0]?.mountpoints[0].path || null);
+      if (!selectedDrive)
+        setSelectedDrive(res.data.drives[0]?.mountpoints[0].path || null);
     });
   }, []);
 
@@ -100,7 +100,7 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
     <MenuOverlay hide={hide}>
       <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <div>
-          <h1>upload</h1>
+          <h1>Upload</h1>
 
           <input
             type="text"
@@ -159,10 +159,10 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
                       );
                   }}
                 >
-                  {item.name}
+                  dir {item.name}
                 </p>
               ) : (
-                <p style={{ width: "fit-content" }}>{item.name}</p>
+                <p style={{ width: "fit-content" }}>file {item.name}</p>
               )}
 
               <button

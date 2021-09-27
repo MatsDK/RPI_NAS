@@ -52,6 +52,8 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
     if (folderCtx) {
       const { selected, currentFolderPath } = folderCtx;
 
+      folderCtx.selected?.setSelected?.(new Map());
+
       selected.selectedItems = new Map();
       currentFolderPath?.setFolderPath({ path, dataStoreId, dataStoreName });
     }

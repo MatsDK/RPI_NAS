@@ -237,6 +237,7 @@ export type User = {
   email: Scalars['String'];
   userName: Scalars['String'];
   isAdmin: Scalars['Boolean'];
+  defaultDownloadPath?: Maybe<Scalars['String']>;
   friends: Array<User>;
 };
 
@@ -350,7 +351,7 @@ export type LogoutMutationMutation = { __typename?: 'Mutation', logout?: Maybe<b
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', email: string, id: string, userName: string, isAdmin: boolean }> };
+export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', email: string, id: string, userName: string, isAdmin: boolean, defaultDownloadPath?: Maybe<string> }> };
 
 export type RegisterMutationMutationVariables = Exact<{
   email: Scalars['String'];
@@ -928,6 +929,7 @@ export const MeDocument = gql`
     id
     userName
     isAdmin
+    defaultDownloadPath
   }
 }
     `;
