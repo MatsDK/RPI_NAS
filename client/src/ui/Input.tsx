@@ -16,7 +16,6 @@ const Input = styled.input`
   font-size: 16px;
   border: 0;
   border-bottom: 1px solid ${(props) => props.theme.textColors[2]};
-  margin-bottom: 10px;
   outline: 0;
   padding-top: 7px;
 `;
@@ -27,8 +26,9 @@ const Label = styled.div<Props>`
   transition: 0.1s ease-in-out;
   color: ${(props) =>
     props.moved ? props.theme.textColors[2] : props.theme.textColors[3]};
-  top: ${(props) => (props.moved ? -12 : 5)}px;
+  top: ${(props) => (props.moved ? -12 : 4)}px;
   font-size: ${(props) => (props.moved ? 14 : 17)}px;
+  pointer-events: none;
 `;
 
 export const LabelInput: React.FC<InputProps> = ({
@@ -39,7 +39,9 @@ export const LabelInput: React.FC<InputProps> = ({
   const [moveLabel, setMoveLabel] = useState(!!value.trim());
 
   return (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{ position: "relative", display: "flex", alignItems: "center" }}
+    >
       <Label moved={moveLabel}>{label}</Label>
       <Input
         onFocus={() => setMoveLabel(true)}

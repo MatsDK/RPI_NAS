@@ -9,7 +9,7 @@ const Overlay = styled.div`
   width: 35vw;
   min-width: 500px;
   max-width: 40vw;
-  background-color: ${(props) => props.theme.bgColors[1]};
+  background-color: ${(props) => props.theme.bgColors[0]};
   z-index: 100;
   color: ${(props) => props.theme.textColors[3]};
 `;

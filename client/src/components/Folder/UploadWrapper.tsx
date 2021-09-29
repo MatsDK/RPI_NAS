@@ -1,4 +1,6 @@
 import { useApolloClient } from "react-apollo";
+import { LabelInput } from "../../ui/Input";
+import { Select } from "src/ui/Select";
 import fsPath from "path";
 import MenuOverlay from "../MenuOverlay";
 import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
@@ -8,6 +10,7 @@ import { FolderContext, FolderContextType } from "src/providers/folderState";
 import React, { useContext, useEffect, useState } from "react";
 import { useInput } from "src/hooks/useInput";
 import { useRouter } from "next/dist/client/router";
+import styled from "styled-components";
 
 interface Props {
   hide: () => any;
@@ -15,6 +18,44 @@ interface Props {
 
 type FolderData = Array<{ name: string; path: string; isDirectory: boolean }>;
 type SelectedPaths = Map<string, { isDir: boolean }>;
+
+const Container = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 25px;
+`;
+
+const Title = styled.h2`
+  font-weight: bold;
+  font-size: 36px;
+  color: ${(props) => props.theme.textColors[3]};
+  border-bottom: 1px solid ${(props) => props.theme.bgColors[1]};
+  padding-bottom: 10px;
+  margin-bottom: 5px;
+`;
+
+const DestinationInput = styled.div`
+  margin-top: 10px;
+  margin-bottom: 15px;
+
+  > div {
+    display: flex;
+  }
+`;
+
+const PathWrapper = styled.div`
+  margin-top: 10px;
+  > div {
+    display: flex;
+  }
+`;
+
+const SmallTitle = styled.span`
+  color: ${(props) => props.theme.textColors[3]};
+  font-size: 18px;
+  font-weight: 500;
+`;
 
 const UploadWrapper: React.FC<Props> = ({ hide }) => {
   const client: any = useApolloClient();
@@ -34,10 +75,18 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
   const [selectedDrive, setSelectedDrive] = useState<string | null>(null);
   const [folderData, setFolderData] = useState<FolderData>([]);
   const [selectedPaths, setSelectedPaths] = useState<SelectedPaths>(new Map());
+  const [selectedDataStore, setSelectedDataStore] = useState<null | {
+    id: any;
+    name: string;
+  }>(null);
 
   useEffect(() => {
     updateUploadFolderView();
   }, [path, selectedDrive]);
+
+  useEffect(() => {
+    setPath("/");
+  }, [selectedDrive]);
 
   useEffect(() => {
     axios.get("/api/getdrives").then((res) => {
@@ -98,51 +147,59 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
 
   return (
     <MenuOverlay hide={hide}>
-      <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-        <div>
-          <h1>Upload</h1>
+      <Container>
+        <Title>Upload</Title>
+        <DestinationInput>
+          <SmallTitle>Upload to</SmallTitle>
+          <div>
+            <Select
+              data={[{ name: "val1" }, { name: "val2" }]}
+              propName={"name"}
+              label={"DataStore"}
+              setValue={setSelectedDataStore}
+            />
+            <div
+              style={{ marginLeft: 20, display: "flex", alignItems: "center" }}
+            >
+              <LabelInput
+                value={folderPath}
+                label={"Path"}
+                setValue={setFolderPath}
+              />
+            </div>
+          </div>
+        </DestinationInput>
 
-          <input
-            type="text"
-            placeholder="upload location"
-            value={folderPath}
-            onChange={setFolderPath}
-          />
-          <select
-            name="drive"
-            onChange={(e) => {
-              setPath("/");
-              setSelectedDrive(e.target.value);
-            }}
-          >
-            {drives.map((d, idx) => (
-              <option value={d} key={idx}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div style={{ display: "flex" }}>
-          {selectedDrive &&
-            fsPath
-              .join(selectedDrive, path || "")
-              .split(`/`)
-              .map((x, idx) => (
-                <div
-                  onClick={() => {
-                    const newPath = (path || "")
-                      .split("/")
-                      .slice(0, idx)
-                      .join("/");
+        <PathWrapper>
+          <SmallTitle>Path</SmallTitle>
+          <div>
+            <Select
+              data={drives}
+              selectedIdx={0}
+              label="Drive"
+              setValue={setSelectedDrive}
+            />
+            <div style={{ display: "flex" }}>
+              {selectedDrive &&
+                path?.split("/")[0] &&
+                (path || "").split(`/`).map((x, idx) => (
+                  <div
+                    onClick={() => {
+                      const newPath = (path || "")
+                        .split("/")
+                        .slice(0, idx)
+                        .join("/");
 
-                    setPath(newPath);
-                  }}
-                  key={idx}
-                >
-                  {x}/
-                </div>
-              ))}
-        </div>
+                      setPath(newPath);
+                    }}
+                    key={idx}
+                  >
+                    {x}/
+                  </div>
+                ))}
+            </div>
+          </div>
+        </PathWrapper>
         <div style={{ flex: 1, overflow: "auto" }}>
           {folderData.map((item, idx) => (
             <div key={idx} style={{ display: "flex" }}>
@@ -202,7 +259,7 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
           </div>
         ))}
         <button onClick={upload}>Upload</button>
-      </div>
+      </Container>
     </MenuOverlay>
   );
 };
