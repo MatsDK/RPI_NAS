@@ -1,8 +1,8 @@
-import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
+import { DeletePtahsMutation } from "graphql/Folder/deletePaths";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { useRouter } from "next/dist/client/router";
 import React, { useContext, useEffect, useState } from "react";
-import { useApolloClient } from "react-apollo";
+import { useApollo } from "src/hooks/useApolloMutation";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import { BgButton, Button, ConditionButton } from "src/ui/Button";
 import styled from "styled-components";
@@ -19,7 +19,7 @@ const FolderNavbarWrapper = styled.div`
 `;
 
 const FolderNavbar = () => {
-  const client: any = useApolloClient();
+  const { mutate } = useApollo();
   const router = useRouter();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
@@ -42,18 +42,13 @@ const FolderNavbar = () => {
 
     if (!selected.length) return;
 
-    const { data } = await (
-      client as ApolloClient<NormalizedCacheObject>
-    ).mutate({
-      mutation: createSessionMutation,
-      variables: {
-        data: selected.map(({ isDirectory, relativePath }) => ({
-          path: relativePath,
-          type: isDirectory ? "directory" : "file",
-        })),
-        type: "http",
-        dataStoreId: Number(router.query.d),
-      },
+    const { data } = await mutate(createSessionMutation, {
+      data: selected.map(({ isDirectory, relativePath }) => ({
+        path: relativePath,
+        type: isDirectory ? "directory" : "file",
+      })),
+      type: "http",
+      dataStoreId: Number(router.query.d),
     });
 
     const sessionId = data?.createDownloadSession?.id;
@@ -65,6 +60,30 @@ const FolderNavbar = () => {
         "_blank"
       )
       ?.focus();
+  };
+
+  const deleteSelected = async () => {
+    if (!folderCtx) return;
+
+    const selected = Array.from(folderCtx.selected.selectedItems).map(
+      ([_, v]) => v
+    );
+
+    if (!router.query.d) return;
+
+    if (!selected.length) return;
+
+    const { data, errors } = await mutate(DeletePtahsMutation, {
+      paths: selected.map(({ isDirectory, relativePath }) => ({
+        path: relativePath,
+        type: isDirectory ? "directory" : "file",
+      })),
+      dataStoreId: Number(router.query.d),
+    });
+
+    if (errors) return console.log(errors);
+
+    console.log(data);
   };
 
   return (
@@ -98,7 +117,7 @@ const FolderNavbar = () => {
         )}
       </ConditionButton>
       <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
-        <Button onClick={() => {}}>Delete</Button>
+        <Button onClick={deleteSelected}>Delete</Button>
       </ConditionButton>
     </FolderNavbarWrapper>
   );

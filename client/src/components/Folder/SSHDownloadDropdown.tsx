@@ -1,15 +1,14 @@
-import { ApolloClient, NormalizedCacheObject } from "apollo-boost";
-import { LabelInput } from "src/ui/Input";
 import axios from "axios";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { setDefaultDownloadPathMutation } from "graphql/User/setDefaultDownloadPath";
 import router from "next/router";
 import React, { useContext } from "react";
-import { useApolloClient } from "react-apollo";
+import { useApollo } from "src/hooks/useApolloMutation";
 import { useInput } from "src/hooks/useInput";
 import { useMeState } from "src/hooks/useMeState";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import { ConditionButton, LightButton } from "src/ui/Button";
+import { LabelInput } from "src/ui/Input";
 import styled from "styled-components";
 
 interface SSHDownloadDropdownProps {
@@ -36,16 +35,15 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
   const { me } = useMeState();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
-  const client = useApolloClient();
+  const { mutate } = useApollo();
 
   const [pathInput, setPathInput] = useInput<string>(
     me.defaultDownloadPath || ""
   );
 
   const setDefaultPath = async () => {
-    const { errors, data } = await client.mutate({
-      mutation: setDefaultDownloadPathMutation,
-      variables: { path: pathInput.trim() },
+    const { errors, data } = await mutate(setDefaultDownloadPathMutation, {
+      path: pathInput.trim(),
     });
 
     if (errors) {
@@ -64,18 +62,13 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
 
     if (!router.query.d) return;
 
-    const { data } = await (
-      client as ApolloClient<NormalizedCacheObject>
-    ).mutate({
-      mutation: createSessionMutation,
-      variables: {
-        data: selected.map(({ isDirectory, relativePath }) => ({
-          path: relativePath,
-          type: isDirectory ? "directory" : "file",
-        })),
-        type: "SSH",
-        dataStoreId: Number(router.query.d),
-      },
+    const { data } = await mutate(createSessionMutation, {
+      data: selected.map(({ isDirectory, relativePath }) => ({
+        path: relativePath,
+        type: isDirectory ? "directory" : "file",
+      })),
+      type: "SSH",
+      dataStoreId: Number(router.query.d),
     });
 
     const { data: resData, hostIp, ...rest } = data.createDownloadSession;
@@ -104,7 +97,11 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
       <h1>Download</h1>
       <LabelInput label={"Path"} setValue={setPathInput} value={pathInput} />
       <div style={{ display: "flex" }}>
-        <ConditionButton condition={!!pathInput.trim()}>
+        <ConditionButton
+          condition={
+            !!pathInput.trim() && pathInput.trim() !== me.defaultDownloadPath
+          }
+        >
           <LightButton onClick={setDefaultPath}>Set as default</LightButton>
         </ConditionButton>
         <ConditionButton condition={!!pathInput.trim()}>

@@ -6,9 +6,11 @@ const Overlay = styled.div`
   right: 0;
   top: 0;
   height: 100vh;
-  min-width: 35vw;
+  width: 35vw;
+  min-width: 500px;
   max-width: 40vw;
   background-color: ${(props) => props.theme.bgColors[1]};
+  z-index: 100;
   color: ${(props) => props.theme.textColors[3]};
 `;
 

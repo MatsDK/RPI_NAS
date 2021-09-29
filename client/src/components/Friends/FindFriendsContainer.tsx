@@ -1,7 +1,7 @@
-import { FindUsersQuery } from "graphql/User/findUsers";
 import { SendFriendRequestMutation } from "graphql/Friends/sendFriendRequest";
+import { FindUsersQuery } from "graphql/User/findUsers";
 import React, { FormEvent, useState } from "react";
-import { useApolloClient } from "react-apollo";
+import { useApollo } from "src/hooks/useApolloMutation";
 import { useTimeoutInput } from "src/hooks/useTimeoutInput";
 
 interface FindFriendsContainerProps {
@@ -11,17 +11,14 @@ interface FindFriendsContainerProps {
 export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
   friendsIds,
 }) => {
-  const client = useApolloClient();
+  const { query, mutate } = useApollo();
 
   const [foundUsers, setFoundUsers] = useState<any[] | null>(null);
 
   const cb = async (val: string) => {
     if (!val.trim()) return;
 
-    const { data, errors } = await client.query({
-      query: FindUsersQuery,
-      variables: { name: val.trim() },
-    });
+    const { data, errors } = await query(FindUsersQuery, { name: val.trim() });
 
     if (errors) return console.log(errors);
 
@@ -43,14 +40,11 @@ export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
   };
 
   const sendFriendRequest = async (userId: number) => {
-    const { errors, data } = await client.mutate({
-      mutation: SendFriendRequestMutation,
-      variables: { userId },
+    const { errors, data } = await mutate(SendFriendRequestMutation, {
+      userId,
     });
 
-    if (errors) {
-      console.log(errors);
-    }
+    if (errors) return console.log(errors);
 
     console.log(data);
   };
