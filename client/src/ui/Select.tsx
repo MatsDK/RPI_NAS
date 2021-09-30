@@ -8,6 +8,7 @@ interface SelectProps {
   label: string;
   setValue: React.Dispatch<any>;
   propName?: string;
+  minWidth: number;
 }
 
 const SelectWrapper = styled.div`
@@ -21,7 +22,6 @@ const SelectWrapper = styled.div`
 const SelectContainer = styled.div`
   display: flex;
   height: 29px;
-  min-width: 85px;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid ${(props) => props.theme.textColors[2]};
@@ -54,7 +54,10 @@ export const Select: React.FC<SelectProps> = ({
   label,
   setValue,
   propName,
+  minWidth = 85,
 }) => {
+  if (selectedIdx == -1) selectedIdx = undefined;
+
   const [selected, setSelectedIdx] = useState(
     selectedIdx != null ? selectedIdx : null
   );
@@ -66,7 +69,10 @@ export const Select: React.FC<SelectProps> = ({
 
   return (
     <SelectWrapper>
-      <SelectContainer onClick={() => setDropdownOpen((s) => !s)}>
+      <SelectContainer
+        style={{ minWidth }}
+        onClick={() => setDropdownOpen((s) => !s)}
+      >
         {selected != null ? (
           <Label>{propName ? data[selected][propName] : data[selected]}</Label>
         ) : (
@@ -91,6 +97,7 @@ export const Select: React.FC<SelectProps> = ({
           {data.map((v, idx) => {
             return (
               <p
+                key={idx}
                 style={{ cursor: "pointer" }}
                 onClick={() => {
                   idx != selected && setSelectedIdx(idx);
