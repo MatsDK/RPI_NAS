@@ -8,7 +8,6 @@ const Overlay = styled.div`
   height: 100vh;
   width: 35vw;
   min-width: 500px;
-  max-width: 40vw;
   background-color: ${(props) => props.theme.bgColors[0]};
   z-index: 100;
   color: ${(props) => props.theme.textColors[3]};
@@ -25,12 +24,17 @@ const BackgroundOverlay = styled.div`
 
 interface Props {
   hide: () => any;
+  maxWidth?: string;
 }
 
-const MenuOverlay: React.FC<Props> = ({ children, hide }) => {
+const MenuOverlay: React.FC<Props> = ({
+  children,
+  hide,
+  maxWidth = "40vw",
+}) => {
   return (
     <BackgroundOverlay onClick={(e) => e.currentTarget == e.target && hide()}>
-      <Overlay>{children}</Overlay>
+      <Overlay style={{ maxWidth }}>{children}</Overlay>
     </BackgroundOverlay>
   );
 };

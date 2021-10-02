@@ -65,7 +65,9 @@ export const Select: React.FC<SelectProps> = ({
 
   useEffect(() => {
     selected != null && setValue(data[selected]);
-  }, [selected]);
+
+    setSelectedIdx(selectedIdx != null ? selectedIdx : null);
+  }, [selected, selectedIdx]);
 
   return (
     <SelectWrapper>

@@ -72,7 +72,7 @@ const ShareDataStoreWrapper: React.FC<Props> = ({
   };
 
   return (
-    <MenuOverlay hide={hide}>
+    <MenuOverlay hide={hide} maxWidth="20vw">
       <b>friends</b>
       {!friendsLoading &&
         friends?.friends?.friends.map((friend, idx) => (

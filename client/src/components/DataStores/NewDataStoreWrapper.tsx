@@ -13,7 +13,7 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
   const [nodeIdInput, setNodeIdInput] = useInput("");
 
   return (
-    <MenuOverlay hide={hide}>
+    <MenuOverlay hide={hide} maxWidth="20vw">
       <Mutation mutation={CreateDataStoreMutation}>
         {(mutate) => {
           const submit = async (e: FormEvent) => {

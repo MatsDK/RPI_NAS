@@ -12,7 +12,7 @@ Logout.getInitialProps = async ({
 }: NextContextWithApollo) => {
   await apolloClient.mutate({ mutation: logoutMutation });
   await apolloClient.resetStore();
-  redirect(ctx, "/");
+  redirect(ctx, "/login");
   return {};
 };
 

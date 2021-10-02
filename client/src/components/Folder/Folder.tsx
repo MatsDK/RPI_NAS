@@ -106,6 +106,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
         <FolderContent>
           {folderCtx?.newFolderInput?.showNewFolderInput && (
             <FolderItemWrapper>
+              <div style={{ width: 38 }} />
               <IconWrapper>
                 <Icon
                   color={{ idx: 2, propName: "bgColors" }}

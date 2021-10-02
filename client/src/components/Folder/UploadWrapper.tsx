@@ -230,7 +230,7 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
       },
     } = await mutate(createUploadSessionMutation, {
       uploadPath: folderPath,
-      dataStoreId: Number(dataStoreId),
+      dataStoreId: selectedDataStore!.id,
     });
 
     const res = await axios.get(`/api/upload`, {
@@ -410,7 +410,9 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
             ))}
           </SelectedPaths>
         </SelectedPathsContainer>
-        <ConditionButton condition={!!selectedPaths.size}>
+        <ConditionButton
+          condition={!!selectedPaths.size && !!selectedDataStore}
+        >
           <UploadButton onClick={upload}>Upload</UploadButton>
         </ConditionButton>
       </Container>

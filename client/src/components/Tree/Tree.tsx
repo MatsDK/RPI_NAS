@@ -30,6 +30,7 @@ const TreeContent = styled.div`
 `;
 
 const TreeHeader = styled.h1`
+  color: ${(props) => props.theme.bgColors[0]};
   white-space: nowrap;
   font-style: normal;
   font-weight: bold;
