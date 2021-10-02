@@ -5,6 +5,7 @@ import {
 import React, { useContext } from "react";
 import { useApolloClient } from "react-apollo";
 import { FolderContext } from "src/providers/folderState";
+import { Scrollbar } from "src/ui/Scrollbar";
 import styled from "styled-components";
 import TreeObjectItem from "./TreeItem";
 
@@ -13,28 +14,13 @@ interface Props {
 }
 
 const TreeWrapper = styled.div`
+  ${Scrollbar}
+
   min-width: 280px;
   max-width: 280px;
   overflow: auto;
   height: calc(100% - 65px);
   padding: 25px 0 0 30px;
-
-  scrollbar-color: ${(props) => props.theme.lightBgColors[2]} white;
-  scrollbar-width: thin;
-
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: ${(props) => props.theme.lightBgColors[2]};
-    border-radius: 2px;
-  }
 `;
 
 const TreeContent = styled.div`

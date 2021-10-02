@@ -8,9 +8,9 @@ export const getUser: MiddlewareFn<MyContext> = async (
 ) => {
   if ((req as any).user) return next();
 
-  if ((req as any).userId != null)
+  if (req.userId != null)
     (req as any).user = await User.findOne({
-      where: { id: (req as any).userId },
+      where: { id: req.userId },
     });
 
   return next();

@@ -10,6 +10,7 @@ import styled from "styled-components";
 import { CreateFolderMutation } from "graphql/Folder/createFolder";
 import Icon from "../../ui/Icon";
 import { FolderPath } from "./FolderPath";
+import { Scrollbar } from "src/ui/Scrollbar";
 
 interface Props {
   path: string;
@@ -23,6 +24,8 @@ const FolderContent = styled.div`
 `;
 
 const FolderContainer = styled.div`
+  ${Scrollbar}
+
   overflow-y: auto;
   height: 100%;
   display: flex;
