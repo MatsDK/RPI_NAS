@@ -1,26 +1,25 @@
-import { CopyDataMutation } from "graphql/Folder/copyData";
-import { Tree } from "./Tree";
+import { MoveDataMutation } from "graphql/Folder/moveData";
+import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import React, { useContext, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
 import { FolderContext } from "src/providers/folderState";
 import { ConditionButton, LightBgButton } from "src/ui/Button";
 import styled from "styled-components";
 import MenuOverlay from "../../MenuOverlay";
-import { MoveCopyPath } from "./Tree";
-import { getTreeQuery } from "graphql/TreeObject/queryTree";
+import { MoveCopyPath, Tree } from "./Tree";
 
-interface CopyToWrapperProps {
+interface MoveToWrapperProps {
   hide: () => any;
 }
 
-const CopyToContainer = styled.div`
+const MoveToContainer = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
   padding: 20px 25px;
 `;
 
-const CopyToBottomContainer = styled.div`
+const MoveToBottomContainer = styled.div`
   padding: 10px 0 0 0;
   border-top: 1px solid ${(props) => props.theme.bgColors[1]};
 `;
@@ -34,14 +33,14 @@ const Title = styled.h2`
   margin-bottom: 5px;
 `;
 
-export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
+export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
   const { mutate } = useApollo();
 
-  const [copyToPath, setCopyToPath] = useState<null | MoveCopyPath>(null);
+  const [movePath, setMovePath] = useState<null | MoveCopyPath>(null);
 
   const folderCtx = useContext(FolderContext);
 
-  const copy = async () => {
+  const move = async () => {
     const selectedData = Array.from(
       folderCtx?.selected.selectedItems || []
     ).map(([_, v]) => ({
@@ -52,11 +51,11 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
     if (!selectedData) return;
 
     const { errors, data } = await mutate(
-      CopyDataMutation,
+      MoveDataMutation,
       {
         data: selectedData,
         dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
-        destination: copyToPath,
+        destination: movePath,
       },
       {
         refetchQueries: [
@@ -64,8 +63,16 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
             query: getTreeQuery,
             variables: {
               depth: 1,
-              dataStoreId: copyToPath?.dataStoreId,
-              path: copyToPath?.path,
+              dataStoreId: movePath?.dataStoreId,
+              path: movePath?.path,
+            },
+          },
+          {
+            query: getTreeQuery,
+            variables: {
+              depth: 1,
+              dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+              path: folderCtx?.currentFolderPath?.folderPath.path,
             },
           },
         ],
@@ -74,20 +81,20 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
 
     if (errors) return console.log(errors);
 
-    if (data.copy) hide();
+    console.log(data);
   };
 
   return (
     <MenuOverlay maxWidth={"25vw"} hide={hide}>
-      <CopyToContainer>
-        <Title>Copy To</Title>
-        <Tree setSelectedPath={setCopyToPath} selectedPath={copyToPath} />
-        <CopyToBottomContainer>
-          <ConditionButton condition={!!copyToPath}>
-            <LightBgButton onClick={copy}>Copy</LightBgButton>
+      <MoveToContainer>
+        <Title>Move To</Title>
+        <Tree setSelectedPath={setMovePath} selectedPath={movePath} />
+        <MoveToBottomContainer>
+          <ConditionButton condition={!!movePath}>
+            <LightBgButton onClick={move}>Move</LightBgButton>
           </ConditionButton>
-        </CopyToBottomContainer>
-      </CopyToContainer>
+        </MoveToBottomContainer>
+      </MoveToContainer>
     </MenuOverlay>
   );
 };

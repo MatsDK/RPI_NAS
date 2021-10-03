@@ -2,7 +2,7 @@ import { Field, InputType, ObjectType } from "type-graphql";
 import { Type } from "../../types";
 
 @InputType()
-export class CopyDestinationObject {
+export class CopyMoveDestinationObject {
   @Field(() => Number)
   dataStoreId: number;
 
@@ -11,7 +11,7 @@ export class CopyDestinationObject {
 }
 
 @InputType()
-export class CopyDataObject {
+export class CopyMoveDataObject {
   @Field(() => String)
   type: Type;
 
@@ -20,13 +20,13 @@ export class CopyDataObject {
 }
 
 @InputType()
-export class CopyInput {
+export class CopyMoveInput {
   @Field(() => Number)
   dataStoreId: number;
 
-  @Field(() => CopyDestinationObject)
-  destination: CopyDestinationObject;
+  @Field(() => CopyMoveDestinationObject)
+  destination: CopyMoveDestinationObject;
 
-  @Field(() => [CopyDataObject])
-  data: CopyDataObject[];
+  @Field(() => [CopyMoveDataObject])
+  data: CopyMoveDataObject[];
 }

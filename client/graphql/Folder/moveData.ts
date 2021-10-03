@@ -1,12 +1,12 @@
 import gql from "graphql-tag";
 
-export const CopyDataMutation = gql`
-  mutation CopyDataMutation(
+export const MoveDataMutation = gql`
+  mutation MoveDataMutation(
     $dataStoreId: Float!
     $destination: CopyMoveDestinationObject!
     $data: [CopyMoveDataObject!]!
   ) {
-    copy(
+    move(
       data: {
         dataStoreId: $dataStoreId
         destination: $destination

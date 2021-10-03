@@ -1,4 +1,5 @@
 import { DeletePtahsMutation } from "graphql/Folder/deletePaths";
+import { MoveToWrapper } from "./CopyMove/MoveToWrapper";
 import { CopyToWrapper } from "./CopyMove/CopyToWrapper";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
@@ -29,6 +30,7 @@ const FolderNavbar = () => {
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [showSSHDownloadDropdown, setShowSSHDownloadDropdown] = useState(false);
   const [showCopyToForm, setShowCopyToForm] = useState(false);
+  const [showMoveToForm, setShowMoveToForm] = useState(false);
 
   useEffect(() => {
     setShowSSHDownloadDropdown(false);
@@ -123,6 +125,9 @@ const FolderNavbar = () => {
       {showCopyToForm && (
         <CopyToWrapper hide={() => setShowCopyToForm(false)} />
       )}
+      {showMoveToForm && (
+        <MoveToWrapper hide={() => setShowMoveToForm(false)} />
+      )}
       <BgButton
         onClick={() => {
           folderCtx?.newFolderInput?.setShowNewFolderInput((s) => !s);
@@ -152,7 +157,7 @@ const FolderNavbar = () => {
         <Button onClick={deleteSelected}>Delete</Button>
       </ConditionButton>
       <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
-        <Button onClick={() => {}}>Move To</Button>
+        <Button onClick={() => setShowMoveToForm((s) => !s)}>Move To</Button>
       </ConditionButton>
       <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
         <Button onClick={() => setShowCopyToForm((s) => !s)}>Copy To</Button>

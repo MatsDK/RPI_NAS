@@ -14,20 +14,20 @@ export type Scalars = {
   Float: number;
 };
 
-export type CopyDataObject = {
+export type CopyMoveDataObject = {
   type: Scalars['String'];
   path: Scalars['String'];
 };
 
-export type CopyDestinationObject = {
+export type CopyMoveDestinationObject = {
   dataStoreId: Scalars['Float'];
   path: Scalars['String'];
 };
 
-export type CopyInput = {
+export type CopyMoveInput = {
   dataStoreId: Scalars['Float'];
-  destination: CopyDestinationObject;
-  data: Array<CopyDataObject>;
+  destination: CopyMoveDestinationObject;
+  data: Array<CopyMoveDataObject>;
 };
 
 export type CreateDataStoreInput = {
@@ -109,6 +109,7 @@ export type Mutation = {
   createFolder?: Maybe<Scalars['String']>;
   delete?: Maybe<Scalars['Boolean']>;
   copy?: Maybe<Scalars['Boolean']>;
+  move?: Maybe<Scalars['Boolean']>;
   createUploadSession?: Maybe<UploadSessionReturn>;
   createDownloadSession?: Maybe<DownloadSessionReturn>;
   login?: Maybe<User>;
@@ -143,7 +144,12 @@ export type MutationDeleteArgs = {
 
 
 export type MutationCopyArgs = {
-  data: CopyInput;
+  data: CopyMoveInput;
+};
+
+
+export type MutationMoveArgs = {
+  data: CopyMoveInput;
 };
 
 
@@ -303,8 +309,8 @@ export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Maybe<A
 
 export type CopyDataMutationMutationVariables = Exact<{
   dataStoreId: Scalars['Float'];
-  destination: CopyDestinationObject;
-  data: Array<CopyDataObject> | CopyDataObject;
+  destination: CopyMoveDestinationObject;
+  data: Array<CopyMoveDataObject> | CopyMoveDataObject;
 }>;
 
 
@@ -325,6 +331,15 @@ export type DeleteDataMutationMutationVariables = Exact<{
 
 
 export type DeleteDataMutationMutation = { __typename?: 'Mutation', delete?: Maybe<boolean> };
+
+export type MoveDataMutationMutationVariables = Exact<{
+  dataStoreId: Scalars['Float'];
+  destination: CopyMoveDestinationObject;
+  data: Array<CopyMoveDataObject> | CopyMoveDataObject;
+}>;
+
+
+export type MoveDataMutationMutation = { __typename?: 'Mutation', move?: Maybe<boolean> };
 
 export type AcceptFriendRequestMutationVariables = Exact<{
   userId: Scalars['Float'];
@@ -542,7 +557,7 @@ export type GetDataStoresQueryHookResult = ReturnType<typeof useGetDataStoresQue
 export type GetDataStoresLazyQueryHookResult = ReturnType<typeof useGetDataStoresLazyQuery>;
 export type GetDataStoresQueryResult = Apollo.QueryResult<GetDataStoresQuery, GetDataStoresQueryVariables>;
 export const CopyDataMutationDocument = gql`
-    mutation CopyDataMutation($dataStoreId: Float!, $destination: CopyDestinationObject!, $data: [CopyDataObject!]!) {
+    mutation CopyDataMutation($dataStoreId: Float!, $destination: CopyMoveDestinationObject!, $data: [CopyMoveDataObject!]!) {
   copy(data: {dataStoreId: $dataStoreId, destination: $destination, data: $data})
 }
     `;
@@ -638,6 +653,39 @@ export function useDeleteDataMutationMutation(baseOptions?: Apollo.MutationHookO
 export type DeleteDataMutationMutationHookResult = ReturnType<typeof useDeleteDataMutationMutation>;
 export type DeleteDataMutationMutationResult = Apollo.MutationResult<DeleteDataMutationMutation>;
 export type DeleteDataMutationMutationOptions = Apollo.BaseMutationOptions<DeleteDataMutationMutation, DeleteDataMutationMutationVariables>;
+export const MoveDataMutationDocument = gql`
+    mutation MoveDataMutation($dataStoreId: Float!, $destination: CopyMoveDestinationObject!, $data: [CopyMoveDataObject!]!) {
+  move(data: {dataStoreId: $dataStoreId, destination: $destination, data: $data})
+}
+    `;
+export type MoveDataMutationMutationFn = Apollo.MutationFunction<MoveDataMutationMutation, MoveDataMutationMutationVariables>;
+
+/**
+ * __useMoveDataMutationMutation__
+ *
+ * To run a mutation, you first call `useMoveDataMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMoveDataMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [moveDataMutationMutation, { data, loading, error }] = useMoveDataMutationMutation({
+ *   variables: {
+ *      dataStoreId: // value for 'dataStoreId'
+ *      destination: // value for 'destination'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useMoveDataMutationMutation(baseOptions?: Apollo.MutationHookOptions<MoveDataMutationMutation, MoveDataMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MoveDataMutationMutation, MoveDataMutationMutationVariables>(MoveDataMutationDocument, options);
+      }
+export type MoveDataMutationMutationHookResult = ReturnType<typeof useMoveDataMutationMutation>;
+export type MoveDataMutationMutationResult = Apollo.MutationResult<MoveDataMutationMutation>;
+export type MoveDataMutationMutationOptions = Apollo.BaseMutationOptions<MoveDataMutationMutation, MoveDataMutationMutationVariables>;
 export const AcceptFriendRequestDocument = gql`
     mutation AcceptFriendRequest($userId: Float!) {
   acceptFriendRequest(userId: $userId)

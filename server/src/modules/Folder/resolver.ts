@@ -5,7 +5,8 @@ import { isAuth } from "../../middleware/auth";
 import fsPath from "path";
 import { checkPermissions } from "../../middleware/checkPermissions";
 import { DeletePathsInput } from "./deletePathsInput";
-import { CopyInput } from "./copyMutationInput";
+import { CopyMoveInput } from "./copyMoveMutationInput";
+import { MoveCopyData } from "./moveCopyData";
 
 @Resolver()
 export class FolderResolver {
@@ -54,32 +55,13 @@ export class FolderResolver {
 
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
-  async copy(@Arg("data") { data, dataStoreId, destination }: CopyInput) {
-    const dataStores: Map<number, Datastore> = new Map();
+  copy(@Arg("data") data: CopyMoveInput) {
+    return MoveCopyData({ ...data, type: "copy" });
+  }
 
-    const thisDataStore = await Datastore.find({
-      where: [{ id: dataStoreId }, { id: destination.dataStoreId }],
-    });
-
-    if (thisDataStore.length !== 2) return null;
-    thisDataStore.forEach((v) => dataStores.set(v.id, v));
-
-    const ds = dataStores.get(dataStoreId),
-      destDs = dataStores.get(destination.dataStoreId);
-
-    if (!ds || !destDs) return null;
-
-    for (const { path } of data) {
-      const fromPath = fsPath.join(ds.basePath, path),
-        toPath = fsPath.join(
-          destDs.basePath,
-          destination.path,
-          fsPath.basename(path)
-        );
-
-      fs.copySync(fromPath, toPath, { recursive: true });
-    }
-
-    return true;
+  @UseMiddleware(isAuth)
+  @Mutation(() => Boolean, { nullable: true })
+  move(@Arg("data") data: CopyMoveInput) {
+    return MoveCopyData({ ...data, type: "move" });
   }
 }
