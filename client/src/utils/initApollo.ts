@@ -41,10 +41,12 @@ const create = (
           .split(";")
           .map((v: string) => v.split("="));
 
-        for (const [name, value] of parsedCookies)
+        for (const [name, value] of parsedCookies) {
           cookieCutter.set(name.trim(), value.trim(), {
             expires: getExpiresDate(name.trim() as CookieNames),
+            path: "/",
           });
+        }
       }
 
       return response;

@@ -5,6 +5,8 @@ import Navbar from "./Navbar";
 const PageBody = styled.div`
   display: flex;
   height: 100%;
+
+  background-color: ${(props) => props.theme.lightBgColors[0]};
 `;
 
 const Layout: React.FC = ({ children }) => {

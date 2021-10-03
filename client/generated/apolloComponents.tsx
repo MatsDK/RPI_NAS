@@ -14,6 +14,22 @@ export type Scalars = {
   Float: number;
 };
 
+export type CopyDataObject = {
+  type: Scalars['String'];
+  path: Scalars['String'];
+};
+
+export type CopyDestinationObject = {
+  dataStoreId: Scalars['Float'];
+  path: Scalars['String'];
+};
+
+export type CopyInput = {
+  dataStoreId: Scalars['Float'];
+  destination: CopyDestinationObject;
+  data: Array<CopyDataObject>;
+};
+
 export type CreateDataStoreInput = {
   localNodeId: Scalars['Float'];
   name: Scalars['String'];
@@ -33,6 +49,11 @@ export type Datastore = {
   basePath: Scalars['String'];
   sharedUsers: Array<User>;
   owner?: Maybe<User>;
+};
+
+export type DeletePathsInput = {
+  path: Scalars['String'];
+  type: Scalars['String'];
 };
 
 export type DownloadPathsInput = {
@@ -85,12 +106,15 @@ export type Mutation = {
   __typename?: 'Mutation';
   createDataStore?: Maybe<Datastore>;
   createSharedDataStore?: Maybe<Scalars['Boolean']>;
-  createFolder?: Maybe<Scalars['Boolean']>;
+  createFolder?: Maybe<Scalars['String']>;
+  delete?: Maybe<Scalars['Boolean']>;
+  copy?: Maybe<Scalars['Boolean']>;
   createUploadSession?: Maybe<UploadSessionReturn>;
   createDownloadSession?: Maybe<DownloadSessionReturn>;
   login?: Maybe<User>;
   logout?: Maybe<Scalars['Boolean']>;
   register: User;
+  setDefaultDownloadPath?: Maybe<Scalars['Boolean']>;
   sendFriendRequest?: Maybe<Scalars['Boolean']>;
   acceptFriendRequest?: Maybe<Scalars['Boolean']>;
 };
@@ -112,6 +136,17 @@ export type MutationCreateFolderArgs = {
 };
 
 
+export type MutationDeleteArgs = {
+  paths: Array<DeletePathsInput>;
+  dataStoreId: Scalars['Float'];
+};
+
+
+export type MutationCopyArgs = {
+  data: CopyInput;
+};
+
+
 export type MutationCreateUploadSessionArgs = {
   data: UploadSessionInput;
 };
@@ -130,6 +165,11 @@ export type MutationLoginArgs = {
 
 export type MutationRegisterArgs = {
   data: RegisterInput;
+};
+
+
+export type MutationSetDefaultDownloadPathArgs = {
+  path: Scalars['String'];
 };
 
 
@@ -261,13 +301,30 @@ export type GetDataStoresQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Maybe<Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }>> };
 
+export type CopyDataMutationMutationVariables = Exact<{
+  dataStoreId: Scalars['Float'];
+  destination: CopyDestinationObject;
+  data: Array<CopyDataObject> | CopyDataObject;
+}>;
+
+
+export type CopyDataMutationMutation = { __typename?: 'Mutation', copy?: Maybe<boolean> };
+
 export type CreateFolderMutationMutationVariables = Exact<{
   path: Scalars['String'];
   dataStoreId: Scalars['Float'];
 }>;
 
 
-export type CreateFolderMutationMutation = { __typename?: 'Mutation', createFolder?: Maybe<boolean> };
+export type CreateFolderMutationMutation = { __typename?: 'Mutation', createFolder?: Maybe<string> };
+
+export type DeleteDataMutationMutationVariables = Exact<{
+  paths: Array<DeletePathsInput> | DeletePathsInput;
+  dataStoreId: Scalars['Float'];
+}>;
+
+
+export type DeleteDataMutationMutation = { __typename?: 'Mutation', delete?: Maybe<boolean> };
 
 export type AcceptFriendRequestMutationVariables = Exact<{
   userId: Scalars['Float'];
@@ -361,6 +418,13 @@ export type RegisterMutationMutationVariables = Exact<{
 
 
 export type RegisterMutationMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string } };
+
+export type SetDefaultDownloadPathMutationVariables = Exact<{
+  path: Scalars['String'];
+}>;
+
+
+export type SetDefaultDownloadPathMutation = { __typename?: 'Mutation', setDefaultDownloadPath?: Maybe<boolean> };
 
 
 export const CreateDataStoreMutionDocument = gql`
@@ -477,6 +541,39 @@ export function useGetDataStoresLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type GetDataStoresQueryHookResult = ReturnType<typeof useGetDataStoresQuery>;
 export type GetDataStoresLazyQueryHookResult = ReturnType<typeof useGetDataStoresLazyQuery>;
 export type GetDataStoresQueryResult = Apollo.QueryResult<GetDataStoresQuery, GetDataStoresQueryVariables>;
+export const CopyDataMutationDocument = gql`
+    mutation CopyDataMutation($dataStoreId: Float!, $destination: CopyDestinationObject!, $data: [CopyDataObject!]!) {
+  copy(data: {dataStoreId: $dataStoreId, destination: $destination, data: $data})
+}
+    `;
+export type CopyDataMutationMutationFn = Apollo.MutationFunction<CopyDataMutationMutation, CopyDataMutationMutationVariables>;
+
+/**
+ * __useCopyDataMutationMutation__
+ *
+ * To run a mutation, you first call `useCopyDataMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCopyDataMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [copyDataMutationMutation, { data, loading, error }] = useCopyDataMutationMutation({
+ *   variables: {
+ *      dataStoreId: // value for 'dataStoreId'
+ *      destination: // value for 'destination'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCopyDataMutationMutation(baseOptions?: Apollo.MutationHookOptions<CopyDataMutationMutation, CopyDataMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CopyDataMutationMutation, CopyDataMutationMutationVariables>(CopyDataMutationDocument, options);
+      }
+export type CopyDataMutationMutationHookResult = ReturnType<typeof useCopyDataMutationMutation>;
+export type CopyDataMutationMutationResult = Apollo.MutationResult<CopyDataMutationMutation>;
+export type CopyDataMutationMutationOptions = Apollo.BaseMutationOptions<CopyDataMutationMutation, CopyDataMutationMutationVariables>;
 export const CreateFolderMutationDocument = gql`
     mutation CreateFolderMutation($path: String!, $dataStoreId: Float!) {
   createFolder(path: $path, dataStoreId: $dataStoreId)
@@ -509,6 +606,38 @@ export function useCreateFolderMutationMutation(baseOptions?: Apollo.MutationHoo
 export type CreateFolderMutationMutationHookResult = ReturnType<typeof useCreateFolderMutationMutation>;
 export type CreateFolderMutationMutationResult = Apollo.MutationResult<CreateFolderMutationMutation>;
 export type CreateFolderMutationMutationOptions = Apollo.BaseMutationOptions<CreateFolderMutationMutation, CreateFolderMutationMutationVariables>;
+export const DeleteDataMutationDocument = gql`
+    mutation DeleteDataMutation($paths: [DeletePathsInput!]!, $dataStoreId: Float!) {
+  delete(paths: $paths, dataStoreId: $dataStoreId)
+}
+    `;
+export type DeleteDataMutationMutationFn = Apollo.MutationFunction<DeleteDataMutationMutation, DeleteDataMutationMutationVariables>;
+
+/**
+ * __useDeleteDataMutationMutation__
+ *
+ * To run a mutation, you first call `useDeleteDataMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteDataMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteDataMutationMutation, { data, loading, error }] = useDeleteDataMutationMutation({
+ *   variables: {
+ *      paths: // value for 'paths'
+ *      dataStoreId: // value for 'dataStoreId'
+ *   },
+ * });
+ */
+export function useDeleteDataMutationMutation(baseOptions?: Apollo.MutationHookOptions<DeleteDataMutationMutation, DeleteDataMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteDataMutationMutation, DeleteDataMutationMutationVariables>(DeleteDataMutationDocument, options);
+      }
+export type DeleteDataMutationMutationHookResult = ReturnType<typeof useDeleteDataMutationMutation>;
+export type DeleteDataMutationMutationResult = Apollo.MutationResult<DeleteDataMutationMutation>;
+export type DeleteDataMutationMutationOptions = Apollo.BaseMutationOptions<DeleteDataMutationMutation, DeleteDataMutationMutationVariables>;
 export const AcceptFriendRequestDocument = gql`
     mutation AcceptFriendRequest($userId: Float!) {
   acceptFriendRequest(userId: $userId)
@@ -995,3 +1124,34 @@ export function useRegisterMutationMutation(baseOptions?: Apollo.MutationHookOpt
 export type RegisterMutationMutationHookResult = ReturnType<typeof useRegisterMutationMutation>;
 export type RegisterMutationMutationResult = Apollo.MutationResult<RegisterMutationMutation>;
 export type RegisterMutationMutationOptions = Apollo.BaseMutationOptions<RegisterMutationMutation, RegisterMutationMutationVariables>;
+export const SetDefaultDownloadPathDocument = gql`
+    mutation SetDefaultDownloadPath($path: String!) {
+  setDefaultDownloadPath(path: $path)
+}
+    `;
+export type SetDefaultDownloadPathMutationFn = Apollo.MutationFunction<SetDefaultDownloadPathMutation, SetDefaultDownloadPathMutationVariables>;
+
+/**
+ * __useSetDefaultDownloadPathMutation__
+ *
+ * To run a mutation, you first call `useSetDefaultDownloadPathMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetDefaultDownloadPathMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setDefaultDownloadPathMutation, { data, loading, error }] = useSetDefaultDownloadPathMutation({
+ *   variables: {
+ *      path: // value for 'path'
+ *   },
+ * });
+ */
+export function useSetDefaultDownloadPathMutation(baseOptions?: Apollo.MutationHookOptions<SetDefaultDownloadPathMutation, SetDefaultDownloadPathMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetDefaultDownloadPathMutation, SetDefaultDownloadPathMutationVariables>(SetDefaultDownloadPathDocument, options);
+      }
+export type SetDefaultDownloadPathMutationHookResult = ReturnType<typeof useSetDefaultDownloadPathMutation>;
+export type SetDefaultDownloadPathMutationResult = Apollo.MutationResult<SetDefaultDownloadPathMutation>;
+export type SetDefaultDownloadPathMutationOptions = Apollo.BaseMutationOptions<SetDefaultDownloadPathMutation, SetDefaultDownloadPathMutationVariables>;

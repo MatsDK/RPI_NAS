@@ -9,10 +9,22 @@ export const isAuth: MiddlewareFn<MyContext> = async (
   { context: { req, res } },
   next
 ) => {
-  const { "access-token": accessToken, "refresh-token": refreshToken } =
+  let { "access-token": accessToken, "refresh-token": refreshToken } =
     Object.keys(req.cookies).length
       ? req.cookies
       : cookie.parse((req.headers["authorization"] as string) || "");
+
+  if (!Object.keys(req.cookies).length) {
+    const cookiesMap: Map<string, string> = new Map();
+
+    ((req.headers["authorization"] as string) || "")
+      .split(";")
+      .map((x: string) => x.split("="))
+      .map(([key, v]: any) => cookiesMap.set(key.trim(), v.trim()));
+
+    accessToken = cookiesMap.get("access-token");
+    refreshToken = cookiesMap.get("refresh-token");
+  }
 
   if (!accessToken && !refreshToken) return null;
 

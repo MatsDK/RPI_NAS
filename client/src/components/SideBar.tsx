@@ -27,6 +27,7 @@ const SideBarItem = styled.div`
 
 const SideBarItemText = styled.div`
   position: absolute;
+  z-index: 200;
   pointer-events: none;
   left: 100px;
   opacity: 0;

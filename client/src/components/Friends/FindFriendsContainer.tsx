@@ -1,7 +1,7 @@
 import { SendFriendRequestMutation } from "graphql/Friends/sendFriendRequest";
 import { FindUsersQuery } from "graphql/User/findUsers";
 import React, { FormEvent, useState } from "react";
-import { useApollo } from "src/hooks/useApolloMutation";
+import { useApollo } from "src/hooks/useApollo";
 import { useTimeoutInput } from "src/hooks/useTimeoutInput";
 
 interface FindFriendsContainerProps {

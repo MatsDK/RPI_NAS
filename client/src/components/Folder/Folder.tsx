@@ -11,6 +11,8 @@ import { CreateFolderMutation } from "graphql/Folder/createFolder";
 import Icon from "../../ui/Icon";
 import { FolderPath } from "./FolderPath";
 import { Scrollbar } from "src/ui/Scrollbar";
+import { getTreeQuery } from "graphql/TreeObject/queryTree";
+import { useApollo } from "src/hooks/useApollo";
 
 interface Props {
   path: string;
@@ -33,9 +35,18 @@ const FolderContainer = styled.div`
   flex: 1;
 `;
 
+const NewFolderInput = styled.input`
+  border: 0;
+  outline: 0;
+  padding: 1px 2px;
+  font-size: 16px;
+  border-bottom: 1px solid ${(props) => props.theme.lightBgColors[2]};
+`;
+
 const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
   if (!dataStoreId) return null;
 
+  const { mutate } = useApollo();
   const client: any = useApolloClient();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
@@ -46,7 +57,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
     variables: {
       depth: 1,
       path,
-      dataStoreId: dataStoreId,
+      dataStoreId,
     },
     client,
   });
@@ -70,22 +81,71 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
 
   const createNewFolder = async (e: FormEvent) => {
     e.preventDefault();
-    const path = fsPath.join(
+    const newPath = fsPath.join(
       folderCtx?.currentFolderPath?.folderPath.path || "",
       folderNameInput
     );
 
-    if (!folderNameInput.trim() || !path.trim()) return;
+    if (!folderNameInput.trim() || !newPath.trim()) return;
 
-    const res = await client.mutate({
-      mutation: CreateFolderMutation,
-      variables: {
-        path,
+    await mutate(
+      CreateFolderMutation,
+      {
+        path: newPath,
         dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
       },
-    });
+      {
+        update: (cache, { data }) => {
+          try {
+            const cacheData: any = cache.readQuery({
+              query: getTreeQuery,
+              variables: { depth: 1, path, dataStoreId },
+            });
 
-    console.log(res);
+            if (!data.createFolder || !cacheData?.tree) return;
+
+            const newItem = {
+              relativePath: newPath,
+              isDirectory: true,
+              path: data.createFolder,
+              name: fsPath.basename(newPath),
+              __typename: "TreeItem",
+            };
+
+            cacheData.tree.tree = [newItem, ...cacheData.tree.tree];
+
+            cache.writeQuery({
+              query: getTreeQuery,
+              variables: { depth: 1, path, dataStoreId },
+              data: cacheData,
+            });
+
+            // const cacheFolderData: any = cache.readQuery({
+            //   query: getDirectoryTreeQuery,
+            //   variables: { depth: 1, path, dataStoreId },
+            // });
+
+            // if (!cacheFolderData?.directoryTree) return;
+
+            // cacheFolderData.directoryTree.tree = [
+            //   { ...newItem, dataStoreId, sharedDataStore: null },
+            //   ...cacheFolderData.directoryTree.tree,
+            // ];
+
+            // cache.writeQuery({
+            //   query: getDirectoryTreeQuery,
+            //   variables: { depth: 1, path, dataStoreId },
+            //   data: cacheFolderData,
+            // });
+          } catch (error) {
+            console.log(error);
+          }
+        },
+      }
+    );
+
+    folderCtx?.newFolderInput?.setShowNewFolderInput(false);
+    setFolderNameInput("");
   };
 
   return (
@@ -117,7 +177,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
                 />
               </IconWrapper>
               <form onSubmit={createNewFolder}>
-                <input
+                <NewFolderInput
                   type="text"
                   value={folderNameInput}
                   onChange={(e) => setFolderNameInput(e.target.value)}
@@ -135,7 +195,10 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
               />
             ))}
         </FolderContent>
-        <div style={{ minHeight: 300, flex: 1 }}></div>
+        <div
+          style={{ minHeight: 300, flex: 1 }}
+          onClick={() => folderCtx?.selected?.setSelected?.(new Map())}
+        ></div>
       </FolderContainer>
     </div>
   );

@@ -1,11 +1,12 @@
 import axios from "axios";
+import { LightBgButton } from "src/ui/Button";
 import { getDataStoresQuery } from "graphql/DataStores/getDataStores";
 import { ConditionButton } from "src/ui/Button";
 import { createUploadSessionMutation } from "graphql/TransferData/createUploadSession";
 import { useRouter } from "next/dist/client/router";
 import fsPath from "path";
 import React, { useContext, useEffect, useState } from "react";
-import { useApollo } from "src/hooks/useApolloMutation";
+import { useApollo } from "src/hooks/useApollo";
 import { useInput } from "src/hooks/useInput";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import Icon from "src/ui/Icon";
@@ -129,24 +130,6 @@ const SelectedItem = styled.div`
 
   :hover > div {
     opacity: 1;
-  }
-`;
-
-const UploadButton = styled.button`
-  background-color: ${(props) => props.theme.lightBgColors[2]};
-  cursor: pointer;
-  border: 0;
-  outline: none;
-  font-size: 18px;
-  color: ${(props) => props.theme.textColors[0]};
-  font-weight: 500;
-  border-radius: 3px;
-  padding: 3px 13px;
-  width: fit-content;
-  transition: 0.1s ease-in-out;
-
-  :hover {
-    background-color: ${(props) => props.theme.lightBgColors[1]};
   }
 `;
 
@@ -413,7 +396,7 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
         <ConditionButton
           condition={!!selectedPaths.size && !!selectedDataStore}
         >
-          <UploadButton onClick={upload}>Upload</UploadButton>
+          <LightBgButton onClick={upload}>Upload</LightBgButton>
         </ConditionButton>
       </Container>
     </MenuOverlay>

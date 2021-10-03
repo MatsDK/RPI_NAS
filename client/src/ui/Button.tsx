@@ -61,3 +61,21 @@ export const ConditionButton: React.FC<Props> = ({ children, condition }) => (
     {children}
   </div>
 );
+
+export const LightBgButton = styled.button`
+  background-color: ${(props) => props.theme.lightBgColors[2]};
+  cursor: pointer;
+  border: 0;
+  outline: none;
+  font-size: 18px;
+  color: ${(props) => props.theme.textColors[0]};
+  font-weight: 500;
+  border-radius: 3px;
+  padding: 3px 13px;
+  width: fit-content;
+  transition: 0.1s ease-in-out;
+
+  :hover {
+    background-color: ${(props) => props.theme.lightBgColors[1]};
+  }
+`;

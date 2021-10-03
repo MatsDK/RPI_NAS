@@ -1,8 +1,10 @@
 import { DeletePtahsMutation } from "graphql/Folder/deletePaths";
+import { CopyToWrapper } from "./CopyMove/CopyToWrapper";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
+import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import { useRouter } from "next/dist/client/router";
 import React, { useContext, useEffect, useState } from "react";
-import { useApollo } from "src/hooks/useApolloMutation";
+import { useApollo } from "src/hooks/useApollo";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import { BgButton, Button, ConditionButton } from "src/ui/Button";
 import styled from "styled-components";
@@ -26,6 +28,7 @@ const FolderNavbar = () => {
 
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [showSSHDownloadDropdown, setShowSSHDownloadDropdown] = useState(false);
+  const [showCopyToForm, setShowCopyToForm] = useState(false);
 
   useEffect(() => {
     setShowSSHDownloadDropdown(false);
@@ -73,15 +76,41 @@ const FolderNavbar = () => {
 
     if (!selected.length) return;
 
-    const { data, errors } = await mutate(DeletePtahsMutation, {
-      paths: selected.map(({ isDirectory, relativePath }) => ({
-        path: relativePath,
-        type: isDirectory ? "directory" : "file",
-      })),
-      dataStoreId: Number(router.query.d),
-    });
+    const { data, errors } = await mutate(
+      DeletePtahsMutation,
+      {
+        paths: selected.map(({ isDirectory, relativePath }) => ({
+          path: relativePath,
+          type: isDirectory ? "directory" : "file",
+        })),
+
+        dataStoreId: Number(router.query.d),
+      },
+      {
+        refetchQueries: [
+          {
+            query: getTreeQuery,
+            variables: {
+              depth: 1,
+              dataStoreId: folderCtx.currentFolderPath?.folderPath.dataStoreId,
+              path: folderCtx.currentFolderPath?.folderPath.path,
+            },
+          },
+          // {
+          //   query: getDirectoryTreeQuery,
+          //   variables: {
+          //     depth: 1,
+          //     dataStoreId: folderCtx.currentFolderPath?.folderPath.dataStoreId,
+          //     path: folderCtx.currentFolderPath?.folderPath.path,
+          //   },
+          // },
+        ],
+      }
+    );
 
     if (errors) return console.log(errors);
+
+    folderCtx.selected.setSelected?.(new Map());
 
     console.log(data);
   };
@@ -90,6 +119,9 @@ const FolderNavbar = () => {
     <FolderNavbarWrapper>
       {showUploadForm && (
         <UploadWrapper hide={() => setShowUploadForm(false)} />
+      )}
+      {showCopyToForm && (
+        <CopyToWrapper hide={() => setShowCopyToForm(false)} />
       )}
       <BgButton
         onClick={() => {
@@ -118,6 +150,12 @@ const FolderNavbar = () => {
       </ConditionButton>
       <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
         <Button onClick={deleteSelected}>Delete</Button>
+      </ConditionButton>
+      <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+        <Button onClick={() => {}}>Move To</Button>
+      </ConditionButton>
+      <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+        <Button onClick={() => setShowCopyToForm((s) => !s)}>Copy To</Button>
       </ConditionButton>
     </FolderNavbarWrapper>
   );

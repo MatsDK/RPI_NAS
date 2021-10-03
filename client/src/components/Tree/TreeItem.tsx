@@ -2,6 +2,7 @@ import {
   TreeItem,
   useGetDirectoryTreeQueryQuery,
 } from "generated/apolloComponents";
+import fsPath from "path";
 import { ArrowButton, ArrowButtonProps } from "src/ui/ArrowButton";
 import Icon from "src/ui/Icon";
 import { useRouter } from "next/dist/client/router";
@@ -151,12 +152,19 @@ const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
         {showNestedItems &&
           nestedItems &&
           nestedItems.map((i, idx) => {
-            const show =
-              !!FolderCtx?.currentFolderPath?.folderPath.path?.startsWith(
-                i.relativePath.replace(/\\/g, "/")
-              ) &&
-              FolderCtx.currentFolderPath.folderPath.path !=
-                i.relativePath.replace(/\\/g, "/");
+            // const show =
+            //   !!FolderCtx?.currentFolderPath?.folderPath.path?.startsWith(
+            //     i.relativePath.replace(/\\/g, "/")
+            //   )&&
+            // FolderCtx.currentFolderPath.folderPath.path !=
+            //   i.relativePath.replace(/\\/g, "/");
+
+            const show = !fsPath
+              .relative(
+                i.relativePath.replace(/\\/g, "/"),
+                FolderCtx?.currentFolderPath?.folderPath.path || ""
+              )
+              .startsWith("..");
 
             return (
               <Item

@@ -3,7 +3,7 @@ import { createSessionMutation } from "graphql/TransferData/createDownloadSessio
 import { setDefaultDownloadPathMutation } from "graphql/User/setDefaultDownloadPath";
 import router from "next/router";
 import React, { useContext } from "react";
-import { useApollo } from "src/hooks/useApolloMutation";
+import { useApollo } from "src/hooks/useApollo";
 import { useInput } from "src/hooks/useInput";
 import { useMeState } from "src/hooks/useMeState";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
@@ -45,6 +45,8 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
     const { errors, data } = await mutate(setDefaultDownloadPathMutation, {
       path: pathInput.trim(),
     });
+
+    me.defaultDownloadPath = pathInput.trim();
 
     if (errors) {
       return console.log(errors);
