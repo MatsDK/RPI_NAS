@@ -5,6 +5,7 @@ interface InputProps {
   label: string;
   value: any;
   setValue: any;
+  type?: string;
 }
 
 type Props = { moved: boolean };
@@ -35,6 +36,7 @@ export const LabelInput: React.FC<InputProps> = ({
   label,
   value,
   setValue,
+  type = "text",
 }) => {
   const [moveLabel, setMoveLabel] = useState(!!value.trim());
 
@@ -46,7 +48,7 @@ export const LabelInput: React.FC<InputProps> = ({
       <Input
         onFocus={() => setMoveLabel(true)}
         onBlur={() => !value.trim() && setMoveLabel(false)}
-        type="text"
+        type={type}
         value={value}
         onChange={setValue}
       />

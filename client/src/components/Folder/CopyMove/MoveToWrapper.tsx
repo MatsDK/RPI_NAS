@@ -1,9 +1,12 @@
+import { useGetDirectoryTreeQueryQuery } from "generated/apolloComponents";
 import { MoveDataMutation } from "graphql/Folder/moveData";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import React, { useContext, useState } from "react";
+import { useApolloClient } from "react-apollo";
 import { useApollo } from "src/hooks/useApollo";
 import { FolderContext } from "src/providers/folderState";
 import { ConditionButton, LightBgButton } from "src/ui/Button";
+import { Scrollbar } from "src/ui/Scrollbar";
 import styled from "styled-components";
 import MenuOverlay from "../../MenuOverlay";
 import { MoveCopyPath, Tree } from "./Tree";
@@ -22,6 +25,22 @@ const MoveToContainer = styled.div`
 const MoveToBottomContainer = styled.div`
   padding: 10px 0 0 0;
   border-top: 1px solid ${(props) => props.theme.bgColors[1]};
+  display: flex;
+  color: ${(props) => props.theme.textColors[2]};
+
+  p {
+    margin-left: 8px;
+    display: flex;
+    overflow: hidden;
+  }
+
+  span {
+    flex: 1;
+    color: ${(props) => props.theme.textColors[3]};
+    overflow: auto;
+    white-space: nowrap;
+    ${Scrollbar}
+  }
 `;
 
 const Title = styled.h2`
@@ -35,10 +54,18 @@ const Title = styled.h2`
 
 export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
   const { mutate } = useApollo();
+  const client: any = useApolloClient();
 
   const [movePath, setMovePath] = useState<null | MoveCopyPath>(null);
 
   const folderCtx = useContext(FolderContext);
+
+  const { data, error } = useGetDirectoryTreeQueryQuery({
+    client,
+    variables: { depth: 1, path: "/" },
+  });
+
+  if (error) console.log(error);
 
   const move = async () => {
     const selectedData = Array.from(
@@ -88,11 +115,26 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
     <MenuOverlay maxWidth={"25vw"} hide={hide}>
       <MoveToContainer>
         <Title>Move To</Title>
-        <Tree setSelectedPath={setMovePath} selectedPath={movePath} />
+        <Tree
+          data={data}
+          setSelectedPath={setMovePath}
+          selectedPath={movePath}
+        />
         <MoveToBottomContainer>
           <ConditionButton condition={!!movePath}>
             <LightBgButton onClick={move}>Move</LightBgButton>
           </ConditionButton>
+          <p>
+            To:{" "}
+            <span>
+              {
+                data?.directoryTree?.tree?.find(
+                  (v) => v.dataStoreId == movePath?.dataStoreId
+                )?.name
+              }
+              /{movePath?.path.replace(/\\/g, "/")}
+            </span>
+          </p>
         </MoveToBottomContainer>
       </MoveToContainer>
     </MenuOverlay>

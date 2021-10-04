@@ -33,6 +33,8 @@ export type CopyMoveInput = {
 export type CreateDataStoreInput = {
   localNodeId: Scalars['Float'];
   name: Scalars['String'];
+  sizeInMB: Scalars['Float'];
+  ownerId: Scalars['Float'];
 };
 
 export type CreateSharedDataStoreInput = {
@@ -47,6 +49,7 @@ export type Datastore = {
   localHostNodeId: Scalars['Float'];
   localNodeId: Scalars['Float'];
   basePath: Scalars['String'];
+  sizeInMB?: Maybe<Scalars['Float']>;
   sharedUsers: Array<User>;
   owner?: Maybe<User>;
 };
@@ -203,6 +206,7 @@ export type Node = {
 
 export type Query = {
   __typename?: 'Query';
+  getNodes?: Maybe<Array<Node>>;
   tree?: Maybe<Tree>;
   directoryTree?: Maybe<Tree>;
   getDataStores?: Maybe<Array<Datastore>>;
@@ -290,6 +294,8 @@ export type User = {
 export type CreateDataStoreMutionMutationVariables = Exact<{
   localNodeId: Scalars['Float'];
   name: Scalars['String'];
+  sizeInMb: Scalars['Float'];
+  ownerId: Scalars['Float'];
 }>;
 
 
@@ -306,6 +312,11 @@ export type GetDataStoresQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Maybe<Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }>> };
+
+export type GetNodesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetNodesQuery = { __typename?: 'Query', getNodes?: Maybe<Array<{ __typename?: 'Node', name: string, id: string, host: string }>> };
 
 export type CopyDataMutationMutationVariables = Exact<{
   dataStoreId: Scalars['Float'];
@@ -443,8 +454,10 @@ export type SetDefaultDownloadPathMutation = { __typename?: 'Mutation', setDefau
 
 
 export const CreateDataStoreMutionDocument = gql`
-    mutation CreateDataStoreMution($localNodeId: Float!, $name: String!) {
-  createDataStore(data: {localNodeId: $localNodeId, name: $name}) {
+    mutation CreateDataStoreMution($localNodeId: Float!, $name: String!, $sizeInMb: Float!, $ownerId: Float!) {
+  createDataStore(
+    data: {localNodeId: $localNodeId, name: $name, sizeInMB: $sizeInMb, ownerId: $ownerId}
+  ) {
     id
   }
 }
@@ -466,6 +479,8 @@ export type CreateDataStoreMutionMutationFn = Apollo.MutationFunction<CreateData
  *   variables: {
  *      localNodeId: // value for 'localNodeId'
  *      name: // value for 'name'
+ *      sizeInMb: // value for 'sizeInMb'
+ *      ownerId: // value for 'ownerId'
  *   },
  * });
  */
@@ -556,6 +571,42 @@ export function useGetDataStoresLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type GetDataStoresQueryHookResult = ReturnType<typeof useGetDataStoresQuery>;
 export type GetDataStoresLazyQueryHookResult = ReturnType<typeof useGetDataStoresLazyQuery>;
 export type GetDataStoresQueryResult = Apollo.QueryResult<GetDataStoresQuery, GetDataStoresQueryVariables>;
+export const GetNodesDocument = gql`
+    query GetNodes {
+  getNodes {
+    name
+    id
+    host
+  }
+}
+    `;
+
+/**
+ * __useGetNodesQuery__
+ *
+ * To run a query within a React component, call `useGetNodesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNodesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNodesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetNodesQuery(baseOptions?: Apollo.QueryHookOptions<GetNodesQuery, GetNodesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetNodesQuery, GetNodesQueryVariables>(GetNodesDocument, options);
+      }
+export function useGetNodesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetNodesQuery, GetNodesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetNodesQuery, GetNodesQueryVariables>(GetNodesDocument, options);
+        }
+export type GetNodesQueryHookResult = ReturnType<typeof useGetNodesQuery>;
+export type GetNodesLazyQueryHookResult = ReturnType<typeof useGetNodesLazyQuery>;
+export type GetNodesQueryResult = Apollo.QueryResult<GetNodesQuery, GetNodesQueryVariables>;
 export const CopyDataMutationDocument = gql`
     mutation CopyDataMutation($dataStoreId: Float!, $destination: CopyMoveDestinationObject!, $data: [CopyMoveDataObject!]!) {
   copy(data: {dataStoreId: $dataStoreId, destination: $destination, data: $data})

@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { useMeState } from "src/hooks/useMeState";
 import styled from "styled-components";
+import { useRouter } from "next/router";
 
 const NavBar = styled.div`
   width: 100vw;
@@ -36,6 +37,7 @@ const UserInfo = styled.div`
 
 const Navbar = () => {
   const { me } = useMeState();
+  const router = useRouter();
 
   return (
     <NavBar>
@@ -44,7 +46,7 @@ const Navbar = () => {
           <p>{me?.userName}</p>
           <span>{me?.isAdmin && "Admin"}</span>
         </UserInfo>
-        {me && <Link href={"/logout"}>logout</Link>}
+        {me && <div onClick={() => router.push("/logout ")}>logout</div>}
       </UserData>
     </NavBar>
   );

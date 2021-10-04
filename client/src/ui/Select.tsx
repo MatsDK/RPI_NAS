@@ -8,7 +8,7 @@ interface SelectProps {
   label: string;
   setValue: React.Dispatch<any>;
   propName?: string;
-  minWidth: number;
+  minWidth?: number;
 }
 
 const SelectWrapper = styled.div`
@@ -16,6 +16,7 @@ const SelectWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: fit-content;
   position: relative;
 `;
 
@@ -37,9 +38,9 @@ const SelectDropDown = styled.div`
   margin-top: -4px;
   position: absolute;
   top: 100%;
+  width: 100%;
   background-color: ${(props) => props.theme.bgColors[0]};
   z-index: 200;
-  width: 100%;
   padding: 2px 3px;
   box-shadow: 3px 3px 10px 5px #0000007a;
 

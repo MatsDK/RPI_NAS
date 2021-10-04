@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import Icon from "src/ui/Icon";
+import { useRouter } from "next/router";
 
 interface Props {
   item: TreeItem;
@@ -54,6 +55,8 @@ const FolderButtonItem = styled.p`
 const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
   const folderCtx: FolderContextType = useContext(FolderContext);
 
+  const router = useRouter();
+
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
@@ -63,6 +66,10 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
   return (
     <FolderItemWrapper
       style={{ backgroundColor: selected ? "#ededed" : "#fff" }}
+      onDoubleClick={() =>
+        item.isDirectory &&
+        router.push(`/path/${item.relativePath}?d=${dataStoreId}`)
+      }
       onClick={() => {
         setSelected((s) => !s);
 

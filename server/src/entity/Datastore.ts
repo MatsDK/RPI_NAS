@@ -29,6 +29,10 @@ export class Datastore extends BaseEntity {
   @Column("text")
   basePath: string;
 
+  @Field({ nullable: true })
+  @Column("int", { nullable: true })
+  sizeInMB: number;
+
   @Field(() => [User])
   sharedUsers: User[];
 

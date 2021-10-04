@@ -1,4 +1,11 @@
-import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import {
+  Arg,
+  Ctx,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import fs from "fs";
 import fsPath from "path";
 import { Node } from "../../entity/CloudNode";
@@ -9,14 +16,15 @@ import { CreateDataStoreInput } from "./CreateDataStoreInput";
 import { nanoid } from "nanoid";
 import { SharedDataStore } from "../../entity/SharedDataStore";
 import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
+import { isAdmin } from "../../middleware/isAdmin";
 
 @Resolver()
 export class DataStoreResolver {
-  @UseMiddleware(isAuth)
+  @UseMiddleware(isAuth, isAdmin)
   @Mutation(() => Datastore, { nullable: true })
   async createDataStore(
     @Ctx() { req }: MyContext,
-    @Arg("data") { localNodeId, name }: CreateDataStoreInput
+    @Arg("data") { localNodeId, name, ownerId, sizeInMB }: CreateDataStoreInput
   ): Promise<Datastore | null> {
     const hostNode = await Node.findOne({ where: { hostNode: true } }),
       thisNode = await Node.findOne({ where: { id: localNodeId } });
@@ -34,9 +42,10 @@ export class DataStoreResolver {
 
     return Datastore.create({
       basePath: path,
-      userId: (req as any).userId,
+      userId: ownerId,
       localHostNodeId: hostNode.id,
       localNodeId,
+      sizeInMB,
       name,
     }).save();
   }
@@ -60,5 +69,11 @@ export class DataStoreResolver {
     await SharedDataStore.insert(ids);
 
     return true;
+  }
+
+  @UseMiddleware(isAuth, isAdmin)
+  @Query(() => [Node], { nullable: true })
+  getNodes() {
+    return Node.find();
   }
 }

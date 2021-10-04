@@ -7,4 +7,10 @@ export class CreateDataStoreInput {
 
   @Field()
   name: string;
+
+  @Field()
+  sizeInMB: number;
+
+  @Field()
+  ownerId: number;
 }

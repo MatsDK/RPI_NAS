@@ -8,6 +8,9 @@ import styled from "styled-components";
 import MenuOverlay from "../../MenuOverlay";
 import { MoveCopyPath } from "./Tree";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
+import { useApolloClient } from "react-apollo";
+import { useGetDirectoryTreeQueryQuery } from "generated/apolloComponents";
+import { Scrollbar } from "src/ui/Scrollbar";
 
 interface CopyToWrapperProps {
   hide: () => any;
@@ -22,7 +25,23 @@ const CopyToContainer = styled.div`
 
 const CopyToBottomContainer = styled.div`
   padding: 10px 0 0 0;
+  display: flex;
+  color: ${(props) => props.theme.textColors[2]};
   border-top: 1px solid ${(props) => props.theme.bgColors[1]};
+
+  p {
+    margin-left: 8px;
+    display: flex;
+    overflow: hidden;
+  }
+
+  span {
+    flex: 1;
+    color: ${(props) => props.theme.textColors[3]};
+    overflow: auto;
+    white-space: nowrap;
+    ${Scrollbar}
+  }
 `;
 
 const Title = styled.h2`
@@ -36,10 +55,18 @@ const Title = styled.h2`
 
 export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
   const { mutate } = useApollo();
+  const client: any = useApolloClient();
 
   const [copyToPath, setCopyToPath] = useState<null | MoveCopyPath>(null);
 
   const folderCtx = useContext(FolderContext);
+
+  const { data, error } = useGetDirectoryTreeQueryQuery({
+    client,
+    variables: { depth: 1, path: "/" },
+  });
+
+  if (error) console.log(error);
 
   const copy = async () => {
     const selectedData = Array.from(
@@ -81,11 +108,26 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
     <MenuOverlay maxWidth={"25vw"} hide={hide}>
       <CopyToContainer>
         <Title>Copy To</Title>
-        <Tree setSelectedPath={setCopyToPath} selectedPath={copyToPath} />
+        <Tree
+          data={data}
+          setSelectedPath={setCopyToPath}
+          selectedPath={copyToPath}
+        />
         <CopyToBottomContainer>
           <ConditionButton condition={!!copyToPath}>
             <LightBgButton onClick={copy}>Copy</LightBgButton>
           </ConditionButton>
+          <p>
+            To:{" "}
+            <span>
+              {
+                data?.directoryTree?.tree?.find(
+                  (v) => v.dataStoreId == copyToPath?.dataStoreId
+                )?.name
+              }
+              /{copyToPath?.path.replace(/\\/g, "/")}
+            </span>
+          </p>
         </CopyToBottomContainer>
       </CopyToContainer>
     </MenuOverlay>

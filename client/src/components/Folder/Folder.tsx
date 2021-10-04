@@ -2,7 +2,13 @@ import { TreeItem, useGetTreeQueryQuery } from "generated/apolloComponents";
 import { FolderItemWrapper, IconWrapper } from "./FolderItem";
 import fsPath from "path";
 import { useApolloClient } from "react-apollo";
-import React, { FormEvent, useContext, useEffect, useState } from "react";
+import React, {
+  FormEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import FolderItem from "./FolderItem";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import FolderNavbar from "./FolderNavbar";
@@ -52,6 +58,13 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
   const folderCtx: FolderContextType = useContext(FolderContext);
 
   const [folderNameInput, setFolderNameInput] = useState("");
+
+  const inputRef = useRef<HTMLInputElement>();
+
+  useEffect(() => {
+    if (folderCtx?.newFolderInput?.showNewFolderInput)
+      inputRef.current?.focus();
+  }, [folderCtx]);
 
   const { data, error, loading } = useGetTreeQueryQuery({
     variables: {
@@ -179,6 +192,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
               <form onSubmit={createNewFolder}>
                 <NewFolderInput
                   type="text"
+                  ref={inputRef as any}
                   value={folderNameInput}
                   onChange={(e) => setFolderNameInput(e.target.value)}
                 />

@@ -21,6 +21,7 @@ const Svg = styled.svg<svgProps>`
   }
 
   display: grid;
+  place-items: center;
 `;
 
 const Icon: React.FC<Props> = ({ name, color, width, height, viewPort }) => {
