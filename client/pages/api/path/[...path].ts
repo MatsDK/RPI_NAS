@@ -12,12 +12,21 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     const pathStats = fs.lstatSync(path);
     if (!pathStats.isDirectory()) return res.status(400);
   } catch {
-    res.status(200).json({ data: [] });
+    return res.status(200).json({ data: [] });
   }
 
-  const returnArr: Array<{ path: string; isDirectory: boolean; name: string }> =
-      [],
+  const returnArr: Array<{
+    path: string;
+    isDirectory: boolean;
+    name: string;
+  }> = [];
+  let folderData: string[] = [];
+
+  try {
     folderData = fs.readdirSync(path);
+  } catch {
+    return res.status(200).json({ data: [] });
+  }
 
   for (const folderItem of folderData) {
     const thisPath = fsPath.join(path, folderItem);

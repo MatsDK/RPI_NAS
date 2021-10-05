@@ -26,8 +26,8 @@ const CreateDataStoreWrapper = styled.div`
 `;
 
 const Title = styled.h2`
-  font-weight: bold;
-  font-size: 36px;
+  font-weight: 600;
+  font-size: 27px;
   color: ${(props) => props.theme.textColors[3]};
   border-bottom: 1px solid ${(props) => props.theme.bgColors[1]};
   padding-bottom: 10px;
@@ -46,6 +46,20 @@ const FormItem = styled.div`
       margin-left: 5px;
       color: ${(props) => props.theme.textColors[2]};
     }
+  }
+
+  > p {
+    color: ${(props) => props.theme.textColors[2]};
+  }
+`;
+
+const SelectCloudDropdownItem = styled.div`
+  cursor: pointer;
+  padding: 2px;
+
+  p {
+    font-size: 14px;
+    color: ${(props) => props.theme.textColors[2]};
   }
 `;
 
@@ -139,6 +153,11 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
                         setValue={setSelectedNode}
                         propName={"name"}
                         minWidth={160}
+                        renderItem={(item, idx, onClick) => (
+                          <SelectCloudDropdownItem key={idx} onClick={onClick}>
+                            {item.name} <p>{item.host}</p>
+                          </SelectCloudDropdownItem>
+                        )}
                       />
                     </div>
                   </div>
@@ -152,7 +171,7 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
                     />
                     <p>(e.g. 100M, 10G)</p>
                   </div>
-                  {sizeInMb != null ? `valid ${sizeInMb}Mb` : "invalid"}
+                  <p>{sizeInMb != null ? `valid` : "invalid"}</p>
                 </FormItem>
 
                 <FormItem></FormItem>

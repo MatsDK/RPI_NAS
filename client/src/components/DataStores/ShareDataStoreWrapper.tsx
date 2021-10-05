@@ -23,21 +23,12 @@ const ShareDataStoreWrapper: React.FC<Props> = ({
     loading: friendsLoading,
   } = useGetFriendsQueryQuery({ client });
 
-  // const {
-  //   data: dataStores,
-  //   error: dataStoresError,
-  //   loading: dataStoresLoading,
-  // } = useGetMyDataStoresQuery({ client });
-
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
   const [selectedDataStores, setSelectedDataStores] = useState<Set<number>>(
     new Set([dataStoreId])
   );
 
-  if (friendsError) {
-    console.log(friendsError);
-    return <div>errors</div>;
-  }
+  if (friendsError) console.log(friendsError);
 
   const share = async () => {
     if (!selectedUsers.size) return alert("you haven't selected any friends");

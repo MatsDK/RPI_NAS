@@ -1,12 +1,26 @@
 import { SendFriendRequestMutation } from "graphql/Friends/sendFriendRequest";
+import { Title } from "pages/friends";
 import { FindUsersQuery } from "graphql/User/findUsers";
 import React, { FormEvent, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
 import { useTimeoutInput } from "src/hooks/useTimeoutInput";
+import styled from "styled-components";
 
 interface FindFriendsContainerProps {
   friendsIds: string[];
 }
+
+const Header = styled.div`
+  border-bottom: 1px solid ${(props) => props.theme.textColors[3]};
+  min-width: 500px;
+  padding: 4px 10px;
+  display: flex;
+`;
+
+const Container = styled.div`
+  padding: 15px;
+  flex: 1;
+`;
 
 export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
   friendsIds,
@@ -50,11 +64,14 @@ export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
   };
 
   return (
-    <div>
-      <form onSubmit={search}>
-        <input type="text" value={nameInput} onChange={setNameInput} />
-        <button type="submit"></button>
-      </form>
+    <Container>
+      <Header>
+        <Title>Search Friends</Title>
+        <form onSubmit={search}>
+          <input type="text" value={nameInput} onChange={setNameInput} />
+          <button type="submit"></button>
+        </form>
+      </Header>
       {foundUsers == null
         ? null
         : !foundUsers.length
@@ -74,6 +91,6 @@ export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
               )}
             </div>
           ))}
-    </div>
+    </Container>
   );
 };

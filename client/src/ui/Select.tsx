@@ -9,6 +9,7 @@ interface SelectProps {
   setValue: React.Dispatch<any>;
   propName?: string;
   minWidth?: number;
+  renderItem?: (item: any, idx: number, onClick: () => void) => JSX.Element;
 }
 
 const SelectWrapper = styled.div`
@@ -44,8 +45,14 @@ const SelectDropDown = styled.div`
   padding: 2px 3px;
   box-shadow: 3px 3px 10px 5px #0000007a;
 
-  p:not(:last-child) {
+  .item:not(:last-child) {
     border-bottom: 1px solid ${(props) => props.theme.bgColors[2]};
+  }
+`;
+
+const DropDownItem = styled.p`
+  p {
+    padding: 2px;
   }
 `;
 
@@ -56,6 +63,7 @@ export const Select: React.FC<SelectProps> = ({
   setValue,
   propName,
   minWidth = 85,
+  renderItem,
 }) => {
   if (selectedIdx == -1) selectedIdx = undefined;
 
@@ -100,17 +108,22 @@ export const Select: React.FC<SelectProps> = ({
       {dropdownOpen && (
         <SelectDropDown>
           {data.map((v, idx) => {
-            return (
-              <p
+            const onClick = () => {
+              idx != selected && setSelectedIdx(idx);
+              setDropdownOpen(false);
+            };
+
+            return renderItem ? (
+              renderItem(v, idx, onClick)
+            ) : (
+              <DropDownItem
+                className={"item"}
                 key={idx}
                 style={{ cursor: "pointer" }}
-                onClick={() => {
-                  idx != selected && setSelectedIdx(idx);
-                  setDropdownOpen(false);
-                }}
+                onClick={onClick}
               >
                 {propName ? v[propName] : v}
-              </p>
+              </DropDownItem>
             );
           })}
         </SelectDropDown>

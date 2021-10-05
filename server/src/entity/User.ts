@@ -27,6 +27,9 @@ export class User extends BaseEntity {
   @Column("text")
   password: string;
 
+  @Column("text", { nullable: true })
+  profilePictureId: string;
+
   @Column("int", { array: true, default: [] })
   friendsIds: number[];
 

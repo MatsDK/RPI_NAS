@@ -43,7 +43,7 @@
     "dev": "tsnd --respawn --ignore-watch .next/ ./server/server.ts",
     "build": "next build && tsc --project tsconfig.server.json",
     "postinstall": "npm run build",
-    "start": "node .next/production-server/server.js",
+    "start": "node .next/production-server/server/server.js",
     "generate": "gql-gen --config codegen.yml"
   },
   "keywords": [],

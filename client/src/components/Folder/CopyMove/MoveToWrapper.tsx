@@ -44,8 +44,8 @@ const MoveToBottomContainer = styled.div`
 `;
 
 const Title = styled.h2`
-  font-weight: bold;
-  font-size: 36px;
+  font-weight: 600;
+  font-size: 27px;
   color: ${(props) => props.theme.textColors[3]};
   border-bottom: 1px solid ${(props) => props.theme.bgColors[1]};
   padding-bottom: 10px;
