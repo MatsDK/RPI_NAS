@@ -15,16 +15,30 @@ export const getTreeObject = (
 ): null | TreeItem[] => {
   path = fsPath.join(basePath, path);
 
+  try {
+
+
   if (checkPath) {
     const thisPathstats = fs.lstatSync(path);
     if (!thisPathstats.isDirectory()) return null;
   }
+  }catch (e) {
+	  return []
+  }
 
   if (!depth) return null;
 
+
   const items: TreeItem[] = [];
 
-  for (const currPath of fs.readdirSync(path)) {
+  let data = []
+  try {
+	 data  =fs.readdirSync(path) 
+  } catch(e) {
+	  return []
+  }
+
+  for (const currPath of data) {
     try {
       const thisPath = fsPath.join(path, currPath);
       const stats = fs.lstatSync(thisPath);
@@ -48,5 +62,5 @@ export const getTreeObject = (
     } catch (error) {}
   }
 
-  return items;
+  return items || [];
 };

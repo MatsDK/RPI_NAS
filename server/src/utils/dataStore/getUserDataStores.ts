@@ -1,9 +1,9 @@
 import { getConnection } from "typeorm";
-import { Datastore } from "../entity/Datastore";
+import { Datastore } from "../../entity/Datastore";
 
 // SELECT * FROM datastore d LEFT JOIN shared_data_store s ON s."dataStoreId"=d.id
 // WHERE d."userId"=$1 OR s.id=$1
-export const getUserDataStores = (userId: number) =>
+export const getUserDataStores = (userId: number): Promise<Datastore[]> =>
   getConnection()
     .getRepository(Datastore)
     .createQueryBuilder("d")

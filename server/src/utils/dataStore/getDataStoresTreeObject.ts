@@ -1,6 +1,7 @@
 import fsPath from "path";
-import { SharedDataStore } from "../entity/SharedDataStore";
-import { TreeItem } from "../modules/Tree/TreeItem";
+import { SharedDataStore } from "../../entity/SharedDataStore";
+import { TreeItem } from "../../modules/Tree/TreeItem";
+import { Datastore } from "../../entity/Datastore"
 import { getUserDataStores } from "./getUserDataStores";
 
 export const getDataStoresTreeObject = async (
@@ -9,7 +10,7 @@ export const getDataStoresTreeObject = async (
   path: string,
   directoryTree: boolean
 ): Promise<TreeItem[]> => {
-  const userDataStores = await getUserDataStores(userId),
+  const userDataStores: Datastore[] = await getUserDataStores(userId),
     items: TreeItem[] = [];
 
   for (const { basePath, name, id } of userDataStores) {

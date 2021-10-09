@@ -1,7 +1,7 @@
 import { Field, ObjectType } from "type-graphql";
 import { getTreeObject } from "../../utils/getTreeObject";
 import { TreeItem } from "./TreeItem";
-import { getDataStoresTreeObject } from "../../utils/getDataStoresTreeObject";
+import { getDataStoresTreeObject } from "../../utils/dataStore/getDataStoresTreeObject";
 
 @ObjectType()
 export class Tree {

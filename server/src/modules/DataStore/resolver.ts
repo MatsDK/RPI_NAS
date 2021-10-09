@@ -17,6 +17,7 @@ import { nanoid } from "nanoid";
 import { SharedDataStore } from "../../entity/SharedDataStore";
 import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { isAdmin } from "../../middleware/isAdmin";
+import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder"
 
 @Resolver()
 export class DataStoreResolver {
@@ -31,14 +32,10 @@ export class DataStoreResolver {
 
     if (!hostNode || !thisNode) return null;
 
-    const path = fsPath.join(thisNode.basePath, nanoid(10));
-    try {
-      fs.mkdirSync(path);
-      fs.chownSync(path, 1000, 1000);
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
+    const path = fsPath.join(thisNode.basePath, nanoid(10))
+    createDatastoreFolder(path, sizeInMB).then(res => {
+	    console.log(res)
+    })
 
     return Datastore.create({
       basePath: path,

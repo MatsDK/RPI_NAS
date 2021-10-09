@@ -6,10 +6,11 @@ import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
 import { checkPermissions } from "../../middleware/checkPermissions";
 import { MyContext } from "../../types";
-import { getUserDataStores } from "../../utils/getUserDataStores";
+import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
 import { buildTreeObject } from "./buildTreeObject";
 import { GetTreeInput } from "./GetTreeInput";
 import { Tree } from "./TreeObject";
+import { getDataStoreSizes } from "../../utils/dataStore/getDataStoreSizes"
 
 @Resolver()
 export class TreeResolver {
@@ -88,10 +89,10 @@ export class TreeResolver {
         ]);
     });
 
-    return dataStores.map((dataStore) => ({
+    return await getDataStoreSizes(dataStores.map((dataStore) => ({
       ...dataStore,
       sharedUsers: sharedUsersMap.get(dataStore.id) || [],
       owner: users.find(({ id }) => id === dataStore.userId),
-    })) as any;
+    })) as any);
   }
 }
