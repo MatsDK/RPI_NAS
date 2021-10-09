@@ -1,19 +1,28 @@
 const df = require("node-df")
-import {Datastore} from "../../entity/Datastore"
+import { Datastore, SizeObject} from "../../entity/Datastore"
 
-export const getDataStoreSizes = (dataStores: Datastore[]): Promise<Datastore[]> => {
+const options = { prefixMultiplier: "MiB", isDisplayPrefixMultiplier: false}
 
-	return new Promise((res, rej) => {
-
-		df((err: any, r: any) => {
+export const getDataStoreSizes = (dataStores: Datastore[]): Promise<Datastore[]> => 
+	new Promise((res, rej) => {
+		df(options, (err: any, r: any) => {
 			if(err) rej(err)
 
 			for (const ds of dataStores) {
 				const fs = r.find((f: any) => f.mount === ds.basePath)
-			//	console.log(fs, ds.basePath)
+
+				if(fs) {
+					const sizeObj = new SizeObject()
+					
+					sizeObj.usedSize = Math.round(fs.used * 10) / 10
+					sizeObj.usedPercent = Math.round(fs.capacity * 100)
+
+					ds.size = sizeObj
+					console.log(ds)
+				}
 			}
 		
 			res(dataStores)
 		})
 
-	}) }
+	}) 

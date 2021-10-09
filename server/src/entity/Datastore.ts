@@ -3,6 +3,15 @@ import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 import { User } from "./User";
 
 @ObjectType()
+export class SizeObject {
+	@Field()
+	usedSize: number
+
+	@Field()
+  	usedPercent: number
+}
+
+@ObjectType()
 @Entity()
 export class Datastore extends BaseEntity {
   @Field(() => ID)
@@ -33,9 +42,13 @@ export class Datastore extends BaseEntity {
   @Column("int", { nullable: true })
   sizeInMB: number;
 
+  @Field({ nullable: true })
+  size?: SizeObject;
+
   @Field(() => [User])
   sharedUsers: User[];
 
   @Field(() => User, { nullable: true })
   owner: User;
 }
+

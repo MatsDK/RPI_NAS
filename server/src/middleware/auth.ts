@@ -20,7 +20,7 @@ export const isAuth: MiddlewareFn<MyContext> = async (
     ((req.headers["authorization"] as string) || "")
       .split(";")
       .map((x: string) => x.split("="))
-      .map(([key, v]: any) => cookiesMap.set(key.trim(), v.trim()));
+      .map(([key, v]: any) => cookiesMap.set(key?.trim(), v?.trim()));
 
     accessToken = cookiesMap.get("access-token");
     refreshToken = cookiesMap.get("refresh-token");
