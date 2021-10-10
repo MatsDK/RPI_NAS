@@ -91,14 +91,14 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
       .charAt(sizeInput.trim().length - 1);
 
     let m = 1;
-    if (lastChar == "g") m = 1024;
+    if (lastChar == "g") m = 1000;
     else if (lastChar != "m") return setSizeInMB(null);
 
     const lastIdx = sizeInput.toLowerCase().indexOf(lastChar);
     const num = Number(sizeInput.slice(0, lastIdx));
 
     if (num)
-      num * m >= 1 && num * m <= 204800
+      num * m >= 1 && num * m <= 200000
         ? setSizeInMB(num * m)
         : setSizeInMB(null);
     else setSizeInMB(null);

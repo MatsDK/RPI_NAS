@@ -1,0 +1,254 @@
+import { Datastore } from "generated/apolloComponents";
+import Link from "next/link";
+import React from "react";
+import { useMeState } from "src/hooks/useMeState";
+import styled from "styled-components";
+
+interface DataStoreListItemProps {
+  dataStore: Datastore;
+  setDataStoreId: React.Dispatch<React.SetStateAction<number>>;
+  setShowShareDataStoreForm: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const DataStoreShared = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const DataStoreSize = styled.div`
+  width: 100px;
+  position: relative;
+  margin-right: 10px;
+  display: grid;
+  place-items: center;
+
+  > div {
+    position: absolute;
+    background-color: transparent;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+
+    p {
+      font-size: 13px;
+
+      span {
+        font-weight: 500;
+      }
+
+      :last-child {
+        color: ${(props) => props.theme.textColors[2]};
+      }
+    }
+  }
+
+  svg {
+    top: 5px;
+    position: absolute;
+  }
+
+  svg:first-child {
+    z-index: 2;
+    stroke: ${(props) => props.theme.textColors[3]};
+  }
+
+  svg:last-child {
+    z-index: 3;
+    stroke: ${(props) => props.theme.bgColors[2]};
+  }
+`;
+
+const DataStoreItem = styled.div`
+  padding: 15px;
+  display: flex;
+  border-bottom: 1px solid ${(props) => props.theme.textColors[3]};
+  min-height: 132px;
+`;
+
+const DataStoreInfo = styled.div`
+  flex: 1;
+`;
+
+const DataStoreItemHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 0 0 5px 0;
+  justify-content: space-between;
+`;
+
+const DataStoreOwner = styled.div`
+  display: flex;
+
+  label {
+    color: ${(props) => props.theme.textColors[2]};
+    margin-right: 3px;
+  }
+
+  span {
+    color: ${(props) => props.theme.textColors[0]};
+    font-weight: 500;
+  }
+
+  p {
+    color: ${(props) => props.theme.textColors[2]};
+    font-weight: 500;
+    margin-left: 3px;
+  }
+`;
+
+const DataStoreItemTitle = styled.div`
+  font-weight: 600;
+  font-size: 20px;
+  color: ${(props) => props.theme.textColors[0]};
+
+  button {
+    background-color: transparent;
+    border: 0;
+    color: ${(props) => props.theme.textColors[2]};
+    font-size: 14px;
+    margin-left: 4px;
+    cursor: pointer;
+  }
+`;
+
+const DataStoreSharedUsers = styled.div`
+  display: flex;
+  align-items: center;
+
+  > div {
+    margin: 0 6px;
+    display: flex;
+    margin-top: 5px;
+
+    p {
+      color: ${(props) => props.theme.textColors[2]};
+    }
+  }
+`;
+
+const DataStoreSharedHeader = styled.div`
+  display: flex;
+  align-items: baseline;
+  margin-top: 5px;
+
+  button {
+    margin-left: 15px;
+    background-color: transparent;
+    border: 0;
+    color: ${(props) => props.theme.textColors[2]};
+    transition: 0.1s ease-in-out;
+    cursor: pointer;
+    font-size: 15px;
+
+    :hover {
+      color: ${(props) => props.theme.textColors[1]};
+    }
+  }
+
+  > div {
+    display: flex;
+    align-items: baseline;
+    font-size: 17px;
+    color: ${(props) => props.theme.textColors[0]};
+
+    p {
+      font-size: 14px;
+      margin-left: 3px;
+      color: ${(props) => props.theme.textColors[2]};
+    }
+  }
+`;
+
+export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
+  dataStore,
+  setDataStoreId,
+  setShowShareDataStoreForm,
+}) => {
+  const { me } = useMeState();
+  const isDataStoreOwner = dataStore.owner?.id == me?.id;
+
+  return (
+    <DataStoreItem>
+      <DataStoreSize>
+        <svg viewBox="0 0 36 36">
+          <path
+            d="M18 2.0845
+      a 15.9155 15.9155 0 0 1 0 31.831
+      a 15.9155 15.9155 0 0 1 0 -31.831"
+            fill="none"
+            strokeWidth="2"
+            strokeDasharray="100, 100"
+          />
+        </svg>
+        <div>
+          <p>
+            <span>{`${Math.round(dataStore.size?.usedSize || 0)}/${Math.round(
+              dataStore.sizeInMB || 0
+            )}`}</span>{" "}
+            Mb
+          </p>
+          <p>{Math.round(dataStore.size?.usedPercent || 0)}%</p>
+        </div>
+        <svg viewBox="0 0 36 36">
+          <path
+            d="M18 2.0845
+      a 15.9155 15.9155 0 0 1 0 31.831
+      a 15.9155 15.9155 0 0 1 0 -31.831"
+            fill="none"
+            strokeWidth="3"
+            strokeDasharray={`${dataStore.size?.usedPercent || 100}, 100`}
+          />
+        </svg>
+      </DataStoreSize>
+      <DataStoreInfo>
+        <DataStoreItemHeader>
+          <DataStoreItemTitle>
+            <span>{dataStore.name}</span>
+            <Link href={`/path?d=${dataStore.id}`}>
+              <button>Go to</button>
+            </Link>
+          </DataStoreItemTitle>
+          <DataStoreOwner>
+            <label>Owner: </label>
+            <span>{dataStore.owner?.userName}</span>
+            <p>{dataStore.owner?.id === me?.id && " (You)"}</p>
+          </DataStoreOwner>
+        </DataStoreItemHeader>
+        <DataStoreShared>
+          <DataStoreSharedHeader>
+            <div>
+              Shared
+              <p>
+                {dataStore.sharedUsers.length}{" "}
+                {dataStore.sharedUsers.length == 1 ? "person" : "people"}
+              </p>
+            </div>
+            {isDataStoreOwner && (
+              <button
+                onClick={() => {
+                  setDataStoreId(Number(dataStore.id));
+                  setShowShareDataStoreForm((s) => !s);
+                }}
+              >
+                Share
+              </button>
+            )}
+          </DataStoreSharedHeader>
+          <DataStoreSharedUsers>
+            {dataStore.sharedUsers.map((sharedUser, idx) => {
+              return (
+                <div key={idx}>
+                  {sharedUser.userName}
+                  <p>{sharedUser.id === me?.id && "(You)"}</p>
+                </div>
+              );
+            })}
+          </DataStoreSharedUsers>
+        </DataStoreShared>
+      </DataStoreInfo>
+    </DataStoreItem>
+  );
+};

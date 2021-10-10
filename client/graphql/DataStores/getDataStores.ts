@@ -9,6 +9,11 @@ export const getDataStoresQuery = gql`
       localHostNodeId
       localNodeId
       basePath
+      sizeInMB
+      size {
+        usedSize
+        usedPercent
+      }
       owner {
         id
         userName
