@@ -11,6 +11,12 @@ export class SizeObject {
   	usedPercent: number
 }
 
+export enum DataStoreStatus {
+	ONLINE = "online",
+	OFFLINE = "offline",
+	INIT = "init"
+}
+
 @ObjectType()
 @Entity()
 export class Datastore extends BaseEntity {
@@ -44,6 +50,10 @@ export class Datastore extends BaseEntity {
 
   @Field({ nullable: true })
   size?: SizeObject;
+
+  @Column({type: "enum", enum: DataStoreStatus, default: DataStoreStatus.INIT})
+  @Field(() => String)
+  status: DataStoreStatus
 
   @Field(() => [User])
   sharedUsers: User[];

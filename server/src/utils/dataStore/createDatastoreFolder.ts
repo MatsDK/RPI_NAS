@@ -15,7 +15,7 @@ export const createDatastoreFolder = async (path: string, sizeInMb: number) : Pr
 		if((await createFs()).err) return {err: true}
 		if((await mountFs(path)).err) return {err: true}
 
-		await fs.rmSync("./fileSize")
+		fs.rmSync("./fileSize")
 
 		return {err: false}
 						      
@@ -35,7 +35,7 @@ const createFileSize = async (sizeInMb: number): Promise<{err: any}> => {
 const createFs = async (): Promise<{err: any}> => {
 		const { stderr} = await exec(`mkfs.ext4 fileSize`)
 
-		return {err:   false}
+		return {err: false}
 }
 
 const mountFs = async (path: string): Promise<{err: any}> => {

@@ -9,7 +9,7 @@ import {
 import fs from "fs";
 import fsPath from "path";
 import { Node } from "../../entity/CloudNode";
-import { Datastore } from "../../entity/Datastore";
+import { Datastore , DataStoreStatus } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
 import { MyContext } from "../../types";
 import { CreateDataStoreInput } from "./CreateDataStoreInput";
@@ -32,12 +32,10 @@ export class DataStoreResolver {
 
     if (!hostNode || !thisNode) return null;
 
-    const path = fsPath.join(thisNode.basePath, nanoid(10))
-    createDatastoreFolder(path, sizeInMB).then(res => {
-	    console.log(res)
-    })
 
-    return Datastore.create({
+    const path = fsPath.join(thisNode.basePath, nanoid(10))
+
+    const newDatastore = await Datastore.create({
       basePath: path,
       userId: ownerId,
       localHostNodeId: hostNode.id,
@@ -45,6 +43,14 @@ export class DataStoreResolver {
       sizeInMB,
       name,
     }).save();
+
+    createDatastoreFolder(path, sizeInMB).then(async (res) => {
+	    console.log("update")
+	    newDatastore && await Datastore.update({id: newDatastore.id}, {status: DataStoreStatus.ONLINE})
+	    console.log("online")
+    })
+
+    return newDatastore
   }
 
   @UseMiddleware(isAuth)

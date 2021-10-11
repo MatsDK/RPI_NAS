@@ -18,7 +18,6 @@ export const getDataStoreSizes = (dataStores: Datastore[]): Promise<Datastore[]>
 					sizeObj.usedPercent = Math.round(fs.capacity * 100)
 
 					ds.size = sizeObj
-					console.log(ds)
 				}
 			}
 		
