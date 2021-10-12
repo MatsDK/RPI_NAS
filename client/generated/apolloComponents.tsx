@@ -52,6 +52,7 @@ export type Datastore = {
   sharedUsers: Array<User>;
   size?: Maybe<SizeObject>;
   sizeInMB?: Maybe<Scalars['Float']>;
+  status: Scalars['String'];
   userId: Scalars['Float'];
 };
 
@@ -318,7 +319,7 @@ export type CreateSharedDataStoresMutaionMutation = { __typename?: 'Mutation', c
 export type GetDataStoresQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: number | null | undefined, size?: { __typename?: 'SizeObject', usedSize: number, usedPercent: number } | null | undefined, owner?: { __typename?: 'User', id: string, userName: string, isAdmin: boolean } | null | undefined, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }> | null | undefined };
+export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: number | null | undefined, status: string, size?: { __typename?: 'SizeObject', usedSize: number, usedPercent: number } | null | undefined, owner?: { __typename?: 'User', id: string, userName: string, isAdmin: boolean } | null | undefined, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }> | null | undefined };
 
 export type GetNodesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -543,6 +544,7 @@ export const GetDataStoresDocument = gql`
       usedSize
       usedPercent
     }
+    status
     owner {
       id
       userName

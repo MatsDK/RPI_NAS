@@ -322,8 +322,8 @@ const UploadWrapper: React.FC<Props> = ({ hide }) => {
                     marginRight: 10,
                     outline: 0,
                   }}
-                  defaultChecked={selectedPaths.has(item.path)}
-                  onChange={() => selectItem(item)}
+                  checked={selectedPaths.has(item.path)}
+                  onClick={() => selectItem(item)}
                 />
                 <div
                   style={{ display: "flex" }}

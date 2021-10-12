@@ -9,7 +9,7 @@ import {
 import fs from "fs";
 import fsPath from "path";
 import { Node } from "../../entity/CloudNode";
-import { Datastore , DataStoreStatus } from "../../entity/Datastore";
+import { Datastore, DataStoreStatus } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
 import { MyContext } from "../../types";
 import { CreateDataStoreInput } from "./CreateDataStoreInput";
@@ -17,7 +17,7 @@ import { nanoid } from "nanoid";
 import { SharedDataStore } from "../../entity/SharedDataStore";
 import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { isAdmin } from "../../middleware/isAdmin";
-import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder"
+import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder";
 
 @Resolver()
 export class DataStoreResolver {
@@ -32,8 +32,7 @@ export class DataStoreResolver {
 
     if (!hostNode || !thisNode) return null;
 
-
-    const path = fsPath.join(thisNode.basePath, nanoid(10))
+    const path = fsPath.join(thisNode.basePath, nanoid(10));
 
     const newDatastore = await Datastore.create({
       basePath: path,
@@ -45,12 +44,16 @@ export class DataStoreResolver {
     }).save();
 
     createDatastoreFolder(path, sizeInMB).then(async (res) => {
-	    console.log("update")
-	    newDatastore && await Datastore.update({id: newDatastore.id}, {status: DataStoreStatus.ONLINE})
-	    console.log("online")
-    })
+      console.log("update");
+      newDatastore &&
+        (await Datastore.update(
+          { id: newDatastore.id },
+          { status: DataStoreStatus.ONLINE }
+        ));
+      console.log("online");
+    });
 
-    return newDatastore
+    return newDatastore;
   }
 
   @UseMiddleware(isAuth)

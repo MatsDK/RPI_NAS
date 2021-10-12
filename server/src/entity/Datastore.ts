@@ -4,17 +4,17 @@ import { User } from "./User";
 
 @ObjectType()
 export class SizeObject {
-	@Field()
-	usedSize: number
+  @Field()
+  usedSize: number;
 
-	@Field()
-  	usedPercent: number
+  @Field()
+  usedPercent: number;
 }
 
 export enum DataStoreStatus {
-	ONLINE = "online",
-	OFFLINE = "offline",
-	INIT = "init"
+  ONLINE = "online",
+  OFFLINE = "offline",
+  INIT = "init",
 }
 
 @ObjectType()
@@ -51,9 +51,13 @@ export class Datastore extends BaseEntity {
   @Field({ nullable: true })
   size?: SizeObject;
 
-  @Column({type: "enum", enum: DataStoreStatus, default: DataStoreStatus.INIT})
+  @Column({
+    type: "enum",
+    enum: DataStoreStatus,
+    default: DataStoreStatus.INIT,
+  })
   @Field(() => String)
-  status: DataStoreStatus
+  status: DataStoreStatus;
 
   @Field(() => [User])
   sharedUsers: User[];
@@ -61,4 +65,3 @@ export class Datastore extends BaseEntity {
   @Field(() => User, { nullable: true })
   owner: User;
 }
-

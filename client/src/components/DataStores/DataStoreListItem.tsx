@@ -162,6 +162,23 @@ const DataStoreSharedHeader = styled.div`
   }
 `;
 
+interface StatusSectionProps {
+  status: number;
+}
+
+const StatusSection = styled.div<StatusSectionProps>`
+  color: ${(props) => props.theme.textColors[2]};
+  display: flex;
+
+  p {
+    margin-left: 4px;
+    font-weight: 600;
+    color: ${(props) => props.theme.statusColors[props.status]};
+  }
+`;
+
+const status = ["init", "online", "offline"];
+
 export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
   dataStore,
   setDataStoreId,
@@ -217,6 +234,15 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
             <p>{dataStore.owner?.id === me?.id && " (You)"}</p>
           </DataStoreOwner>
         </DataStoreItemHeader>
+        <StatusSection status={status.indexOf(dataStore.status)}>
+          status:
+          <p>
+            {dataStore.status === "init"
+              ? "Initializing"
+              : dataStore.status.charAt(0).toUpperCase() +
+                dataStore.status.slice(1)}
+          </p>
+        </StatusSection>
         <DataStoreShared>
           <DataStoreSharedHeader>
             <div>

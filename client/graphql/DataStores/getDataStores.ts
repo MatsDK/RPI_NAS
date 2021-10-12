@@ -14,6 +14,7 @@ export const getDataStoresQuery = gql`
         usedSize
         usedPercent
       }
+      status
       owner {
         id
         userName

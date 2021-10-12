@@ -1,7 +1,7 @@
 import fsPath from "path";
 import { SharedDataStore } from "../../entity/SharedDataStore";
 import { TreeItem } from "../../modules/Tree/TreeItem";
-import { Datastore } from "../../entity/Datastore"
+import { Datastore } from "../../entity/Datastore";
 import { getUserDataStores } from "./getUserDataStores";
 
 export const getDataStoresTreeObject = async (
