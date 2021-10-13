@@ -1,6 +1,6 @@
 import { MiddlewareFn } from "type-graphql";
 import { verify } from "jsonwebtoken";
-import { MyContext } from "../types";
+import { MyContext } from "../types/Context";
 import { User } from "../entity/User";
 import { createTokens } from "../utils/createTokens";
 import cookie from "cookie";

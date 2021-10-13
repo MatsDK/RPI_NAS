@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { graphqlUploadExpress } from 'graphql-upload';
 import { ApolloServer } from "apollo-server-express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -30,6 +31,7 @@ dotenv.config();
     context: ({ req, res }) => ({ req, res }),
   });
 
+
   await createConnection().then(() =>
     console.log("> Connected to postgreSQL database")
   );
@@ -44,7 +46,11 @@ dotenv.config();
 
   app.use("/", router);
 
+
   await apolloServer.start();
+
+  app.use(graphqlUploadExpress());
+
   apolloServer.applyMiddleware({
     app,
     cors: { credentials: true, origin: process.env.CLIENT_URL },

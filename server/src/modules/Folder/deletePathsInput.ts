@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from "type-graphql";
-import { Type } from "../../types";
+import { Type } from "../../types/Context";
 
 @InputType()
 export class DeletePathsInput {

@@ -1,4 +1,5 @@
 import { compare, hash } from "bcrypt";
+import { createWriteStream } from "fs"
 import {
   Arg,
   Ctx,
@@ -7,13 +8,18 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
+import fsPath from "path"
+import { IMGS_FOLDER } from "../../constants"
+import fs from "fs-extra"
 import { getConnection, ILike, In, Not } from "typeorm";
 import { Datastore } from "../../entity/Datastore";
+import { FileUpload, GraphQLUpload } from "graphql-upload";
 import { FriendRequest } from "../../entity/FriendRequest";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
 import { getUser } from "../../middleware/getUser";
-import { MyContext } from "../../types";
+import { MyContext } from "../../types/Context";
+import { Upload } from "../../types/Upload";
 import { createTokens } from "../../utils/createTokens";
 import { FriendsQueryReturn } from "./FriendsQueryReturn";
 import { RegisterInput } from "./RegisterInput";
@@ -177,5 +183,24 @@ export class UserResolver {
     await Promise.all(promiseList);
 
     return true;
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Boolean, {nullable: true})
+  async UploadProfilePicture (
+	  @Arg("file", () => GraphQLUpload) { createReadStream, filename } : Upload,
+	  @Ctx() { req }: MyContext
+  ): Promise<boolean> {
+	  const path = fsPath.join(IMGS_FOLDER, `${req.userId}.png`)
+
+	  if(fs.pathExistsSync(path))
+			  fs.removeSync(path)
+		  
+	  return new Promise((resolve, reject) => 
+		  createReadStream()
+			  .pipe(createWriteStream(path))
+			  .on("finish", () => resolve(true))
+			  .on("error", () => reject(false))
+	  )
   }
 }

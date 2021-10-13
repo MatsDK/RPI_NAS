@@ -1,7 +1,7 @@
 import { MiddlewareFn } from "type-graphql";
 import { Node } from "../entity/CloudNode";
 import { Datastore } from "../entity/Datastore";
-import { MyContext } from "../types";
+import { MyContext } from "../types/Context";
 
 export const getDataStoreAndNode: MiddlewareFn<MyContext> = async (
   { context: { req }, args },

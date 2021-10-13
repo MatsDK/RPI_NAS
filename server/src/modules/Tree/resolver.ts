@@ -5,7 +5,7 @@ import { SharedDataStore } from "../../entity/SharedDataStore";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
 import { checkPermissions } from "../../middleware/checkPermissions";
-import { MyContext } from "../../types";
+import { MyContext } from "../../types/Context";
 import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
 import { buildTreeObject } from "./buildTreeObject";
 import { GetTreeInput } from "./GetTreeInput";

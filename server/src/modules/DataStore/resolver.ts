@@ -11,7 +11,7 @@ import fsPath from "path";
 import { Node } from "../../entity/CloudNode";
 import { Datastore, DataStoreStatus } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
-import { MyContext } from "../../types";
+import { MyContext } from "../../types/Context";
 import { CreateDataStoreInput } from "./CreateDataStoreInput";
 import { nanoid } from "nanoid";
 import { SharedDataStore } from "../../entity/SharedDataStore";

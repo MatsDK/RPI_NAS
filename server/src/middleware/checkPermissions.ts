@@ -1,6 +1,6 @@
 import { MiddlewareFn } from "type-graphql";
 import { getConnection } from "typeorm";
-import { MyContext } from "../types";
+import { MyContext } from "../types/Context";
 
 export const checkPermissions: MiddlewareFn<MyContext> = async (
   { context: { req }, args: { data, dataStoreId } },
