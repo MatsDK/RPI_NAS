@@ -12,6 +12,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type CopyMoveDataObject = {
@@ -109,6 +111,7 @@ export type GetTreeInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  UploadProfilePicture: Scalars['Boolean'];
   acceptFriendRequest?: Maybe<Scalars['Boolean']>;
   copy?: Maybe<Scalars['Boolean']>;
   createDataStore?: Maybe<Datastore>;
@@ -123,6 +126,11 @@ export type Mutation = {
   register: User;
   sendFriendRequest?: Maybe<Scalars['Boolean']>;
   setDefaultDownloadPath?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationUploadProfilePictureArgs = {
+  file: Scalars['Upload'];
 };
 
 
@@ -413,6 +421,13 @@ export type GetTreeQueryQueryVariables = Exact<{
 
 
 export type GetTreeQueryQuery = { __typename?: 'Query', tree?: { __typename: 'Tree', path: string, tree?: Array<{ __typename: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string }> | null | undefined } | null | undefined };
+
+export type UploadMutationVariables = Exact<{
+  file: Scalars['Upload'];
+}>;
+
+
+export type UploadMutation = { __typename?: 'Mutation', UploadProfilePicture: boolean };
 
 export type GetUserNameByNameQueryVariables = Exact<{
   name: Scalars['String'];
@@ -1029,6 +1044,37 @@ export function useGetTreeQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type GetTreeQueryQueryHookResult = ReturnType<typeof useGetTreeQueryQuery>;
 export type GetTreeQueryLazyQueryHookResult = ReturnType<typeof useGetTreeQueryLazyQuery>;
 export type GetTreeQueryQueryResult = Apollo.QueryResult<GetTreeQueryQuery, GetTreeQueryQueryVariables>;
+export const UploadDocument = gql`
+    mutation Upload($file: Upload!) {
+  UploadProfilePicture(file: $file)
+}
+    `;
+export type UploadMutationFn = Apollo.MutationFunction<UploadMutation, UploadMutationVariables>;
+
+/**
+ * __useUploadMutation__
+ *
+ * To run a mutation, you first call `useUploadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadMutation, { data, loading, error }] = useUploadMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useUploadMutation(baseOptions?: Apollo.MutationHookOptions<UploadMutation, UploadMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UploadMutation, UploadMutationVariables>(UploadDocument, options);
+      }
+export type UploadMutationHookResult = ReturnType<typeof useUploadMutation>;
+export type UploadMutationResult = Apollo.MutationResult<UploadMutation>;
+export type UploadMutationOptions = Apollo.BaseMutationOptions<UploadMutation, UploadMutationVariables>;
 export const GetUserNameByNameDocument = gql`
     query getUserNameByName($name: String!) {
   getUsersByName(name: $name) {

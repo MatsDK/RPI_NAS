@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { useMeState } from "src/hooks/useMeState";
 import styled from "styled-components";
 import { useRouter } from "next/router";
@@ -34,6 +35,13 @@ const UserInfo = styled.div`
   }
 `;
 
+const ProfilePicture = styled.img`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: contain;
+`;
+
 const Navbar = () => {
   const { me } = useMeState();
   const router = useRouter();
@@ -42,9 +50,16 @@ const Navbar = () => {
     <NavBar>
       <UserData>
         <UserInfo>
-          <p>{me?.userName}</p>
+          <Link href="/profile">
+            <p>{me?.userName}</p>
+          </Link>
           <span>{me?.isAdmin && "Admin"}</span>
         </UserInfo>
+        {me && (
+          <ProfilePicture
+            src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me.id}`}
+          />
+        )}
         {me && <div onClick={() => router.push("/logout ")}>logout</div>}
       </UserData>
     </NavBar>

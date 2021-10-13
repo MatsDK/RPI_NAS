@@ -1,9 +1,10 @@
 import { ApolloClient, ApolloLink, InMemoryCache } from "apollo-boost";
 import { setContext } from "apollo-link-context";
-import { createHttpLink, HttpLink } from "apollo-link-http";
+import { HttpLink } from "apollo-link-http";
 import { isBrowser } from "./isBrowser";
 import cookieCutter from "cookie-cutter";
 import { MAX_AGE_ACCESS_TOKEN, MAX_AGE_REFRESH_TOKEN } from "./constants";
+import { createUploadLink } from "apollo-upload-client";
 
 let apolloClient: any = null;
 
@@ -16,20 +17,17 @@ const create = (
   { getToken }: Options,
   linkOptions: HttpLink.Options
 ) => {
-  const httpLink = createHttpLink({
-    ...linkOptions,
-    credentials: "include",
+  const uploadLink = createUploadLink({
+    uri: linkOptions.uri as any,
+    credentials: linkOptions.credentials,
   });
 
-  const authLink = setContext((_, { headers = {} }) => {
-    const token = getToken() || "";
-
-    headers.authorization = token;
-
-    return {
-      headers,
-    };
-  });
+  const authLink = setContext((_, { headers = {} }) => ({
+    headers: {
+      ...headers,
+      authorization: getToken() || "",
+    },
+  }));
 
   const afterwareLink = new ApolloLink((operation, forward) => {
     return forward(operation).map((response) => {
@@ -53,10 +51,13 @@ const create = (
     });
   });
 
+  const createLink = (link: ApolloLink) =>
+    ApolloLink.from([afterwareLink.concat(authLink.concat(link))]);
+
   return new ApolloClient({
     connectToDevTools: isBrowser,
     ssrMode: !isBrowser,
-    link: ApolloLink.from([afterwareLink.concat(authLink.concat(httpLink))]),
+    link: createLink(uploadLink as any),
     cache: new InMemoryCache().restore(initialState || {}),
   });
 };
