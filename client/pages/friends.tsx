@@ -1,3 +1,4 @@
+import { ProfilePicture } from "src/ui/ProfilePicture";
 import {
   GetFriendsQueryQuery,
   useGetFriendsQueryQuery,
@@ -13,12 +14,17 @@ import SideBar from "../src/components/SideBar";
 import { useApolloClient } from "react-apollo";
 import { acceptFriendRequestMutation } from "graphql/Friends/acceptFriendRequest";
 import styled from "styled-components";
+import { Scrollbar } from "src/ui/Scrollbar";
 
 interface FriendsProps extends GetFriendsQueryQuery {}
 
 const Container = styled.div`
+  ${Scrollbar}
   padding: 25px 0 0 30px;
+  height: 100%;
+  overflow: auto;
   min-width: 300px;
+  padding-bottom: 100px;
 
   > div:not(:last-child) {
     border-bottom: 1px solid ${(props) => props.theme.textColors[3]};
@@ -42,8 +48,57 @@ const ContainerItem = styled.div`
   padding: 10px 0;
 `;
 
-const PlaceHolder = styled.span`
+export const PlaceHolder = styled.span`
   color: ${(props) => props.theme.textColors[2]};
+`;
+
+const FriendRequest = styled.div`
+  padding: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  :hover button {
+    opacity: 1;
+  }
+
+  > div {
+    align-items: center;
+    display: flex;
+
+    span {
+      margin-left: 10px;
+      font-size: 18px;
+      font-weight: 4000;
+      color: ${(props) => props.theme.textColors[1]};
+    }
+  }
+`;
+
+const Friend = styled.div`
+  padding: 3px;
+  display: flex;
+  align-items: center;
+
+  span {
+    margin-left: 10px;
+    font-size: 18px;
+    color: ${(props) => props.theme.textColors[1]};
+  }
+`;
+
+const AcceptButton = styled.button`
+  background-color: transparent;
+  border: 0;
+  outline: none;
+  cursor: pointer;
+  color: ${(props) => props.theme.textColors[2]};
+  transition: 0.15s ease-in-out;
+  opacity: 0;
+
+  :hover {
+    color: ${(props) => props.theme.textColors[1]};
+  }
 `;
 
 const Friends: NextFunctionComponentWithAuth<FriendsProps> = ({ me }) => {
@@ -89,15 +144,20 @@ const Friends: NextFunctionComponentWithAuth<FriendsProps> = ({ me }) => {
           </Title>
           {friendRequests?.length ? (
             friendRequests?.map((f, idx) => (
-              <div key={idx} style={{ display: "flex" }}>
-                <span>{f.userName}</span>
-                <button onClick={() => acceptFriendRequest(Number(f.id))}>
-                  accept
-                </button>
-              </div>
+              <FriendRequest key={idx} style={{ display: "flex" }}>
+                <div>
+                  <ProfilePicture
+                    src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${f.id}`}
+                  />
+                  <span>{f.userName}</span>
+                </div>
+                <AcceptButton onClick={() => acceptFriendRequest(Number(f.id))}>
+                  Accept
+                </AcceptButton>
+              </FriendRequest>
             ))
           ) : (
-            <PlaceHolder>No friends requests</PlaceHolder>
+            <PlaceHolder>No friend requests</PlaceHolder>
           )}
         </ContainerItem>
         <ContainerItem>
@@ -110,7 +170,14 @@ const Friends: NextFunctionComponentWithAuth<FriendsProps> = ({ me }) => {
             ) : null}
           </Title>
           {friends?.length ? (
-            friends?.map((f, idx) => <div key={idx}>{f.userName}</div>)
+            friends?.map((f, idx) => (
+              <Friend key={idx}>
+                <ProfilePicture
+                  src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${f.id}`}
+                />
+                <span>{f.userName}</span>
+              </Friend>
+            ))
           ) : (
             <PlaceHolder>No friends</PlaceHolder>
           )}

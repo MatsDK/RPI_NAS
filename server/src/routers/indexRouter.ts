@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {IMGS_FOLDER} from "../constants"
+import { IMGS_FOLDER } from "../constants";
 import fsPath from "path";
 import fs from "fs-extra";
 import { downloadSessions } from "../utils/transferData/downloadSessions";
@@ -34,20 +34,16 @@ router.route("/download").get(async (req, res) => {
 });
 
 router.get("/profile/:id", (req, res) => {
-	const userId = req.params?.id
+  const userId = req.params?.id;
+  if (userId == null) return res.json();
 
-	if(userId == null ) {
-		return res.json()
-	}
+  const path = fsPath.join(IMGS_FOLDER, `${userId}.png`);
 
-	const path = fsPath.join(IMGS_FOLDER,  `${userId}.png`)
-
-	if(fs.pathExistsSync(path))
-		res.sendFile(path)
-	else {
-		console.log("default pic")
-		return res.json()
-	}
-})
+  if (fs.pathExistsSync(path)) res.sendFile(path);
+  else {
+    console.log("default pic");
+    return res.json();
+  }
+});
 
 export { router };

@@ -1,10 +1,13 @@
 import { SendFriendRequestMutation } from "graphql/Friends/sendFriendRequest";
-import { Title } from "pages/friends";
+import { ProfilePicture } from "src/ui/ProfilePicture";
+import Icon from "src/ui/Icon";
+import { PlaceHolder, Title } from "pages/friends";
 import { FindUsersQuery } from "graphql/User/findUsers";
 import React, { FormEvent, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
 import { useTimeoutInput } from "src/hooks/useTimeoutInput";
 import styled from "styled-components";
+import { Scrollbar } from "src/ui/Scrollbar";
 
 interface FindFriendsContainerProps {
   friendsIds: string[];
@@ -20,6 +23,59 @@ const Header = styled.div`
 const Container = styled.div`
   padding: 15px;
   flex: 1;
+`;
+
+const Input = styled.div`
+  padding: 2px;
+  margin-left: 15px;
+  border-radius: 3px;
+  display: flex;
+  background-color: ${(props) => props.theme.lightBgColors[1]};
+
+  input {
+    border: 0;
+    background: transparent;
+    outline: none;
+    padding: 2px 5px;
+    font-size: 18px;
+    width: 100%;
+    height: 100%;
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    border: 0;
+    outline: none;
+    cursor: pointer;
+    padding-right: 5px;
+  }
+`;
+
+const FoundUsersContainer = styled.div`
+  ${Scrollbar}
+  height: 100%;
+  overflow: scroll;
+  padding: 5px 10px;
+`;
+
+const Friend = styled.div`
+  min-width: 200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+
+  > div {
+    display: flex;
+    align-items: center;
+
+    > span {
+      margin-left: 10px;
+      color: ${(props) => props.theme.textColors[1]};
+      font-size: 18px;
+    }
+  }
 `;
 
 export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
@@ -68,29 +124,51 @@ export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
       <Header>
         <Title>Search Friends</Title>
         <form onSubmit={search}>
-          <input type="text" value={nameInput} onChange={setNameInput} />
-          <button type="submit"></button>
+          <Input>
+            <input
+              type="text"
+              placeholder={"Name"}
+              value={nameInput}
+              onChange={setNameInput}
+            />
+            <button type="submit">
+              <Icon
+                name={"searchIcon"}
+                width={20}
+                height={20}
+                color={{ idx: 1, propName: "textColors" }}
+              />
+            </button>
+          </Input>
         </form>
       </Header>
-      {foundUsers == null
-        ? null
-        : !foundUsers.length
-        ? "no users found"
-        : foundUsers.map((u, idx) => (
-            <div key={idx}>
-              <span>{u.userName}</span>
+      <FoundUsersContainer>
+        {foundUsers == null ? null : !foundUsers.length ? (
+          <PlaceHolder>No users found</PlaceHolder>
+        ) : (
+          foundUsers.map((u, idx) => (
+            <Friend key={idx}>
+              <div>
+                <ProfilePicture
+                  src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${u.id}`}
+                />
+
+                <span>{u.userName}</span>
+              </div>
               {friendsIds.includes(u.id) ? (
-                "already your friend"
+                <PlaceHolder>Already your friend</PlaceHolder>
               ) : (
                 <button
                   type="submit"
                   onClick={() => sendFriendRequest(Number(u.id))}
                 >
-                  send friend request
+                  Send friend request
                 </button>
               )}
-            </div>
-          ))}
+            </Friend>
+          ))
+        )}
+      </FoundUsersContainer>
     </Container>
   );
 };

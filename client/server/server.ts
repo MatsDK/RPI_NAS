@@ -12,11 +12,11 @@ app
   .then(() => {
     const server: Application = express();
 
-    server.use(bodyParser());
+    server.use((bodyParser as any)());
     server.use(cors());
 
     server.get("*", (req: Request, res: Response) => {
-      return handle(req, res);
+      return handle(req, res as any);
     });
 
     server.listen(8000, (err?: any): void => {

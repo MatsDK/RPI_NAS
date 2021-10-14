@@ -1,5 +1,5 @@
 import { compare, hash } from "bcrypt";
-import { createWriteStream } from "fs"
+import { createWriteStream } from "fs";
 import {
   Arg,
   Ctx,
@@ -8,12 +8,12 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import fsPath from "path"
-import { IMGS_FOLDER } from "../../constants"
-import fs from "fs-extra"
+import fsPath from "path";
+import { IMGS_FOLDER } from "../../constants";
+import fs from "fs-extra";
 import { getConnection, ILike, In, Not } from "typeorm";
 import { Datastore } from "../../entity/Datastore";
-import { FileUpload, GraphQLUpload } from "graphql-upload";
+import { GraphQLUpload } from "graphql-upload";
 import { FriendRequest } from "../../entity/FriendRequest";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
@@ -39,13 +39,6 @@ export class UserResolver {
     if (!valid) return null;
 
     const { accessToken, refreshToken } = createTokens(user);
-
-    // res.cookie("access-token", accessToken, {
-    //   maxAge: MAX_AGE_ACCESS_TOKEN,
-    // });
-    // res.cookie("refresh-token", refreshToken, {
-    //   maxAge: MAX_AGE_REFRESH_TOKEN,
-    // });
 
     res.setHeader(
       "Cookie",
@@ -186,21 +179,20 @@ export class UserResolver {
   }
 
   @UseMiddleware(isAuth)
-  @Mutation(() => Boolean, {nullable: true})
-  async UploadProfilePicture (
-	  @Arg("file", () => GraphQLUpload) { createReadStream, filename } : Upload,
-	  @Ctx() { req }: MyContext
+  @Mutation(() => Boolean, { nullable: true })
+  async UploadProfilePicture(
+    @Arg("file", () => GraphQLUpload) { createReadStream }: Upload,
+    @Ctx() { req }: MyContext
   ): Promise<boolean> {
-	  const path = fsPath.join(IMGS_FOLDER, `${req.userId}.png`)
+    const path = fsPath.join(IMGS_FOLDER, `${req.userId}.png`);
 
-	  if(fs.pathExistsSync(path))
-			  fs.removeSync(path)
-		  
-	  return new Promise((resolve, reject) => 
-		  createReadStream()
-			  .pipe(createWriteStream(path))
-			  .on("finish", () => resolve(true))
-			  .on("error", () => reject(false))
-	  )
+    if (fs.pathExistsSync(path)) fs.removeSync(path);
+
+    return new Promise((resolve, reject) =>
+      createReadStream()
+        .pipe(createWriteStream(path))
+        .on("finish", () => resolve(true))
+        .on("error", () => reject(false))
+    );
   }
 }

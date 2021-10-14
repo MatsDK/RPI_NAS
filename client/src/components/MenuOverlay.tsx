@@ -19,6 +19,7 @@ const BackgroundOverlay = styled.div`
   height: 100vh;
   top: 0;
   right: 0;
+  z-index: 99;
   background-color: #00000060;
 `;
 

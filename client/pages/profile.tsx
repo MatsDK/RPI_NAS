@@ -6,8 +6,6 @@ import { useMeState } from "src/hooks/useMeState";
 import { NextFunctionComponentWithAuth } from "types/types";
 import { useDropzone } from "react-dropzone";
 import { UploadProfilePictureMutation } from "graphql/User/UploadProfilePicture";
-import { createUploadLink } from "apollo-upload-client";
-import { ApolloClient, InMemoryCache } from "apollo-boost";
 import { useApollo } from "src/hooks/useApollo";
 
 interface ProfileProps {}
