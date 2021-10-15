@@ -9,10 +9,14 @@ const PageBody = styled.div`
   background-color: ${(props) => props.theme.lightBgColors[0]};
 `;
 
-const Layout: React.FC = ({ children }) => {
+interface Props {
+  showHomeButton?: boolean;
+}
+
+const Layout: React.FC<Props> = ({ children, showHomeButton = false }) => {
   return (
     <div>
-      <Navbar />
+      <Navbar showHomeButton={showHomeButton} />
       <PageBody>{children}</PageBody>
     </div>
   );

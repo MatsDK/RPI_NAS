@@ -1,4 +1,5 @@
 import React, { FormEvent, useEffect, useState } from "react";
+import { ProfilePicture } from "src/ui/ProfilePicture";
 import { ConditionButton, LightBgButton } from "src/ui/Button";
 import { Select } from "src/ui/Select";
 import { LabelInput } from "src/ui/Input";
@@ -145,6 +146,14 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
                       setValue={setSelectedOwner}
                       propName={"userName"}
                       minWidth={160}
+                      renderItem={(item, idx, onclick) => (
+                        <div key={idx} onClick={onclick}>
+                          <ProfilePicture
+                            src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${item.id}`}
+                          />
+                          <span>{item.userName}</span>
+                        </div>
+                      )}
                     />
                     <div style={{ marginLeft: 15 }}>
                       <Select

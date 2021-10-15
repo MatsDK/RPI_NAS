@@ -11,13 +11,13 @@ export const createDatastoreFolder = async (
 ): Promise<{ err: any }> => {
   try {
     fs.mkdirSync(path);
-    fs.chownSync(path, ids.uid, ids.gid);
 
     if ((await createFileSize(sizeInMb)).err) return { err: true };
     if ((await createFs()).err) return { err: true };
     if ((await mountFs(path)).err) return { err: true };
 
     fs.rmSync("./fileSize");
+    fs.chownSync(path, ids.uid, ids.gid);
 
     return { err: false };
   } catch (err) {

@@ -1,4 +1,5 @@
 import { meQuery } from "graphql/User/me";
+import Router from "next/router";
 import React from "react";
 import { redirectToLogin } from "src/utils/redirect";
 import { NextContextWithApollo, NextFunctionComponent } from "types/types";
@@ -34,6 +35,11 @@ export const withAuth = <T extends object>(
     }
 
     render() {
+      if (!(this.props as any).me) {
+        Router.push("/logins");
+        return null;
+      }
+
       return <Component {...this.props} />;
     }
   };

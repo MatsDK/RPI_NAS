@@ -30,7 +30,7 @@ const Profile: NextFunctionComponentWithAuth<ProfileProps> = ({ me }) => {
   });
 
   return (
-    <Layout>
+    <Layout showHomeButton={true}>
       profile
       <div
         {...getRootProps({
