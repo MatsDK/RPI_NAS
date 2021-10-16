@@ -54,6 +54,21 @@ const FormItem = styled.div`
   }
 `;
 
+const SelectOwnerItem = styled.div`
+  display: flex;
+  padding: 2px 4px;
+  align-items: center;
+  cursor: pointer;
+
+  > img {
+    margin-right: 5px;
+  }
+
+  > span {
+    color: ${(props) => props.theme.textColors[3]};
+  }
+`;
+
 const SelectCloudDropdownItem = styled.div`
   cursor: pointer;
   padding: 2px;
@@ -147,12 +162,12 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
                       propName={"userName"}
                       minWidth={160}
                       renderItem={(item, idx, onclick) => (
-                        <div key={idx} onClick={onclick}>
+                        <SelectOwnerItem key={idx} onClick={onclick}>
                           <ProfilePicture
                             src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${item.id}`}
                           />
                           <span>{item.userName}</span>
-                        </div>
+                        </SelectOwnerItem>
                       )}
                     />
                     <div style={{ marginLeft: 15 }}>

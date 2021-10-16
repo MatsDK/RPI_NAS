@@ -1,6 +1,6 @@
 import { Datastore, useGetDataStoresQuery } from "generated/apolloComponents";
 import { BgButton } from "src/ui/Button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import NewDataStoreWrapper from "./NewDataStoreWrapper";
 import ShareDataStoreWrapper from "./ShareDataStoreWrapper";
 import { useApolloClient } from "react-apollo";
@@ -50,6 +50,12 @@ const DataStoresHeader = styled.div`
   border-bottom: 1px solid ${(props) => props.theme.textColors[3]};
 `;
 
+const SmallTitle = styled.h2`
+  font-size: 24px;
+  font-weight: 600;
+  margin: 10px 0;
+`;
+
 const DataStoresContainer: React.FC = () => {
   const { me } = useMeState();
 
@@ -58,6 +64,9 @@ const DataStoresContainer: React.FC = () => {
 
   const [showNewDataStoreForm, setShowNewDataStoreForm] = useState(false);
   const [showShareDataStoreForm, setShowShareDataStoreForm] = useState(false);
+
+  const [myDatastores, setMyDatastores] = useState<Datastore[]>([]);
+  const [otherDatastores, setOthersDatastores] = useState<Datastore[]>([]);
 
   const [dataStoreId, setDataStoreId] = useState(0);
 
@@ -68,6 +77,23 @@ const DataStoresContainer: React.FC = () => {
 
     return null;
   }
+
+  useEffect(() => {
+    setOthersDatastores(
+      (data?.getDataStores?.filter(
+        (d) =>
+          d.owner?.id !== me?.id &&
+          !d.sharedUsers.find((su) => su.id === me?.id)
+      ) || []) as any
+    );
+    setMyDatastores(
+      (data?.getDataStores?.filter(
+        (d) =>
+          d.owner?.id === me?.id || d.sharedUsers.find((su) => su.id === me?.id)
+      ) || []) as any
+    );
+    return () => {};
+  }, [me]);
 
   return (
     <DataStoresWrapper>
@@ -99,7 +125,7 @@ const DataStoresContainer: React.FC = () => {
         )}
       </DataStoresHeader>
       <DataStoresList>
-        {data?.getDataStores?.map((dataStore, idx) => {
+        {myDatastores.map((dataStore, idx) => {
           return (
             <DataStoreListItem
               dataStore={dataStore as any}
@@ -109,6 +135,22 @@ const DataStoresContainer: React.FC = () => {
             />
           );
         })}
+        {me?.isAdmin && (
+          <>
+            <SmallTitle>Other datastores</SmallTitle>
+            {otherDatastores.map((dataStore, idx) => {
+              return (
+                <DataStoreListItem
+                  showGoToBtn={false}
+                  dataStore={dataStore as any}
+                  setDataStoreId={setDataStoreId}
+                  setShowShareDataStoreForm={setShowShareDataStoreForm}
+                  key={idx}
+                />
+              );
+            })}
+          </>
+        )}
       </DataStoresList>
     </DataStoresWrapper>
   );

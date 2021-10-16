@@ -1,18 +1,22 @@
 import { Datastore } from "generated/apolloComponents";
+import { PlaceHolder } from "pages/friends";
 import Link from "next/link";
 import React from "react";
 import { useMeState } from "src/hooks/useMeState";
+import { ProfilePicture } from "src/ui/ProfilePicture";
 import styled from "styled-components";
 
 interface DataStoreListItemProps {
   dataStore: Datastore;
   setDataStoreId: React.Dispatch<React.SetStateAction<number>>;
   setShowShareDataStoreForm: React.Dispatch<React.SetStateAction<boolean>>;
+  showGoToBtn?: boolean;
 }
 
 const DataStoreShared = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
 `;
 
 const DataStoreSize = styled.div`
@@ -132,7 +136,6 @@ const DataStoreSharedUsers = styled.div`
 const DataStoreSharedHeader = styled.div`
   display: flex;
   align-items: baseline;
-  margin-top: 5px;
 
   button {
     margin-left: 15px;
@@ -162,6 +165,32 @@ const DataStoreSharedHeader = styled.div`
   }
 `;
 
+const SharedUser = styled.div`
+  position: relative;
+
+  > span {
+    position: absolute;
+    background-color: ${(props) => props.theme.bgColors[1]};
+    color: ${(props) => props.theme.textColors[3]};
+    top: 40px;
+    opacity: 0;
+    transition: 0.1s ease-in;
+    pointer-events: none;
+    padding: 1px 6px;
+    border-radius: 2px;
+    display: flex;
+
+    > p {
+      margin-left: 5px;
+    }
+  }
+
+  :hover > span {
+    top: 30px;
+    opacity: 1;
+  }
+`;
+
 interface StatusSectionProps {
   status: number;
 }
@@ -173,6 +202,7 @@ const StatusSection = styled.div<StatusSectionProps>`
   p {
     margin-left: 4px;
     font-weight: 600;
+
     color: ${(props) => props.theme.statusColors[props.status]};
   }
 `;
@@ -183,6 +213,7 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
   dataStore,
   setDataStoreId,
   setShowShareDataStoreForm,
+  showGoToBtn = true,
 }) => {
   const { me } = useMeState();
   const isDataStoreOwner = dataStore.owner?.id == me?.id;
@@ -224,9 +255,11 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
         <DataStoreItemHeader>
           <DataStoreItemTitle>
             <span>{dataStore.name}</span>
-            <Link href={`/path?d=${dataStore.id}`}>
-              <button>Go to</button>
-            </Link>
+            {showGoToBtn && (
+              <Link href={`/path?d=${dataStore.id}`}>
+                <button>Go to</button>
+              </Link>
+            )}
           </DataStoreItemTitle>
           <DataStoreOwner>
             <label>Owner: </label>
@@ -245,14 +278,8 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
         </StatusSection>
         <DataStoreShared>
           <DataStoreSharedHeader>
-            <div>
-              Shared
-              <p>
-                {dataStore.sharedUsers.length}{" "}
-                {dataStore.sharedUsers.length == 1 ? "person" : "people"}
-              </p>
-            </div>
-            {isDataStoreOwner && (
+            <div>Shared: </div>
+            {/* {isDataStoreOwner && (
               <button
                 onClick={() => {
                   setDataStoreId(Number(dataStore.id));
@@ -261,17 +288,26 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
               >
                 Share
               </button>
-            )}
+            )} */}
           </DataStoreSharedHeader>
           <DataStoreSharedUsers>
-            {dataStore.sharedUsers.map((sharedUser, idx) => {
-              return (
-                <div key={idx}>
-                  {sharedUser.userName}
-                  <p>{sharedUser.id === me?.id && "(You)"}</p>
-                </div>
-              );
-            })}
+            {dataStore.sharedUsers.length ? (
+              dataStore.sharedUsers.map((sharedUser, idx) => {
+                return (
+                  <SharedUser key={idx}>
+                    <ProfilePicture
+                      src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${sharedUser.id}`}
+                    />
+                    <span>
+                      {sharedUser.userName}
+                      <p>{sharedUser.id === me?.id && "(You)"}</p>
+                    </span>
+                  </SharedUser>
+                );
+              })
+            ) : (
+              <PlaceHolder style={{ marginLeft: 4 }}>Not shared</PlaceHolder>
+            )}
           </DataStoreSharedUsers>
         </DataStoreShared>
       </DataStoreInfo>
