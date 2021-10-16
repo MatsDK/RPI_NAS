@@ -1,4 +1,5 @@
 import { Arg, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
+import { getUser } from "../../middleware/getUser"
 import { Any } from "typeorm";
 import { Datastore } from "../../entity/Datastore";
 import { SharedDataStore } from "../../entity/SharedDataStore";
@@ -52,10 +53,10 @@ export class TreeResolver {
     return res;
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(isAuth, getUser)
   @Query(() => [Datastore], { nullable: true })
   async getDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
-    const dataStores = await getUserDataStores((req as any).userId);
+    const dataStores = await getUserDataStores(req.userId);
 
     const sharedDataStores = await SharedDataStore.find({
       where: {
