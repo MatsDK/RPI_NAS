@@ -18,6 +18,7 @@ import { SharedDataStore } from "../../entity/SharedDataStore";
 import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { isAdmin } from "../../middleware/isAdmin";
 import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder";
+import { updateSMB } from "../../utils/dataStore/updateSMB"
 
 @Resolver()
 export class DataStoreResolver {
@@ -81,5 +82,25 @@ export class DataStoreResolver {
   @Query(() => [Node], { nullable: true })
   getNodes() {
     return Node.find();
+  }
+
+
+  //@UseMiddleware(isAuth)
+  @Mutation(() => Boolean, { nullable: true })
+  async enableSMB(
+    @Arg("dataStoreId") datastoreId: number,
+  ): Promise<boolean | null> {
+	  const datastore = await Datastore.findOne({where: { id: datastoreId }})
+	  if(!datastore) return null
+
+	  datastore.smbEnabled = !datastore.smbEnabled
+	  await datastore.save()
+
+	  updateSMB().then(res => {
+		  console.log(res)
+	  })
+
+
+	  return true;
   }
 }

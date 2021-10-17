@@ -56,7 +56,7 @@ export class TreeResolver {
   @UseMiddleware(isAuth, getUser)
   @Query(() => [Datastore], { nullable: true })
   async getDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
-    const dataStores = await getUserDataStores(req.userId);
+    const dataStores = await ((req as any).user?.isAdmin ? Datastore.find():  getUserDataStores(req.userId));
 
     const sharedDataStores = await SharedDataStore.find({
       where: {

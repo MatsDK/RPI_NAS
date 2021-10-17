@@ -1,9 +1,6 @@
 import fs from "fs";
 import { ids } from "../../constants";
-import cp from "child_process";
-import util from "util";
-
-const exec = util.promisify(cp.exec);
+import { exec } from "../exec"
 
 export const createDatastoreFolder = async (
   path: string,
