@@ -91,15 +91,23 @@ export class DataStoreResolver {
     @Arg("dataStoreId") datastoreId: number,
   ): Promise<boolean | null> {
 	  const datastore = await Datastore.findOne({where: { id: datastoreId }})
-	  if(!datastore) return null
+	  if(!datastore || datastore.status != DataStoreStatus.ONLINE) return null
 
 	  datastore.smbEnabled = !datastore.smbEnabled
+	  datastore.status = DataStoreStatus.INIT
 	  await datastore.save()
 
-	  updateSMB().then(res => {
-		  console.log(res)
-	  })
+	  updateSMB().then(async (res: any) => {
+	        datastore.status = DataStoreStatus.ONLINE
 
+
+		if(res.err) {
+			  datastore.smbEnabled = !datastore.smbEnabled
+			  console.log(res.err)
+	       	}
+
+		await datastore.save()
+	  })
 
 	  return true;
   }

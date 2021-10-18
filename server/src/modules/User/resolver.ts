@@ -1,4 +1,5 @@
 import { compare, hash } from "bcrypt";
+import { createUser } from "../../utils/createUser"
 import { createWriteStream } from "fs";
 import {
   Arg,
@@ -63,13 +64,23 @@ export class UserResolver {
   async register(
     @Arg("data") { email, password, userName }: RegisterInput
   ): Promise<User> {
-    const hashedPassword = await hash(password, 10);
+    const hashedPassword = await hash(password, 10),
+	    osUserName = userName.replace(/[^a-z0-9]/gi, '_').toLowerCase(); 
 
-    return await User.create({
+    const user = await User.create({
       email,
       userName,
       password: hashedPassword,
-    }).save();
+      osUserName,
+    }).save() 
+
+    createUser(osUserName, password).then((res: any) => {
+	    if(res.err) console.log(res.err)
+    })
+
+
+
+    return user;
   }
 
   @UseMiddleware(isAuth, getUser)
