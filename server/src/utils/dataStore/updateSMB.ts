@@ -1,4 +1,6 @@
 import { Datastore } from "../../entity/Datastore"
+import { User } from "../../entity/User"
+import { Any } from "typeorm"
 import { exec } from "../exec"
 import fsPath from "path"
 import fs from "fs-extra"
@@ -18,14 +20,19 @@ export const updateSMB = async () => {
 	return new Promise(async (res, rej) => {
 		try {
 			const SMBDatastores = await Datastore.find({ where: {smbEnabled: true} }),
-			       baseConfPath = fsPath.join(__dirname, "../../../assets/base_smb.conf")
+			       baseConfPath = fsPath.join(__dirname, "../../../assets/base_smb.conf"),
+			       datastoreOwners = await User.find({ where: { id: Any(SMBDatastores.map(d => d.userId)) } })
+
 			
 			let file = (fs.readFileSync(baseConfPath).toString().split("\n"))
 
 			for (const datastore of SMBDatastores) {
-				const newLines: string[] = [`[${datastore.name}]`, ...baseConf]
+				const newLines: string[] = [`[${datastore.name}]`, ...baseConf],
+					datastoreOwner = datastoreOwners.find(u  => u.id === datastore.userId)
+				if(!datastoreOwner) continue
 
-				newLines.push(`force user = ${"mats"}`)
+
+				newLines.push(`force user = ${datastoreOwner.osUserName}`)
 				newLines.push(`path = ${datastore.basePath}`)
 
 

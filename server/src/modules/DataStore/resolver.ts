@@ -8,9 +8,11 @@ import {
 } from "type-graphql";
 import fs from "fs";
 import fsPath from "path";
+import { User } from "../../entity/User"
 import { Node } from "../../entity/CloudNode";
 import { Datastore, DataStoreStatus } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
+import { getUser } from "../../middleware/getUser";
 import { MyContext } from "../../types/Context";
 import { CreateDataStoreInput } from "./CreateDataStoreInput";
 import { nanoid } from "nanoid";
@@ -19,19 +21,21 @@ import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { isAdmin } from "../../middleware/isAdmin";
 import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder";
 import { updateSMB } from "../../utils/dataStore/updateSMB"
+import { createGroup , addUsersToGroup} from "../../utils/dataStore/handleGroups"
 
 @Resolver()
 export class DataStoreResolver {
-  @UseMiddleware(isAuth, isAdmin)
+  @UseMiddleware(isAuth, getUser, isAdmin)
   @Mutation(() => Datastore, { nullable: true })
   async createDataStore(
     @Ctx() { req }: MyContext,
     @Arg("data") { localNodeId, name, ownerId, sizeInMB }: CreateDataStoreInput
   ): Promise<Datastore | null> {
     const hostNode = await Node.findOne({ where: { hostNode: true } }),
-      thisNode = await Node.findOne({ where: { id: localNodeId } });
+      thisNode = await Node.findOne({ where: { id: localNodeId } }),
+      owner = await User.findOne({ where: { id: ownerId } })
 
-    if (!hostNode || !thisNode) return null;
+    if (!hostNode || !thisNode || !owner) return null;
 
     const path = fsPath.join(thisNode.basePath, nanoid(10));
 
@@ -45,13 +49,14 @@ export class DataStoreResolver {
     }).save();
 
     createDatastoreFolder(path, sizeInMB).then(async (res) => {
-      console.log("update");
       newDatastore &&
         (await Datastore.update(
           { id: newDatastore.id },
           { status: DataStoreStatus.ONLINE }
         ));
-      console.log("online");
+
+	const { err } = await createGroup(fsPath.basename(path), owner.osUserName) 
+	if(err) console.log(err)
     });
 
     return newDatastore;
@@ -74,6 +79,13 @@ export class DataStoreResolver {
     }
 
     await SharedDataStore.insert(ids);
+    
+    const { err } = await addUsersToGroup(ids)
+    if(err) {
+	    console.log(err)
+	    return null
+    }
+    
 
     return true;
   }
