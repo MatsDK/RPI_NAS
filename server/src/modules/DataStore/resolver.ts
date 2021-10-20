@@ -22,6 +22,7 @@ import { isAdmin } from "../../middleware/isAdmin";
 import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder";
 import { updateSMB } from "../../utils/dataStore/updateSMB"
 import { createGroup , addUsersToGroup} from "../../utils/dataStore/handleGroups"
+import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers"
 
 @Resolver()
 export class DataStoreResolver {
@@ -47,16 +48,19 @@ export class DataStoreResolver {
       sizeInMB,
       name,
     }).save();
+    const groupName = fsPath.basename(path)
 
-    createDatastoreFolder(path, sizeInMB).then(async (res) => {
+    const { err } = await createGroup(groupName, owner.osUserName) 
+    if(err) console.log(err);
+
+    createDatastoreFolder(path, sizeInMB, { folderUser: thisNode.loginName, folderGroup: groupName }).then(async (res) => {
+
       newDatastore &&
         (await Datastore.update(
           { id: newDatastore.id },
           { status: DataStoreStatus.ONLINE }
         ));
 
-	const { err } = await createGroup(fsPath.basename(path), owner.osUserName) 
-	if(err) console.log(err)
     });
 
     return newDatastore;
@@ -96,6 +100,14 @@ export class DataStoreResolver {
     return Node.find();
   }
 
+  @UseMiddleware(isAuth)
+  @Query(() => Datastore, { nullable: true })
+  async getDatastore(@Ctx() { req }: MyContext, @Arg("datastoreId") datastoreId: number) {
+	  const datastore = await Datastore.findOne({ where: { id: datastoreId } })
+
+	  return datastore?.userId === req.userId ? (await getDatastoresWithSizesAndSharedUsers([datastore], req.userId!))[0] : null
+  }
+
 
   //@UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
@@ -105,11 +117,14 @@ export class DataStoreResolver {
 	  const datastore = await Datastore.findOne({where: { id: datastoreId }})
 	  if(!datastore || datastore.status != DataStoreStatus.ONLINE) return null
 
+	  const host = await Node.findOne({ where: { id: datastore.localNodeId } })
+	  if(!host) return null
+
 	  datastore.smbEnabled = !datastore.smbEnabled
 	  datastore.status = DataStoreStatus.INIT
 	  await datastore.save()
 
-	  updateSMB().then(async (res: any) => {
+	  updateSMB(host).then(async (res: any) => {
 	        datastore.status = DataStoreStatus.ONLINE
 
 

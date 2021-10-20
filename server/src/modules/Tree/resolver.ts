@@ -11,7 +11,7 @@ import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
 import { buildTreeObject } from "./buildTreeObject";
 import { GetTreeInput } from "./GetTreeInput";
 import { Tree } from "./TreeObject";
-import { getDataStoreSizes } from "../../utils/dataStore/getDataStoreSizes"
+import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers"
 
 @Resolver()
 export class TreeResolver {
@@ -58,42 +58,6 @@ export class TreeResolver {
   async getDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
     const dataStores = await ((req as any).user?.isAdmin ? Datastore.find():  getUserDataStores(req.userId));
 
-    const sharedDataStores = await SharedDataStore.find({
-      where: {
-        dataStoreId: Any(dataStores.map((v) => v.id)),
-      },
-    });
-
-    const users = await User.find({
-      where: {
-        id: Any(
-          Array.from(
-            new Set([
-              (req as any).userId,
-              ...sharedDataStores.map(({ userId }) => userId),
-              ...dataStores.map(({ userId }) => userId),
-            ])
-          )
-        ),
-      },
-    });
-
-    const sharedUsersMap: Map<number, User[]> = new Map();
-
-    sharedDataStores.forEach((sharedDatastore) => {
-      const thisUser = users.find(({ id }) => id === sharedDatastore.userId);
-
-      if (thisUser)
-        sharedUsersMap.set(sharedDatastore.dataStoreId, [
-          ...(sharedUsersMap.get(sharedDatastore.dataStoreId) || []),
-          thisUser,
-        ]);
-    });
-
-    return await getDataStoreSizes(dataStores.map((dataStore) => ({
-      ...dataStore,
-      sharedUsers: sharedUsersMap.get(dataStore.id) || [],
-      owner: users.find(({ id }) => id === dataStore.userId),
-    })) as any);
+    return await getDatastoresWithSizesAndSharedUsers(dataStores, req.userId!)
   }
 }

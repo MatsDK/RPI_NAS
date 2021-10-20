@@ -1,10 +1,12 @@
 import fs from "fs";
-import { ids } from "../../constants";
 import { exec } from "../exec"
+
+type FolderOwner = { folderUser: string, folderGroup: string };
 
 export const createDatastoreFolder = async (
   path: string,
-  sizeInMb: number
+  sizeInMb: number,
+  { folderUser, folderGroup }: FolderOwner 
 ): Promise<{ err: any }> => {
   try {
     fs.mkdirSync(path);
@@ -14,7 +16,9 @@ export const createDatastoreFolder = async (
     if ((await mountFs(path)).err) return { err: true };
 
     fs.rmSync("./fileSize");
-    fs.chownSync(path, ids.uid, ids.gid);
+
+    const { stderr: chownErr } = await exec(`chown ${folderUser}:${folderGroup} ${path}`)
+    if(chownErr) return { err: chownErr }
 
     return { err: false };
   } catch (err) {
