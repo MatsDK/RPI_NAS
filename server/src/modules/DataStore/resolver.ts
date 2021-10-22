@@ -108,33 +108,47 @@ export class DataStoreResolver {
 	  return datastore?.userId === req.userId ? (await getDatastoresWithSizesAndSharedUsers([datastore], req.userId!))[0] : null
   }
 
-
-  //@UseMiddleware(isAuth)
+  @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
-  async enableSMB(
+  async toggleService1(
+	  @Ctx() { req }: MyContext,
     @Arg("dataStoreId") datastoreId: number,
+    @Arg("serviceName", () => String) serviceName: "SMB" | "FTP",
   ): Promise<boolean | null> {
 	  const datastore = await Datastore.findOne({where: { id: datastoreId }})
-	  if(!datastore || datastore.status != DataStoreStatus.ONLINE) return null
+	  if(!datastore || datastore.userId !== req.userId || datastore.status != DataStoreStatus.ONLINE) return null
 
 	  const host = await Node.findOne({ where: { id: datastore.localNodeId } })
 	  if(!host) return null
 
-	  datastore.smbEnabled = !datastore.smbEnabled
+
 	  datastore.status = DataStoreStatus.INIT
-	  await datastore.save()
 
-	  updateSMB(host).then(async (res: any) => {
-	        datastore.status = DataStoreStatus.ONLINE
-
-
-		if(res.err) {
+	  switch(serviceName) {
+		  case "SMB": {
 			  datastore.smbEnabled = !datastore.smbEnabled
-			  console.log(res.err)
-	       	}
+			  await datastore.save()
 
-		await datastore.save()
-	  })
+			  updateSMB(host).then(async (res: any) => {
+				datastore.status = DataStoreStatus.ONLINE
+
+
+				if(res.err) {
+					  datastore.smbEnabled = !datastore.smbEnabled
+					  console.log(res.err)
+				}
+
+				await datastore.save()
+			  })
+		  
+			  break
+		  }
+		  case "FTP": {
+			  
+			  break
+		  } 
+	  }
+
 
 	  return true;
   }

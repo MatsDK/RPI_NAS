@@ -24,6 +24,7 @@ import { Upload } from "../../types/Upload";
 import { createTokens } from "../../utils/createTokens";
 import { FriendsQueryReturn } from "./FriendsQueryReturn";
 import { RegisterInput } from "./RegisterInput";
+import { updateSMB } from "../../utils/services/updateSMB"
 
 @Resolver()
 export class UserResolver {
@@ -205,5 +206,37 @@ export class UserResolver {
         .on("finish", () => resolve(true))
         .on("error", () => reject(false))
     );
+  }
+
+  @UseMiddleware(isAuth, getUser)
+  @Mutation(() => Boolean, { nullable: true })
+  async toggleService(
+    @Arg("serviceName", () => String) serviceName: "SMB" | "FTP",
+    @Ctx() { req }: MyContext
+  ): Promise<boolean> {
+	  const user = (req as any).user
+
+	  switch(serviceName) {
+		  case "SMB": {
+			  user.smbEnabled = !user.smbEnabled
+			  await user.save()
+
+			  updateSMB().then(async (res: any) => {
+				if(res.err) {
+					  console.log(res.err)
+					  user.smbEnabled = !user.smbEnabled
+					  await user.save()
+				}
+
+			  })
+			  break
+		  } 
+		  case  "FTP": {
+			  break
+		  }
+	  }
+
+
+	  return true
   }
 }
