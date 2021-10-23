@@ -1,16 +1,16 @@
 import gql from "graphql-tag";
 
-export const getDataStoresQuery = gql`
-  query GetDataStores {
-    getDataStores {
+export const getDatastoreQuery = gql`
+  query getDatastore($datastoreId: Float!) {
+    getDatastore(datastoreId: $datastoreId) {
       id
       name
       userId
       localHostNodeId
       localNodeId
       basePath
-      smbEnabled
       sizeInMB
+      smbEnabled
       size {
         usedSize
         usedPercent

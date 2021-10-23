@@ -5,6 +5,7 @@ import React from "react";
 import { useMeState } from "src/hooks/useMeState";
 import { ProfilePicture } from "src/ui/ProfilePicture";
 import styled from "styled-components";
+import { useRouter } from "next/router";
 
 interface DataStoreListItemProps {
   dataStore: Datastore;
@@ -216,6 +217,7 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
   showGoToBtn = true,
 }) => {
   const { me } = useMeState();
+  const router = useRouter();
   const isDataStoreOwner = dataStore.owner?.id == me?.id;
 
   return (
@@ -254,7 +256,13 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
       <DataStoreInfo>
         <DataStoreItemHeader>
           <DataStoreItemTitle>
-            <span>{dataStore.name}</span>
+            <span
+              onClick={() =>
+                isDataStoreOwner && router.push(`/datastore/${dataStore.id}`)
+              }
+            >
+              {dataStore.name}
+            </span>
             {showGoToBtn && (
               <Link href={`/path?d=${dataStore.id}`}>
                 <button>Go to</button>

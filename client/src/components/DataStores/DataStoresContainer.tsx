@@ -70,14 +70,6 @@ const DataStoresContainer: React.FC = () => {
 
   const [dataStoreId, setDataStoreId] = useState(0);
 
-  if (loading) return <div>Loading</div>;
-
-  if (error) {
-    console.log(error);
-
-    return null;
-  }
-
   useEffect(() => {
     setOthersDatastores(
       (data?.getDataStores?.filter(
@@ -93,7 +85,15 @@ const DataStoresContainer: React.FC = () => {
       ) || []) as any
     );
     return () => {};
-  }, [me]);
+  }, [me, data]);
+
+  if (loading) return <div>Loading</div>;
+
+  if (error) {
+    console.log(error);
+
+    return null;
+  }
 
   return (
     <DataStoresWrapper>
