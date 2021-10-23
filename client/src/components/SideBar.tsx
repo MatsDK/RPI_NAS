@@ -62,7 +62,7 @@ const sideBar = () => {
           </SideBarItemText>
         </SideBarItem>
       </Link>
-      <Link href={"/datastores"}>
+      <Link href={"/datastore"}>
         <SideBarItem>
           <span style={{ marginRight: 5 }}>
             <Icon
