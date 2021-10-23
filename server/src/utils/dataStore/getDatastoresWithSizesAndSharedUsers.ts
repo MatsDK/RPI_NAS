@@ -3,8 +3,8 @@ import { Any } from "typeorm"
 import { Datastore, SizeObject } from "../../entity/Datastore";
 import { User } from "../../entity/User"
 import { SharedDataStore } from "../../entity/SharedDataStore"
+import { dfOptions } from "../../constants"
 
-const options = { prefixMultiplier: "MiB", isDisplayPrefixMultiplier: false };
 
 export const getDatastoresWithSizesAndSharedUsers = async (datastores: Datastore[], userId: number) => {
     const sharedDataStores = await SharedDataStore.find({
@@ -50,7 +50,7 @@ const getDataStoreSizes = (
   dataStores: Datastore[]
 ): Promise<Datastore[]> =>
   new Promise((res, rej) => {
-    df(options, (err: any, r: any) => {
+    df(dfOptions, (err: any, r: any) => {
       if (err) rej(err);
 
       for (const ds of dataStores) {

@@ -14,7 +14,7 @@ const baseConf = [
     "public = yes",
     "guest ok  = yes",
     "create mask = 0644",
-    "directory mask = 0755",
+    "directory mask = 0770"
 ]
 
 export const updateSMB = async () => {
@@ -28,8 +28,9 @@ export const updateSMB = async () => {
 			for (const user of SMBUsers) {
 				const newLines: string[] = [`[${user.osUserName}]`, ...baseConf]
 
-				newLines.push(`force user = ${user.osUserName}`)
+				newLines.push(`force user = ${"mats"}`)
 				newLines.push(`path = /home/${user.osUserName}`)
+				newLines.push(`force group = ${"mats"}`)
 
 				file = [...file, ...newLines]
 			}

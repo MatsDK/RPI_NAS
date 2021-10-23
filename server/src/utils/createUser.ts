@@ -9,7 +9,7 @@ export const createUser = async (osName: string, password: string): Promise<{err
 	if(addErr) return { err: addErr } 
 
 	const path = `/home/${osName}`
-	const { stderr: createFolderErr } = await exec(`mkdir ${path} && chown ${osName}:${osName} ${path} && chmod 550 ${path{`);
+	const { stderr: createFolderErr } = await exec(`mkdir ${path} && chown ${osName}:${osName} ${path} && chmod 550 ${path}`);
 	if(createFolderErr) return { err: createFolderErr } 
 
 	return {err: false}

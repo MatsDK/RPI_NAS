@@ -8,6 +8,7 @@ import {
 } from "type-graphql";
 import fs from "fs";
 import fsPath from "path";
+import { exec } from "../../utils/exec"
 import { User } from "../../entity/User"
 import { Node } from "../../entity/CloudNode";
 import { Datastore, DataStoreStatus } from "../../entity/Datastore";
@@ -20,9 +21,10 @@ import { SharedDataStore } from "../../entity/SharedDataStore";
 import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { isAdmin } from "../../middleware/isAdmin";
 import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder";
-import { updateSMB } from "../../utils/dataStore/updateSMB"
 import { createGroup , addUsersToGroup} from "../../utils/dataStore/handleGroups"
 import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers"
+import { dfOptions } from "../../constants"
+const df = require("node-df")
 
 @Resolver()
 export class DataStoreResolver {
@@ -46,7 +48,7 @@ export class DataStoreResolver {
       localHostNodeId: hostNode.id,
       localNodeId,
       sizeInMB,
-      name,
+      name: name.replace(/[^a-z0-9]/gi, "_"),
     }).save();
     const groupName = fsPath.basename(path)
 
@@ -108,19 +110,19 @@ export class DataStoreResolver {
 	  return datastore?.userId === req.userId ? (await getDatastoresWithSizesAndSharedUsers([datastore], req.userId!))[0] : null
   }
 
-  @UseMiddleware(isAuth)
+  //@UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
-  async toggleService1(
+  async toggleDatastoreService(
 	  @Ctx() { req }: MyContext,
     @Arg("dataStoreId") datastoreId: number,
     @Arg("serviceName", () => String) serviceName: "SMB" | "FTP",
   ): Promise<boolean | null> {
 	  const datastore = await Datastore.findOne({where: { id: datastoreId }})
-	  if(!datastore || datastore.userId !== req.userId || datastore.status != DataStoreStatus.ONLINE) return null
+	  //if(!datastore || datastore.userId !== req.userId || datastore.status != DataStoreStatus.ONLINE) return null
+	  if(!datastore || datastore.status != DataStoreStatus.ONLINE) return null
 
 	  const host = await Node.findOne({ where: { id: datastore.localNodeId } })
 	  if(!host) return null
-
 
 	  datastore.status = DataStoreStatus.INIT
 
@@ -129,17 +131,22 @@ export class DataStoreResolver {
 			  datastore.smbEnabled = !datastore.smbEnabled
 			  await datastore.save()
 
-			  updateSMB(host).then(async (res: any) => {
+			 const mountPoint = fsPath.join(`/home/`, "bob10", datastore.name)
+			 if(datastore.smbEnabled) {
+				 const fileSystemLoc = await getFileSystemLocation(datastore.basePath)
+				 if(!fileSystemLoc) return null
+
+				fs.mkdirSync(mountPoint)
+
+				const { stderr: mountErr } = await exec(`mount ${fileSystemLoc} ${mountPoint}`)
+				console.log(mountErr)
+
+				 console.log(fileSystemLoc, mountPoint)
+			 }
+
+
 				datastore.status = DataStoreStatus.ONLINE
-
-
-				if(res.err) {
-					  datastore.smbEnabled = !datastore.smbEnabled
-					  console.log(res.err)
-				}
-
 				await datastore.save()
-			  })
 		  
 			  break
 		  }
@@ -152,4 +159,15 @@ export class DataStoreResolver {
 
 	  return true;
   }
-}
+};
+
+const getFileSystemLocation = async (path: string): Promise<string | undefined> => 
+	new Promise((resolve, rej) => {
+		df({...dfOptions, file: "-a"}, (err: any, res: any) => {
+			if(err) rej(err)
+
+			resolve(res.filter((fs: any) => fs.mount === path)[0]?.filesystem)
+				 
+		})
+	})
+
