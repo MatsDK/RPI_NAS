@@ -1,68 +1,61 @@
-import { Datastore } from "../../entity/Datastore"
-import { User } from "../../entity/User"
-import { Any } from "typeorm"
-import { exec } from "../exec"
-import fsPath from "path"
-import fs from "fs-extra"
-import { Node } from "../../entity/CloudNode"
+import { User } from "../../entity/User";
+import { exec } from "../exec";
+import fsPath from "path";
+import fs from "fs-extra";
 
 const baseConf = [
-    "comment = Smb",
-    "read only = no",
-    "browsable = yes",
-    "writable = yes",
-    "public = yes",
-    "guest ok  = yes",
-    "create mask = 0644",
-    "directory mask = 0770"
-]
+  "read only = no",
+  "browsable = yes",
+  "writable = yes",
+  "public = yes",
+  "guest ok  = yes",
+  "create mask = 0770",
+  "directory mask = 0770",
+];
 
-export const updateSMB = async () => {
-	return new Promise(async (res, rej) => {
-		try {
-			const SMBUsers = await User.find({ where: { smbEnabled: true } }),
-			       baseConfPath = fsPath.join(__dirname, "../../../assets/base_smb.conf")
-			
-			let file = (fs.readFileSync(baseConfPath).toString().split("\n"))
+export const updateSMB = async (hostUserName: string) => {
+  return new Promise(async (res, rej) => {
+    try {
+      const SMBUsers = await User.find({ where: { smbEnabled: true } }),
+        baseConfPath = fsPath.join(__dirname, "../../../assets/base_smb.conf");
 
-			for (const user of SMBUsers) {
-				const newLines: string[] = [`[${user.osUserName}]`, ...baseConf]
+      let file = fs.readFileSync(baseConfPath).toString().split("\n");
 
-				newLines.push(`force user = ${"mats"}`)
-				newLines.push(`path = /home/${user.osUserName}`)
-				newLines.push(`force group = ${"mats"}`)
+      for (const user of SMBUsers) {
+        const newLines: string[] = [`[${user.osUserName}]`, ...baseConf];
 
-				file = [...file, ...newLines]
-			}
+        newLines.push(`force user = ${hostUserName}`);
+        newLines.push(`path = /home/${user.osUserName}`);
+        newLines.push(`force group = ${user.osUserName}`);
 
+        file = [...file, ...newLines];
+      }
 
-			fs.writeFileSync(`/etc/samba/smb.conf`, file.join("\n"))
+      fs.writeFileSync(`/etc/samba/smb.conf`, file.join("\n"));
 
-			const {err: SMBServiceErr} = await restartSMBService()
-			if(SMBServiceErr) return rej({err:SMBServiceErr}) 
-			
+      const { err: SMBServiceErr } = await restartSMBService();
+      if (SMBServiceErr) return rej({ err: SMBServiceErr });
 
-			const {err: UpdateFirewallErr} = await updateFirewall()
-			if(UpdateFirewallErr) return rej({err: UpdateFirewallErr})
+      const { err: UpdateFirewallErr } = await updateFirewall();
+      if (UpdateFirewallErr) return rej({ err: UpdateFirewallErr });
 
-			res({err: false})
-		} catch (err) {
-			rej({err})
-		}
-	})
+      res({ err: false });
+    } catch (err) {
+      rej({ err });
+    }
+  });
+};
 
-}	
-
-type returnType = { err: string | boolean}
+type returnType = { err: string | boolean };
 
 const restartSMBService = async (): Promise<returnType> => {
-	const { stderr } = await exec(`service smbd restart`)
+  const { stderr } = await exec(`service smbd restart`);
 
-	return { err: !!stderr ? stderr : false }
-}
+  return { err: !!stderr ? stderr : false };
+};
 
 const updateFirewall = async (): Promise<returnType> => {
-	const { stderr } = await exec(`ufw allow samba`)
+  const { stderr } = await exec(`ufw allow samba`);
 
-	return { err: !!stderr ? stderr : false }
-}
+  return { err: !!stderr ? stderr : false };
+};

@@ -1,5 +1,5 @@
 import { compare, hash } from "bcrypt";
-import { createUser } from "../../utils/createUser"
+import { createUser } from "../../utils/createUser";
 import { createWriteStream } from "fs";
 import {
   Arg,
@@ -19,12 +19,13 @@ import { FriendRequest } from "../../entity/FriendRequest";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
 import { getUser } from "../../middleware/getUser";
+import { Node } from "../../entity/CloudNode";
 import { MyContext } from "../../types/Context";
 import { Upload } from "../../types/Upload";
 import { createTokens } from "../../utils/createTokens";
 import { FriendsQueryReturn } from "./FriendsQueryReturn";
 import { RegisterInput } from "./RegisterInput";
-import { updateSMB } from "../../utils/services/updateSMB"
+import { updateSMB } from "../../utils/services/updateSMB";
 
 @Resolver()
 export class UserResolver {
@@ -66,20 +67,18 @@ export class UserResolver {
     @Arg("data") { email, password, userName }: RegisterInput
   ): Promise<User> {
     const hashedPassword = await hash(password, 10),
-	    osUserName = userName.replace(/[^a-z0-9]/gi, '_').toLowerCase(); 
+      osUserName = userName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
 
     const user = await User.create({
       email,
       userName,
       password: hashedPassword,
       osUserName,
-    }).save() 
+    }).save();
 
     createUser(osUserName, password).then((res: any) => {
-	    if(res.err) console.log(res.err)
-    })
-
-
+      if (res.err) console.log(res.err);
+    });
 
     return user;
   }
@@ -177,7 +176,9 @@ export class UserResolver {
       )
       .execute();
 
-    const users = await User.find({ where: { id: In([req.userId, userId]) } });
+    const users = await User.find({
+      where: { id: In([req.userId, userId]) },
+    });
     const promiseList = [];
 
     for (const user of users) {
@@ -213,30 +214,31 @@ export class UserResolver {
   async toggleService(
     @Arg("serviceName", () => String) serviceName: "SMB" | "FTP",
     @Ctx() { req }: MyContext
-  ): Promise<boolean> {
-	  const user = (req as any).user
+  ): Promise<boolean | null> {
+    const user = (req as any).user;
 
-	  switch(serviceName) {
-		  case "SMB": {
-			  user.smbEnabled = !user.smbEnabled
-			  await user.save()
+    const hostNode = await Node.findOne({ where: { hostNode: null } });
+    if (!hostNode) return null;
 
-			  updateSMB().then(async (res: any) => {
-				if(res.err) {
-					  console.log(res.err)
-					  user.smbEnabled = !user.smbEnabled
-					  await user.save()
-				}
+    switch (serviceName) {
+      case "SMB": {
+        user.smbEnabled = !user.smbEnabled;
+        await user.save();
 
-			  })
-			  break
-		  } 
-		  case  "FTP": {
-			  break
-		  }
-	  }
+        updateSMB(hostNode.loginName).then(async (res: any) => {
+          if (res.err) {
+            console.log(res.err);
+            user.smbEnabled = !user.smbEnabled;
+            await user.save();
+          }
+        });
+        break;
+      }
+      case "FTP": {
+        break;
+      }
+    }
 
-
-	  return true
+    return true;
   }
 }

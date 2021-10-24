@@ -16,7 +16,8 @@ export class TreeResolver {
   @UseMiddleware(isAuth, getDataStoreAndNode)
   @Mutation(() => UploadSessionReturn, { nullable: true })
   createUploadSession(
-    @Arg("data", () => UploadSessionInput) { uploadPath }: UploadSessionInput,
+    @Arg("data", () => UploadSessionInput)
+    { uploadPath }: UploadSessionInput,
     @Ctx() { req }: any
   ): UploadSessionReturn {
     const dataStore = req.dataStore as Datastore,

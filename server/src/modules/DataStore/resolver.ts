@@ -6,10 +6,8 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import fs from "fs-extra";
 import fsPath from "path";
-import { exec } from "../../utils/exec"
-import { User } from "../../entity/User"
+import { User } from "../../entity/User";
 import { Node } from "../../entity/CloudNode";
 import { Datastore, DataStoreStatus } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
@@ -21,10 +19,12 @@ import { SharedDataStore } from "../../entity/SharedDataStore";
 import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { isAdmin } from "../../middleware/isAdmin";
 import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder";
-import { createGroup , addUsersToGroup} from "../../utils/dataStore/handleGroups"
-import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers"
-import { updateMountPoints } from "../../utils/services/updateMountPoints"
-
+import {
+  createGroup,
+  addUsersToGroup,
+} from "../../utils/dataStore/handleGroups";
+import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
+import { updateMountPoints } from "../../utils/services/updateMountPoints";
 
 @Resolver()
 export class DataStoreResolver {
@@ -32,11 +32,12 @@ export class DataStoreResolver {
   @Mutation(() => Datastore, { nullable: true })
   async createDataStore(
     @Ctx() { req }: MyContext,
-    @Arg("data") { localNodeId, name, ownerId, sizeInMB }: CreateDataStoreInput
+    @Arg("data")
+    { localNodeId, name, ownerId, sizeInMB }: CreateDataStoreInput
   ): Promise<Datastore | null> {
     const hostNode = await Node.findOne({ where: { hostNode: true } }),
       thisNode = await Node.findOne({ where: { id: localNodeId } }),
-      owner = await User.findOne({ where: { id: ownerId } })
+      owner = await User.findOne({ where: { id: ownerId } });
 
     if (!hostNode || !thisNode || !owner) return null;
 
@@ -50,19 +51,20 @@ export class DataStoreResolver {
       sizeInMB,
       name: name.replace(/[^a-z0-9]/gi, "_"),
     }).save();
-    const groupName = fsPath.basename(path)
+    const groupName = fsPath.basename(path);
 
-    const { err } = await createGroup(groupName, owner.osUserName) 
-    if(err) console.log(err);
+    const { err } = await createGroup(groupName, owner.osUserName);
+    if (err) console.log(err);
 
-    createDatastoreFolder(path, sizeInMB, { folderUser: thisNode.loginName, folderGroup: groupName }).then(async (res) => {
-
+    createDatastoreFolder(path, sizeInMB, {
+      folderUser: thisNode.loginName,
+      folderGroup: groupName,
+    }).then(async (res) => {
       newDatastore &&
         (await Datastore.update(
           { id: newDatastore.id },
           { status: DataStoreStatus.ONLINE }
         ));
-
     });
 
     return newDatastore;
@@ -80,18 +82,19 @@ export class DataStoreResolver {
     ids.forEach((i) => dataStoreIds.add(i.dataStoreId));
 
     for (const dataStoreId of dataStoreIds) {
-      const dataStore = await Datastore.findOne({ where: { id: dataStoreId } });
+      const dataStore = await Datastore.findOne({
+        where: { id: dataStoreId },
+      });
       if (!dataStore || dataStore.userId != userId) return null;
     }
 
     await SharedDataStore.insert(ids);
-    
-    const { err } = await addUsersToGroup(ids)
-    if(err) {
-	    console.log(err)
-	    return null
+
+    const { err } = await addUsersToGroup(ids);
+    if (err) {
+      console.log(err);
+      return null;
     }
-    
 
     return true;
   }
@@ -104,28 +107,52 @@ export class DataStoreResolver {
 
   @UseMiddleware(isAuth)
   @Query(() => Datastore, { nullable: true })
-  async getDatastore(@Ctx() { req }: MyContext, @Arg("datastoreId") datastoreId: number) {
-	  const datastore = await Datastore.findOne({ where: { id: datastoreId } })
+  async getDatastore(
+    @Ctx() { req }: MyContext,
+    @Arg("datastoreId") datastoreId: number
+  ) {
+    const datastore = await Datastore.findOne({
+      where: { id: datastoreId },
+    });
 
-	  return datastore?.userId === req.userId ? (await getDatastoresWithSizesAndSharedUsers([datastore], req.userId!))[0] : null
+    return datastore?.userId === req.userId
+      ? (
+          await getDatastoresWithSizesAndSharedUsers([datastore], req.userId!)
+        )[0]
+      : null;
   }
 
   @UseMiddleware(isAuth, getUser)
   @Mutation(() => Boolean, { nullable: true })
   async toggleDatastoreService(
-	  @Ctx() { req }: MyContext,
+    @Ctx() { req }: MyContext,
     @Arg("dataStoreId") datastoreId: number,
-    @Arg("serviceName", () => String) serviceName: "SMB" | "FTP",
+    @Arg("serviceName", () => String) serviceName: "SMB" | "FTP"
   ): Promise<boolean | null> {
-	  const datastore = await Datastore.findOne({where: { id: datastoreId }})
-	  if(!datastore ) return null
-	  //if(!datastore || req.userId !== datastore.userId || datastore.status !== DataStoreStatus.ONLINE) return null
+    const datastore = await Datastore.findOne({
+      where: { id: datastoreId },
+    });
+    if (
+      !datastore ||
+      req.userId !== datastore.userId ||
+      datastore.status !== DataStoreStatus.ONLINE
+    )
+      return null;
 
-	  const host = await Node.findOne({ where: { id: datastore.localNodeId } })
-	  if(!host) return null
+    const host = await Node.findOne({
+      where: { id: datastore.localNodeId },
+    });
+    if (!host) return null;
 
-	  const success = await updateMountPoints({ host, datastore , user: (req as any).user}, serviceName)
-	  return success
+    const { err } = await updateMountPoints(
+      { host, datastore, user: (req as any).user },
+      serviceName
+    );
+    if (err) {
+      console.log(err);
+      return false;
+    }
+
+    return true;
   }
-};
-
+}

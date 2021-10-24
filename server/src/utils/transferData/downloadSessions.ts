@@ -1,7 +1,4 @@
-import {
-  DownloadPathsInput,
-  DownloadSessionInput,
-} from "../../modules/TransferData/DownloadSessionInput";
+import { DownloadPathsInput } from "../../modules/TransferData/DownloadSessionInput";
 
 export const downloadSessions = {
   sessions: new Map(),
