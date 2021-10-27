@@ -9,4 +9,4 @@ export const MAX_AGE_ACCESS_TOKEN: number = 1000 * 60 * 15;
 
 export const IMGS_FOLDER = fsPath.join(__dirname, "../images")
 
-export const dfOptions = { prefixMultiplier: "MiB", isDisplayPrefixMultiplier: false };
+export const dfOptions = { prefixMultiplier: "MiB", isDisplayPrefixMultiplier: false, file: "-a" };

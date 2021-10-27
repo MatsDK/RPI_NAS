@@ -24,7 +24,8 @@ import {
   addUsersToGroup,
 } from "../../utils/dataStore/handleGroups";
 import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
-import { updateMountPoints } from "../../utils/services/updateMountPoints";
+import { updateSMB } from "../../utils/services/updateSMB";
+import { DatastoreService, ServiceNames } from "../../entity/DatastoreService"
 
 @Resolver()
 export class DataStoreResolver {
@@ -144,13 +145,26 @@ export class DataStoreResolver {
     });
     if (!host) return null;
 
-    const { err } = await updateMountPoints(
-      { host, datastore, user: (req as any).user },
-      serviceName
-    );
-    if (err) {
-      console.log(err);
-      return false;
+    switch(serviceName) {
+	    case "SMB": {
+		    const obj: any= {serviceName:ServiceNames.SMB, datastoreId: datastore.id, userId: req.userId} 
+		    const service = await DatastoreService.findOne({where: obj as any})
+
+		    if(service){
+			    console.log("disable")
+			    await DatastoreService.delete(obj)
+		    }else {
+			    console.log("enable")
+			    await DatastoreService.insert(obj)
+		    }
+
+		    updateSMB(host.loginName).then(res => {
+			    console.log(res)
+		    })
+
+		    break 
+	    }
+	
     }
 
     return true;

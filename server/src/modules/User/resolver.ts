@@ -208,7 +208,7 @@ export class UserResolver {
         .on("error", () => reject(false))
     );
   }
-
+/*
   @UseMiddleware(isAuth, getUser)
   @Mutation(() => Boolean, { nullable: true })
   async toggleService(
@@ -241,4 +241,5 @@ export class UserResolver {
 
     return true;
   }
+ */
 }

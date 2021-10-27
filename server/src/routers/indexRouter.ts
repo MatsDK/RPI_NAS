@@ -5,6 +5,8 @@ import fs from "fs-extra";
 import { downloadSessions } from "../utils/transferData/downloadSessions";
 import { getDownloadPath } from "../utils/transferData/getDownloadPath";
 
+const defaultProfilePicture = fsPath.join(IMGS_FOLDER, `default.png`);
+
 const router = Router();
 
 router.route("/download").get(async (req, res) => {
@@ -40,10 +42,8 @@ router.get("/profile/:id", (req, res) => {
   const path = fsPath.join(IMGS_FOLDER, `${userId}.png`);
 
   if (fs.pathExistsSync(path)) res.sendFile(path);
-  else {
-    console.log("default pic");
-    return res.json();
-  }
+  else res.sendFile(defaultProfilePicture);
+  
 });
 
 export { router };

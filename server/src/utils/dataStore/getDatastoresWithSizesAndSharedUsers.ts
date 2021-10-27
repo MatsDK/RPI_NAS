@@ -52,6 +52,7 @@ const getDataStoreSizes = (
   new Promise((res, rej) => {
     df(dfOptions, (err: any, r: any) => {
       if (err) rej(err);
+      
 
       for (const ds of dataStores) {
         const fs = r.find((f: any) => f.mount === ds.basePath);
