@@ -24,17 +24,14 @@ import {
   addUsersToGroup,
 } from "../../utils/dataStore/handleGroups";
 import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
-import { updateSMB } from "../../utils/services/updateSMB";
-import { DatastoreService, ServiceNames } from "../../entity/DatastoreService"
+import { toggleService } from "../../utils/services/toggleService";
 
 @Resolver()
 export class DataStoreResolver {
   @UseMiddleware(isAuth, getUser, isAdmin)
   @Mutation(() => Datastore, { nullable: true })
   async createDataStore(
-    @Ctx() { req }: MyContext,
-    @Arg("data")
-    { localNodeId, name, ownerId, sizeInMB }: CreateDataStoreInput
+    @Arg("data") { localNodeId, name, ownerId, sizeInMB }: CreateDataStoreInput
   ): Promise<Datastore | null> {
     const hostNode = await Node.findOne({ where: { hostNode: true } }),
       thisNode = await Node.findOne({ where: { id: localNodeId } }),
@@ -51,6 +48,7 @@ export class DataStoreResolver {
       localNodeId,
       sizeInMB,
       name: name.replace(/[^a-z0-9]/gi, "_"),
+      allowedSMBUsers: [ownerId],
     }).save();
     const groupName = fsPath.basename(path);
 
@@ -145,28 +143,11 @@ export class DataStoreResolver {
     });
     if (!host) return null;
 
-    switch(serviceName) {
-	    case "SMB": {
-		    const obj: any= {serviceName:ServiceNames.SMB, datastoreId: datastore.id, userId: req.userId} 
-		    const service = await DatastoreService.findOne({where: obj as any})
-
-		    if(service){
-			    console.log("disable")
-			    await DatastoreService.delete(obj)
-		    }else {
-			    console.log("enable")
-			    await DatastoreService.insert(obj)
-		    }
-
-		    updateSMB(host.loginName).then(res => {
-			    console.log(res)
-		    })
-
-		    break 
-	    }
-	
-    }
-
-    return true;
+    return await toggleService({
+      serviceName,
+      host,
+      datastore,
+      userId: req.userId,
+    });
   }
 }

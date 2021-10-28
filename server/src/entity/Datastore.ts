@@ -59,9 +59,13 @@ export class Datastore extends BaseEntity {
   @Field(() => String)
   status: DataStoreStatus;
 
-  @Column({default: false})
+  @Column({ default: false })
   @Field(() => Boolean)
   smbEnabled: boolean;
+
+  @Column("int", { array: true, unique: true, default: [] })
+  @Field(() => [Number])
+  allowedSMBUsers: number[];
 
   @Field(() => [User])
   sharedUsers: User[];

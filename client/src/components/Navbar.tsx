@@ -5,6 +5,7 @@ import { useMeState } from "src/hooks/useMeState";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { LightButton } from "src/ui/Button";
+import { NavbarIcon } from "src/ui/NavbarIcon";
 
 const NavBar = styled.div`
   width: 100vw;
@@ -40,6 +41,7 @@ const Navbar: React.FC<Props> = ({ showHomeButton }) => {
 
   return (
     <NavBar>
+      <NavbarIcon />
       {showHomeButton ? (
         <Link href={"/"}>
           <LightButton>Files</LightButton>

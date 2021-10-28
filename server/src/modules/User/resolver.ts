@@ -208,38 +208,4 @@ export class UserResolver {
         .on("error", () => reject(false))
     );
   }
-/*
-  @UseMiddleware(isAuth, getUser)
-  @Mutation(() => Boolean, { nullable: true })
-  async toggleService(
-    @Arg("serviceName", () => String) serviceName: "SMB" | "FTP",
-    @Ctx() { req }: MyContext
-  ): Promise<boolean | null> {
-    const user = (req as any).user;
-
-    const hostNode = await Node.findOne({ where: { hostNode: null } });
-    if (!hostNode) return null;
-
-    switch (serviceName) {
-      case "SMB": {
-        user.smbEnabled = !user.smbEnabled;
-        await user.save();
-
-        updateSMB(hostNode.loginName).then(async (res: any) => {
-          if (res.err) {
-            console.log(res.err);
-            user.smbEnabled = !user.smbEnabled;
-            await user.save();
-          }
-        });
-        break;
-      }
-      case "FTP": {
-        break;
-      }
-    }
-
-    return true;
-  }
- */
 }
