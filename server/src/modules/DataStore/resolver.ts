@@ -104,7 +104,7 @@ export class DataStoreResolver {
     return Node.find();
   }
 
-  @UseMiddleware(isAuth)
+  // @UseMiddleware(isAuth)
   @Query(() => Datastore, { nullable: true })
   async getDatastore(
     @Ctx() { req }: MyContext,
@@ -116,7 +116,11 @@ export class DataStoreResolver {
 
     return datastore?.userId === req.userId
       ? (
-          await getDatastoresWithSizesAndSharedUsers([datastore], req.userId!)
+          await getDatastoresWithSizesAndSharedUsers(
+            [datastore],
+            req.userId!,
+            true
+          )
         )[0]
       : null;
   }

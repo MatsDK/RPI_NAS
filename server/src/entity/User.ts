@@ -28,6 +28,9 @@ export class User extends BaseEntity {
   @Column("text", { nullable: true })
   defaultDownloadPath: string;
 
+  @Field({ nullable: true })
+  smbEnabled: boolean;
+
   @Column("text")
   password: string;
 

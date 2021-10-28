@@ -10,7 +10,6 @@ export const getDatastoreQuery = gql`
       localNodeId
       basePath
       sizeInMB
-      smbEnabled
       size {
         usedSize
         usedPercent
@@ -19,12 +18,14 @@ export const getDatastoreQuery = gql`
       owner {
         id
         userName
+        smbEnabled
         isAdmin
       }
       sharedUsers {
-        userName
-        isAdmin
         id
+        userName
+        smbEnabled
+        isAdmin
       }
     }
   }

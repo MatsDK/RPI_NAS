@@ -55,8 +55,16 @@ export type Datastore = {
   size?: Maybe<SizeObject>;
   status: Scalars['String'];
   smbEnabled: Scalars['Boolean'];
+  allowedSMBUsers: Array<Scalars['Float']>;
   sharedUsers: Array<User>;
   owner?: Maybe<User>;
+};
+
+export type DatastoreService = {
+  __typename?: 'DatastoreService';
+  serviceName: Scalars['String'];
+  userId: Scalars['Float'];
+  datastoreId: Scalars['Float'];
 };
 
 export type DeletePathsInput = {
@@ -128,7 +136,6 @@ export type Mutation = {
   sendFriendRequest?: Maybe<Scalars['Boolean']>;
   acceptFriendRequest?: Maybe<Scalars['Boolean']>;
   UploadProfilePicture?: Maybe<Scalars['Boolean']>;
-  toggleService?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -208,11 +215,6 @@ export type MutationAcceptFriendRequestArgs = {
 
 export type MutationUploadProfilePictureArgs = {
   file: Scalars['Upload'];
-};
-
-
-export type MutationToggleServiceArgs = {
-  serviceName: Scalars['String'];
 };
 
 export type Node = {
@@ -325,7 +327,6 @@ export type User = {
   userName: Scalars['String'];
   osUserName: Scalars['String'];
   isAdmin: Scalars['Boolean'];
-  smbEnabled: Scalars['Boolean'];
   defaultDownloadPath?: Maybe<Scalars['String']>;
   friends: Array<User>;
 };
@@ -350,14 +351,14 @@ export type CreateSharedDataStoresMutaionMutation = { __typename?: 'Mutation', c
 export type GetDataStoresQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Maybe<Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, smbEnabled: boolean, sizeInMB?: Maybe<number>, status: string, size?: Maybe<{ __typename?: 'SizeObject', usedSize: number, usedPercent: number }>, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }>> };
+export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Maybe<Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: Maybe<number>, status: string, size?: Maybe<{ __typename?: 'SizeObject', usedSize: number, usedPercent: number }>, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }>> };
 
 export type GetDatastoreQueryVariables = Exact<{
   datastoreId: Scalars['Float'];
 }>;
 
 
-export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: Maybe<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: Maybe<number>, smbEnabled: boolean, status: string, size?: Maybe<{ __typename?: 'SizeObject', usedSize: number, usedPercent: number }>, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }> };
+export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: Maybe<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: Maybe<number>, status: string, size?: Maybe<{ __typename?: 'SizeObject', usedSize: number, usedPercent: number }>, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }> };
 
 export type GetNodesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -495,7 +496,7 @@ export type LogoutMutationMutation = { __typename?: 'Mutation', logout?: Maybe<b
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', email: string, id: string, userName: string, isAdmin: boolean, smbEnabled: boolean, defaultDownloadPath?: Maybe<string> }> };
+export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', email: string, id: string, userName: string, isAdmin: boolean, defaultDownloadPath?: Maybe<string> }> };
 
 export type RegisterMutationMutationVariables = Exact<{
   email: Scalars['String'];
@@ -512,13 +513,6 @@ export type SetDefaultDownloadPathMutationVariables = Exact<{
 
 
 export type SetDefaultDownloadPathMutation = { __typename?: 'Mutation', setDefaultDownloadPath?: Maybe<boolean> };
-
-export type ToggleServiceMutationMutationVariables = Exact<{
-  serviceName: Scalars['String'];
-}>;
-
-
-export type ToggleServiceMutationMutation = { __typename?: 'Mutation', toggleService?: Maybe<boolean> };
 
 
 export const CreateDataStoreMutionDocument = gql`
@@ -599,7 +593,6 @@ export const GetDataStoresDocument = gql`
     localHostNodeId
     localNodeId
     basePath
-    smbEnabled
     sizeInMB
     size {
       usedSize
@@ -656,7 +649,6 @@ export const GetDatastoreDocument = gql`
     localNodeId
     basePath
     sizeInMB
-    smbEnabled
     size {
       usedSize
       usedPercent
@@ -1352,7 +1344,6 @@ export const MeDocument = gql`
     id
     userName
     isAdmin
-    smbEnabled
     defaultDownloadPath
   }
 }
@@ -1450,34 +1441,3 @@ export function useSetDefaultDownloadPathMutation(baseOptions?: Apollo.MutationH
 export type SetDefaultDownloadPathMutationHookResult = ReturnType<typeof useSetDefaultDownloadPathMutation>;
 export type SetDefaultDownloadPathMutationResult = Apollo.MutationResult<SetDefaultDownloadPathMutation>;
 export type SetDefaultDownloadPathMutationOptions = Apollo.BaseMutationOptions<SetDefaultDownloadPathMutation, SetDefaultDownloadPathMutationVariables>;
-export const ToggleServiceMutationDocument = gql`
-    mutation ToggleServiceMutation($serviceName: String!) {
-  toggleService(serviceName: $serviceName)
-}
-    `;
-export type ToggleServiceMutationMutationFn = Apollo.MutationFunction<ToggleServiceMutationMutation, ToggleServiceMutationMutationVariables>;
-
-/**
- * __useToggleServiceMutationMutation__
- *
- * To run a mutation, you first call `useToggleServiceMutationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useToggleServiceMutationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [toggleServiceMutationMutation, { data, loading, error }] = useToggleServiceMutationMutation({
- *   variables: {
- *      serviceName: // value for 'serviceName'
- *   },
- * });
- */
-export function useToggleServiceMutationMutation(baseOptions?: Apollo.MutationHookOptions<ToggleServiceMutationMutation, ToggleServiceMutationMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ToggleServiceMutationMutation, ToggleServiceMutationMutationVariables>(ToggleServiceMutationDocument, options);
-      }
-export type ToggleServiceMutationMutationHookResult = ReturnType<typeof useToggleServiceMutationMutation>;
-export type ToggleServiceMutationMutationResult = Apollo.MutationResult<ToggleServiceMutationMutation>;
-export type ToggleServiceMutationMutationOptions = Apollo.BaseMutationOptions<ToggleServiceMutationMutation, ToggleServiceMutationMutationVariables>;

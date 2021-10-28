@@ -7,7 +7,6 @@ export const meQuery = gql`
       id
       userName
       isAdmin
-      smbEnabled
       defaultDownloadPath
     }
   }

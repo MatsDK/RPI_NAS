@@ -1,58 +1,86 @@
 const df = require("node-df");
-import { Any } from "typeorm"
+import { Any } from "typeorm";
 import { Datastore, SizeObject } from "../../entity/Datastore";
-import { User } from "../../entity/User"
-import { SharedDataStore } from "../../entity/SharedDataStore"
-import { dfOptions } from "../../constants"
+import { User } from "../../entity/User";
+import { SharedDataStore } from "../../entity/SharedDataStore";
+import { dfOptions } from "../../constants";
+import { DatastoreService, ServiceNames } from "../../entity/DatastoreService";
 
+export const getDatastoresWithSizesAndSharedUsers = async (
+  datastores: Datastore[],
+  userId: number,
+  getSMBData: boolean = false
+) => {
+  const sharedDataStores = await SharedDataStore.find({
+    where: {
+      dataStoreId: Any(datastores.map((v) => v.id)),
+    },
+  });
 
-export const getDatastoresWithSizesAndSharedUsers = async (datastores: Datastore[], userId: number) => {
-    const sharedDataStores = await SharedDataStore.find({
-      where: {
-        dataStoreId: Any(datastores.map((v) => v.id)),
-      },
-    });
+  const users = await User.find({
+    where: {
+      id: Any(
+        Array.from(
+          new Set([
+            userId,
+            ...sharedDataStores.map(({ userId }) => userId),
+            ...datastores.map(({ userId }) => userId),
+          ])
+        )
+      ),
+    },
+  });
 
-    const users = await User.find({
-      where: {
-        id: Any(
-          Array.from(
-            new Set([
-              userId,
-              ...sharedDataStores.map(({ userId }) => userId),
-              ...datastores.map(({ userId }) => userId),
-            ])
-          )
-        ),
-      },
-    });
+  const sharedUsersMap: Map<number, User[]> = new Map();
 
-    const sharedUsersMap: Map<number, User[]> = new Map();
+  sharedDataStores.forEach(async (sharedDatastore) => {
+    let thisUser = users.find(({ id }) => id === sharedDatastore.userId);
 
-    sharedDataStores.forEach((sharedDatastore) => {
-      const thisUser = users.find(({ id }) => id === sharedDatastore.userId);
+    if (thisUser) {
+      if (getSMBData) {
+        const datastore = datastores.find(
+          (ds) => ds.id === sharedDatastore.dataStoreId
+        );
 
-      if (thisUser)
-        sharedUsersMap.set(sharedDatastore.dataStoreId, [
-          ...(sharedUsersMap.get(sharedDatastore.dataStoreId) || []),
-          thisUser,
-        ]);
-    });
+        if (datastore)
+          thisUser.smbEnabled = datastore.allowedSMBUsers.includes(thisUser.id);
+      }
 
-    return await getDataStoreSizes(datastores.map((datastore) => ({
-      ...datastore,
-      sharedUsers: sharedUsersMap.get(datastore.id) || [],
-      owner: users.find(({ id }) => id === datastore.userId),
-    })) as any);
-}
+      sharedUsersMap.set(sharedDatastore.dataStoreId, [
+        ...(sharedUsersMap.get(sharedDatastore.dataStoreId) || []),
+        thisUser,
+      ]);
+    }
+  });
 
-const getDataStoreSizes = (
-  dataStores: Datastore[]
-): Promise<Datastore[]> =>
+  return await getDataStoreSizes(
+    await Promise.all(
+      datastores.map(async (datastore) => {
+        const owner = users.find(({ id }) => id === datastore.userId)!;
+
+        return {
+          ...datastore,
+          sharedUsers: sharedUsersMap.get(datastore.id) || [],
+          owner: {
+            ...owner,
+            smbEnabled: !!(await DatastoreService.findOne({
+              where: {
+                serviceName: ServiceNames.SMB,
+                datastoreId: datastore.id,
+                userId: owner.id,
+              },
+            })),
+          },
+        } as Datastore;
+      })
+    )
+  );
+};
+
+const getDataStoreSizes = (dataStores: Datastore[]): Promise<Datastore[]> =>
   new Promise((res, rej) => {
     df(dfOptions, (err: any, r: any) => {
       if (err) rej(err);
-      
 
       for (const ds of dataStores) {
         const fs = r.find((f: any) => f.mount === ds.basePath);

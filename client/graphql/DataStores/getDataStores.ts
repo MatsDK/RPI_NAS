@@ -9,7 +9,6 @@ export const getDataStoresQuery = gql`
       localHostNodeId
       localNodeId
       basePath
-      smbEnabled
       sizeInMB
       size {
         usedSize
