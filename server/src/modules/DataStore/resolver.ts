@@ -25,6 +25,7 @@ import {
 } from "../../utils/dataStore/handleGroups";
 import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
 import { toggleService } from "../../utils/services/toggleService";
+import { UpdateDatastoreInput } from "./UpdateDatastoreInput";
 
 @Resolver()
 export class DataStoreResolver {
@@ -153,5 +154,39 @@ export class DataStoreResolver {
       datastore,
       userId: req.userId,
     });
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Boolean, { nullable: true })
+  async updateDatastore(
+    @Ctx() { req }: MyContext,
+    @Arg("dataStoreId") datastoreId: number,
+    @Arg("updateProps") updateProps: UpdateDatastoreInput
+  ): Promise<boolean | null> {
+    const datastore = await Datastore.findOne({
+      where: { id: datastoreId, userId: req.userId },
+    });
+    if (!datastore) return null;
+
+    const sharedDatastoreUsers = await SharedDataStore.find({
+      where: { dataStoreId: datastoreId },
+    });
+
+    const newSharedUsers = updateProps.sharedusers.filter(
+        (userId) => !sharedDatastoreUsers.find((u) => u.userId == userId)
+      ),
+      removedSharedUsers = sharedDatastoreUsers.filter(
+        ({ userId }) => !updateProps.sharedusers.includes(userId)
+      );
+
+    console.log(newSharedUsers, removedSharedUsers);
+
+    updateProps.name != null &&
+      updateProps.name != datastore.name &&
+      (datastore.name = updateProps.name);
+
+    console.log(datastore);
+
+    return true;
   }
 }

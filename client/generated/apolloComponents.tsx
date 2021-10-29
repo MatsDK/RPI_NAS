@@ -54,7 +54,6 @@ export type Datastore = {
   sizeInMB?: Maybe<Scalars['Float']>;
   size?: Maybe<SizeObject>;
   status: Scalars['String'];
-  smbEnabled: Scalars['Boolean'];
   allowedSMBUsers: Array<Scalars['Float']>;
   sharedUsers: Array<User>;
   owner?: Maybe<User>;
@@ -328,6 +327,7 @@ export type User = {
   osUserName: Scalars['String'];
   isAdmin: Scalars['Boolean'];
   defaultDownloadPath?: Maybe<Scalars['String']>;
+  smbEnabled?: Maybe<Scalars['Boolean']>;
   friends: Array<User>;
 };
 
@@ -358,7 +358,7 @@ export type GetDatastoreQueryVariables = Exact<{
 }>;
 
 
-export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: Maybe<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: Maybe<number>, status: string, size?: Maybe<{ __typename?: 'SizeObject', usedSize: number, usedPercent: number }>, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }> };
+export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: Maybe<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: Maybe<number>, status: string, size?: Maybe<{ __typename?: 'SizeObject', usedSize: number, usedPercent: number }>, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, smbEnabled?: Maybe<boolean>, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', id: string, userName: string, smbEnabled?: Maybe<boolean>, isAdmin: boolean }> }> };
 
 export type GetNodesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -657,12 +657,14 @@ export const GetDatastoreDocument = gql`
     owner {
       id
       userName
+      smbEnabled
       isAdmin
     }
     sharedUsers {
-      userName
-      isAdmin
       id
+      userName
+      smbEnabled
+      isAdmin
     }
   }
 }

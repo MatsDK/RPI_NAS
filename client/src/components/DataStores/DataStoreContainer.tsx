@@ -1,12 +1,13 @@
-import {
-  Datastore,
-  useGetDatastoreQuery,
-} from "../../../generated/apolloComponents";
+import { getDatastoreQuery } from "graphql/DataStores/getDatastore";
+import { ToggleDatastoreServiceMutation } from "graphql/DataStores/toggleDatastoreService";
 import { useRouter } from "next/router";
 import React from "react";
 import { useApolloClient } from "react-apollo";
 import { useApollo } from "src/hooks/useApollo";
-import { ToggleDatastoreServiceMutation } from "graphql/DataStores/toggleDatastoreService";
+import {
+  Datastore,
+  useGetDatastoreQuery,
+} from "../../../generated/apolloComponents";
 
 interface DataStoreContainerProps {}
 
@@ -25,12 +26,18 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
   if (!ds) return null;
 
   const toggleDatastoreSmbEnabled = async () => {
-    const res = await mutate(ToggleDatastoreServiceMutation, {
-      serviceName: "SMB",
-      datastoreId,
-    });
-
-    console.log(res);
+    await mutate(
+      ToggleDatastoreServiceMutation,
+      {
+        serviceName: "SMB",
+        datastoreId,
+      },
+      {
+        refetchQueries: [
+          { query: getDatastoreQuery, variables: { datastoreId } },
+        ],
+      }
+    );
   };
 
   if (loading) return <div>loading</div>;
@@ -39,7 +46,9 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
   return (
     <div>
       {ds.name}
-      <button onClick={toggleDatastoreSmbEnabled}>toggle</button>
+      <button onClick={toggleDatastoreSmbEnabled}>
+        {ds.owner?.smbEnabled ? "disable" : "enable"}
+      </button>
     </div>
   );
 };
