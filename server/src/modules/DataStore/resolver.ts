@@ -168,6 +168,8 @@ export class DataStoreResolver {
     });
     if (!datastore) return null;
 
+    let updateSMB = false;
+
     const sharedDatastoreUsers = await SharedDataStore.find({
       where: { dataStoreId: datastoreId },
     });
@@ -181,9 +183,10 @@ export class DataStoreResolver {
 
     console.log(newSharedUsers, removedSharedUsers);
 
-    updateProps.name != null &&
-      updateProps.name != datastore.name &&
-      (datastore.name = updateProps.name);
+    if (updateProps.name != null) {
+      const newName = updateProps.name.replace(/[^a-z0-9]/gi, "_");
+      newName != datastore.name && (datastore.name = newName);
+    }
 
     console.log(datastore);
 

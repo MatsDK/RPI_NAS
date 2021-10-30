@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
-export const GetFriendsQuery = gql`
-  query GetFriendsQuery {
+export const GetFriendsAndFriendRequestsQuery = gql`
+  query GetFriendsAndFriendRequestsQuery {
     friends {
       friends {
         id
@@ -11,6 +11,15 @@ export const GetFriendsQuery = gql`
         id
         userName
       }
+    }
+  }
+`;
+
+export const getFriendsQuerys = gql`
+  query getFriendsQuery {
+    getFriends {
+      id
+      userName
     }
   }
 `;

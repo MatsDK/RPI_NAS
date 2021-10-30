@@ -59,7 +59,7 @@ export class Datastore extends BaseEntity {
   @Field(() => String)
   status: DataStoreStatus;
 
-  @Column("int", { array: true, unique: true, default: [] })
+  @Column("int", { array: true, default: [] })
   @Field(() => [Number])
   allowedSMBUsers: number[];
 

@@ -31,4 +31,5 @@ Datastores.getInitialProps = async (ctx: ApolloContext) => {
 
   return { dataStores: data };
 };
+
 export default withAuth(Datastores);

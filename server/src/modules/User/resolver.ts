@@ -108,6 +108,14 @@ export class UserResolver {
     return ret;
   }
 
+  @UseMiddleware(isAuth, getUser)
+  @Query(() => [User], { nullable: true })
+  getFriends(@Ctx() { req }: MyContext): Promise<User[]> {
+    return User.find({
+      where: { id: In(req.user.friendsIds) },
+    });
+  }
+
   @UseMiddleware(isAuth)
   @Query(() => [Datastore], { nullable: true })
   getMyDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {

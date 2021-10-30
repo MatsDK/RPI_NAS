@@ -1,9 +1,6 @@
 import { ProfilePicture } from "src/ui/ProfilePicture";
-import {
-  GetFriendsQueryQuery,
-  useGetFriendsQueryQuery,
-} from "generated/apolloComponents";
-import { GetFriendsQuery } from "graphql/Friends/getFriends";
+import { useGetFriendsAndFriendRequestsQueryQuery } from "generated/apolloComponents";
+import { GetFriendsAndFriendRequestsQuery } from "graphql/Friends/getFriends";
 import { FindFriendsContainer } from "src/components/Friends/FindFriendsContainer";
 import React from "react";
 import { withAuth } from "src/HOC/withAuth";
@@ -15,8 +12,6 @@ import { useApolloClient } from "react-apollo";
 import { acceptFriendRequestMutation } from "graphql/Friends/acceptFriendRequest";
 import styled from "styled-components";
 import { Scrollbar } from "src/ui/Scrollbar";
-
-interface FriendsProps extends GetFriendsQueryQuery {}
 
 const Container = styled.div`
   ${Scrollbar}
@@ -101,12 +96,14 @@ const AcceptButton = styled.button`
   }
 `;
 
-const Friends: NextFunctionComponentWithAuth<FriendsProps> = ({ me }) => {
+const Friends: NextFunctionComponentWithAuth = ({ me }) => {
   useMeState(me);
 
   const client: any = useApolloClient();
 
-  const { data, loading, error } = useGetFriendsQueryQuery({ client });
+  const { data, loading, error } = useGetFriendsAndFriendRequestsQueryQuery({
+    client,
+  });
 
   if (loading) return <div>loading</div>;
 
@@ -122,7 +119,7 @@ const Friends: NextFunctionComponentWithAuth<FriendsProps> = ({ me }) => {
     const { errors, data } = await client.mutate({
       mutation: acceptFriendRequestMutation,
       variables: { userId },
-      refetchQueries: [{ query: GetFriendsQuery }],
+      refetchQueries: [{ query: GetFriendsAndFriendRequestsQuery }],
     });
 
     console.log(errors, data);
@@ -192,7 +189,7 @@ const Friends: NextFunctionComponentWithAuth<FriendsProps> = ({ me }) => {
 
 Friends.getInitialProps = async ({ apolloClient }: ApolloContext) => {
   const { loading, data } = await apolloClient.query({
-    query: GetFriendsQuery,
+    query: GetFriendsAndFriendRequestsQuery,
   });
 
   if (loading) return { friends: [] };

@@ -12,13 +12,7 @@ export class UpdateDatastoreInput {
   sharedusers: number[];
 
   @Field(() => [AllowedSMBUser])
-  allowdSMBUsers: AllowedSMBUser[];
-}
-
-@ObjectType()
-class SharedUsers {
-  @Field()
-  userId: number;
+  allowedSMBUsers: AllowedSMBUser[];
 }
 
 @ObjectType()
