@@ -6,9 +6,11 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
+import { Any } from "typeorm"
 import fsPath from "path";
 import { User } from "../../entity/User";
 import { Node } from "../../entity/CloudNode";
+import { DatastoreService } from "../../entity/DatastoreService";
 import { Datastore, DataStoreStatus } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
 import { getUser } from "../../middleware/getUser";
@@ -105,7 +107,7 @@ export class DataStoreResolver {
     return Node.find();
   }
 
-  // @UseMiddleware(isAuth)
+  @UseMiddleware(isAuth)
   @Query(() => Datastore, { nullable: true })
   async getDatastore(
     @Ctx() { req }: MyContext,
@@ -174,21 +176,32 @@ export class DataStoreResolver {
       where: { dataStoreId: datastoreId },
     });
 
-    const newSharedUsers = updateProps.sharedusers.filter(
-        (userId) => !sharedDatastoreUsers.find((u) => u.userId == userId)
-      ),
-      removedSharedUsers = sharedDatastoreUsers.filter(
-        ({ userId }) => !updateProps.sharedusers.includes(userId)
-      );
+    if(updateProps.sharedusers) {
+	const newSharedUsers = updateProps.sharedusers?.filter(
+		(userId) => !sharedDatastoreUsers.find((u) => u.userId == userId)
+		),
+		removedSharedUsers = sharedDatastoreUsers.filter(
+		({ userId }) => !updateProps.sharedusers?.includes(userId)
+		);
 
-    console.log(newSharedUsers, removedSharedUsers);
+	if(newSharedUsers.length)
+	      await SharedDataStore.insert(newSharedUsers.map((id) => ({userId: id, dataStoreId: datastoreId})));
+
+	if(removedSharedUsers.length) {
+	      await SharedDataStore.delete({ id : Any(removedSharedUsers.map(({ id }) => id)) })
+
+	      const deleteServices = await DatastoreService.delete({ datastoreId, userId: Any(removedSharedUsers.map(({ id }) => id)) })
+	      if(deleteServices.affected) updateSMB = true
+	}
+    }
+
 
     if (updateProps.name != null) {
       const newName = updateProps.name.replace(/[^a-z0-9]/gi, "_");
       newName != datastore.name && (datastore.name = newName);
     }
 
-    console.log(datastore);
+    console.log(datastore, updateSMB);
 
     return true;
   }

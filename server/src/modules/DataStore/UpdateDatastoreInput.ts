@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType } from "type-graphql";
+import { Field, InputType } from "type-graphql";
 
 @InputType()
 export class UpdateDatastoreInput {
@@ -8,14 +8,14 @@ export class UpdateDatastoreInput {
   @Field(() => Boolean, { nullable: true })
   ownerSMBEnabled?: boolean;
 
-  @Field(() => [Number])
-  sharedusers: number[];
+  @Field(() => [Number], { nullable: true })
+  sharedusers?: number[];
 
-  @Field(() => [AllowedSMBUser])
-  allowedSMBUsers: AllowedSMBUser[];
+  @Field(() => [AllowedSMBUser], { nullable: true })
+  allowedSMBUsers?: AllowedSMBUser[];
 }
 
-@ObjectType()
+@InputType()
 class AllowedSMBUser {
   @Field()
   userId: number;
