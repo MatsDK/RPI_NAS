@@ -12,5 +12,8 @@ export const createUser = async (osName: string, password: string): Promise<{err
 	const { stderr: createFolderErr } = await exec(`mkdir ${path} && chown ${osName}:${osName} ${path} && chmod 550 ${path}`);
 	if(createFolderErr) return { err: createFolderErr } 
 
+	const { stderr: setSMBPasswdErr } = await exec(`(echo ${password}; echo ${password}) | smbpasswd -s -a ${osName}`);
+	if(setSMBPasswdErr) return { err: setSMBPasswdErr } 
+
 	return {err: false}
 }

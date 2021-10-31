@@ -27,6 +27,7 @@ import {
 } from "../../utils/dataStore/handleGroups";
 import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
 import { toggleService } from "../../utils/services/toggleService";
+import { updateSMB } from "../../utils/services/updateSMB";
 import { UpdateDatastoreInput } from "./UpdateDatastoreInput";
 
 @Resolver()
@@ -165,14 +166,17 @@ export class DataStoreResolver {
     @Arg("dataStoreId") datastoreId: number,
     @Arg("updateProps") updateProps: UpdateDatastoreInput
   ): Promise<boolean | null> {
-    if(!Object.values(updateProps).filter(v => !!v).length) return null
+    if(!Object.values(updateProps).filter(v => v != null).length) return null
 
     const datastore = await Datastore.findOne({
       where: { id: datastoreId, userId: req.userId },
     });
     if (!datastore || datastore.status == DataStoreStatus.INIT || datastore.userId != req.userId) return null;
 
-    let updateSMB = false;
+    const host = await Node.findOne({ where: { id: datastore.localNodeId } })
+    if(!host) return null
+
+    let updateSMBRequired = false;
 
     const sharedDatastoreUsers = await SharedDataStore.find({
       where: { dataStoreId: datastoreId },
@@ -191,25 +195,20 @@ export class DataStoreResolver {
 
 	if(removedSharedUsers.length) {
 	      await SharedDataStore.delete({ id : Any(removedSharedUsers.map(({ id }) => id)) })
-	      const ids = removedSharedUsers.map(({ id }) => id)
+	      const ids = removedSharedUsers.map(({ userId }) => userId)
 
 	      datastore.allowedSMBUsers = datastore.allowedSMBUsers.filter(id => !ids.includes(id));
 
 	      const deleteServices = await DatastoreService.delete({ datastoreId, userId: Any(ids) })
-	      if(deleteServices.affected) updateSMB = true
+	      if(deleteServices.affected) updateSMBRequired = true
 	}
     }
 
     const datastoreServices = await DatastoreService.find({ where: { datastoreId, serviceName: ServiceNames.SMB } })
     if(updateProps.ownerSMBEnabled != null && !!datastoreServices.find(({ userId }) => datastore.userId === userId) != updateProps.ownerSMBEnabled) {
-	    const host = await Node.findOne({ where: { id: datastore.localNodeId } })
-	    if(host)  {
-		    updateSMB = true
+	    updateSMBRequired = true
 
-		    toggleService({datastore, host, userId: datastore.userId, serviceName: "SMB" }).then(res => {
-			    console.log(res)
-		    })
-	    }
+	    await toggleService({datastore, host, userId: datastore.userId, serviceName: "SMB", updateSMBEnabled: false })
     }
 
     if (updateProps.name != null) {
@@ -218,7 +217,7 @@ export class DataStoreResolver {
       if(newName != datastore.name && newName.trim()){
 	      datastore.name = newName;
 	      if(datastoreServices.length)
-		      updateSMB = true
+		      updateSMBRequired = true
       }
     }
     
@@ -227,14 +226,28 @@ export class DataStoreResolver {
 	    const newAllowedSMBUsers = Array.from(new Set([...datastore.allowedSMBUsers, ...updateProps.allowedSMBUsers.filter(({ allowed }) => allowed)
 							     .map(({ userId }) => userId)])).filter(id => !removedUsers.includes(id));
 
-	    datastore.allowedSMBUsers = newAllowedSMBUsers
+	    const removedSharedUsers = (await SharedDataStore.find({
+	      where: { dataStoreId: datastoreId },
+	    })).filter(({ userId }) => !updateProps.sharedusers?.includes(userId)).map(({ userId }) => userId)
+
+	    datastore.allowedSMBUsers = newAllowedSMBUsers.filter((id) => !removedSharedUsers.includes(id))
 	    const { affected } = await DatastoreService.delete({ datastoreId, serviceName: ServiceNames.SMB, userId: Any(removedUsers) })
-	    if(affected) updateSMB = true
+	    if(affected) updateSMBRequired = true
     }
 
+    if(updateSMBRequired) {
+	    datastore.status = DataStoreStatus.INIT
 
-    const res = await datastore.save()
-    console.log(res);
+	    updateSMB(host.loginName).then(async (res) => {
+		    console.log(res)
+
+		    datastore.status = DataStoreStatus.ONLINE
+		    await datastore.save()
+	    })
+
+    }
+
+    await datastore.save()
 
     return true;
   }
