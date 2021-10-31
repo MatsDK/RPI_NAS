@@ -8,6 +8,7 @@ interface toggleServiceProps {
   datastore: Datastore;
   userId: number;
   host: Node;
+  updateSMBEnabled?: boolean
 }
 
 export const toggleService = async ({
@@ -15,6 +16,7 @@ export const toggleService = async ({
   datastore,
   userId,
   host,
+  updateSMBEnabled = true
 }: toggleServiceProps): Promise<boolean> => {
   switch (serviceName) {
     case "SMB": {
@@ -30,7 +32,7 @@ export const toggleService = async ({
         : datastore.allowedSMBUsers.includes(userId) &&
           (await DatastoreService.insert(obj));
 
-      updateSMB(host.loginName).then((res) => {
+      updateSMBEnabled && updateSMB(host.loginName).then((res) => {
         console.log(res);
       });
 
