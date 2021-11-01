@@ -1,19 +1,44 @@
-import { getDatastoreQuery } from "graphql/DataStores/getDatastore";
-import { ToggleDatastoreServiceMutation } from "graphql/DataStores/toggleDatastoreService";
+import { ProfilePicture } from "src/ui/ProfilePicture";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useApolloClient } from "react-apollo";
-import { useApollo } from "src/hooks/useApollo";
 import { useMeState } from "src/hooks/useMeState";
-import { useGetDatastoreQuery } from "../../../generated/apolloComponents";
+import {
+  Datastore,
+  useGetDatastoreQuery,
+} from "../../../generated/apolloComponents";
+import { useApollo } from "src/hooks/useApollo";
+import { UpdateDatastoreMutation } from "graphql/DataStores/updateDatastore";
+import { getDatastoreQuery } from "graphql/DataStores/getDatastore";
+import styled from "styled-components";
+import { DatastoreUsers } from "./DatastoreUsers";
+import { datastoreUpdated, getUpdateObj } from "./updateDatastore";
+import { ToggleDatastoreServiceMutation } from "graphql/DataStores/toggleDatastoreService";
 
 interface DataStoreContainerProps {}
+
+const DatastoreContainerWrapper = styled.div`
+  padding: 20px 30px;
+`;
+
+const DatastoreName = styled.h1`
+  color: ${(props) => props.theme.textColors[0]};
+  font-size: 40px;
+  font-weight: 700;
+
+  span {
+    font-size: 18px;
+    font-weight: normal;
+    margin-left: 10px;
+    color: ${(props) => props.theme.textColors[2]};
+  }
+`;
 
 export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
   const router = useRouter();
   const client: any = useApolloClient();
-  const { mutate } = useApollo();
   const { me } = useMeState();
+  const { mutate } = useApollo();
 
   const datastoreId = Number(router.query.id);
   const { data, loading, error } = useGetDatastoreQuery({
@@ -23,67 +48,135 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
   const ds = data?.getDatastore;
 
   const [hasChanged, setHasChanged] = useState(false);
-  const [name, setName] = useState("");
-  const [ownerSMBEnabled, setOwnerSMBEnabled] = useState(false);
+  const [smbEnabled, setSmbEnabled] = useState(false);
+  const [updatedDatastore, setUpdatedDatastore] = useState<Datastore | null>({
+    ...ds,
+  } as any);
 
   useEffect(() => {
-    setHasChanged(
-      name !== ds?.name || ownerSMBEnabled !== ds.owner?.smbEnabled
-    );
+    setHasChanged(datastoreUpdated(ds as Datastore | null, updatedDatastore));
 
     return () => {};
-  }, [name, ownerSMBEnabled]);
+  }, [updatedDatastore]);
 
   useEffect(() => {
-    setName(ds?.name || "");
-    setOwnerSMBEnabled(ds?.owner?.smbEnabled || false);
+    setUpdatedDatastore({ ...ds } as any);
 
     return () => {};
   }, [ds]);
 
+  useEffect(() => {
+    setHasChanged(defaultSMBEnabled != smbEnabled);
+  }, [smbEnabled]);
+
   if (!ds) return null;
 
-  // const toggleDatastoreSmbEnabled = async () => {
-  //   await mutate(
-  //     ToggleDatastoreServiceMutation,
-  //     {
-  //       serviceName: "SMB",
-  //       datastoreId,
-  //     },
-  //     {
-  //       refetchQueries: [
-  //         { query: getDatastoreQuery, variables: { datastoreId } },
-  //       ],
-  //     }
-  //   );
-  // };
+  const update = async () => {
+    if (!hasChanged) return;
+
+    if (isDatastoreOwner) {
+      const { data, errors } = await mutate(
+        UpdateDatastoreMutation,
+        {
+          datastoreId,
+          ...getUpdateObj(ds as Datastore | null, updatedDatastore),
+        },
+        {
+          refetchQueries: [
+            { query: getDatastoreQuery, variables: { datastoreId } },
+          ],
+        }
+      );
+
+      console.log(data, errors);
+    } else {
+      const { data, errors } = await mutate(
+        ToggleDatastoreServiceMutation,
+        {
+          datastoreId,
+          serviceName: "SMB",
+        },
+        {
+          refetchQueries: [
+            { query: getDatastoreQuery, variables: { datastoreId } },
+          ],
+        }
+      );
+
+      console.log(data, errors);
+    }
+  };
 
   if (loading) return <div>loading</div>;
   if (error) console.log(error);
-  console.log(me);
 
+  const isDatastoreOwner = me?.id === ds.owner?.id,
+    defaultSMBEnabled = !!updatedDatastore?.sharedUsers.find(
+      ({ id }) => id == me?.id
+    )?.smbEnabled;
+
+  console.log(me, updatedDatastore);
   return (
-    <div>
-      Name:{" "}
-      <input
-        type="text"
-        onChange={(e) => setName(e.target.value)}
-        value={name}
-      />
+    <DatastoreContainerWrapper>
+      <DatastoreName>
+        {ds.name}
+        {ds.sharedUsers.length ? <span>Shared</span> : null}
+      </DatastoreName>
       <div>
         Users:
         <div>
-          {ds.owner?.userName}
-          {me?.id == ds.owner?.id && "(You)"}
-          <button onClick={() => setOwnerSMBEnabled((e) => !e)}>
-            {ownerSMBEnabled ? "disable" : "enable"}
-          </button>
+          {!isDatastoreOwner && (
+            <div>
+              <ProfilePicture
+                src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me?.id}`}
+              />
+              {me?.userName}(You)
+              {updatedDatastore?.allowedSMBUsers?.includes(Number(me?.id)) && (
+                <>
+                  <input
+                    type="checkbox"
+                    defaultChecked={defaultSMBEnabled}
+                    onChange={(e) => setSmbEnabled(e.target.checked)}
+                  />
+                  SMB enabled
+                </>
+              )}
+            </div>
+          )}
+          <div>
+            <ProfilePicture
+              src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${ds.owner?.id}`}
+            />
+            {ds.owner?.userName}
+            (Owner)
+            {me?.id == ds.owner?.id && "(You)"}
+            {isDatastoreOwner && (
+              <button
+                onClick={() =>
+                  setUpdatedDatastore(
+                    (uds) =>
+                      ({
+                        ...uds,
+                        owner: {
+                          ...uds?.owner,
+                          smbEnabled: !uds?.owner?.smbEnabled,
+                        },
+                      } as any)
+                  )
+                }
+              >
+                {updatedDatastore?.owner?.smbEnabled ? "disable" : "enable"}
+              </button>
+            )}
+          </div>
         </div>
-        {ds.sharedUsers.map((sharedUser) => (
-          <div>{sharedUser.userName}</div>
-        ))}
+        <DatastoreUsers
+          setUpdatedDatastore={setUpdatedDatastore}
+          updatedDatastore={updatedDatastore}
+          isDatastoreOwner={isDatastoreOwner}
+        />
       </div>
-      <div>{hasChanged && <button>update</button>}</div>
-    </div>
+      <div>{hasChanged && <button onClick={update}>update</button>}</div>
+    </DatastoreContainerWrapper>
   );
 };
