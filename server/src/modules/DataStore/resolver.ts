@@ -117,8 +117,26 @@ export class DataStoreResolver {
     const datastore = await Datastore.findOne({
       where: { id: datastoreId },
     });
+    if(!datastore) return null
 
-    return datastore?.userId === req.userId
+    const isDatastoreOwner = datastore?.userId === req.userId
+
+    const ret = (await getDatastoresWithSizesAndSharedUsers(
+            [datastore],
+            req.userId!,
+	    isDatastoreOwner
+    ))[0]
+
+    if(!isDatastoreOwner) {
+	    const sharedUser = ret.sharedUsers?.find(({ id }) => id == req.userId)
+	    sharedUser && (sharedUser.smbEnabled = !!(await DatastoreService.findOne({
+		    where: { userId: req.userId, datastoreId, serviceName: ServiceNames.SMB }
+	    })))
+    }
+
+
+    return ret
+    /*return datastore?.userId === req.userId
       ? (
           await getDatastoresWithSizesAndSharedUsers(
             [datastore],
@@ -127,6 +145,7 @@ export class DataStoreResolver {
           )
         )[0]
       : null;
+      */
   }
 
   @UseMiddleware(isAuth, getUser)
@@ -141,10 +160,12 @@ export class DataStoreResolver {
     });
     if (
       !datastore ||
-      req.userId !== datastore.userId ||
       datastore.status !== DataStoreStatus.ONLINE
     )
       return null;
+
+    if(req.userId != datastore.userId && !datastore.allowedSMBUsers.includes(req.userId)) 
+	    return null
 
     const host = await Node.findOne({
       where: { id: datastore.localNodeId },
@@ -226,9 +247,9 @@ export class DataStoreResolver {
 	    const newAllowedSMBUsers = Array.from(new Set([...datastore.allowedSMBUsers, ...updateProps.allowedSMBUsers.filter(({ allowed }) => allowed)
 							     .map(({ userId }) => userId)])).filter(id => !removedUsers.includes(id));
 
-	    const removedSharedUsers = (await SharedDataStore.find({
+	    const removedSharedUsers = updateProps.sharedusers != null  ? (await SharedDataStore.find({
 	      where: { dataStoreId: datastoreId },
-	    })).filter(({ userId }) => !updateProps.sharedusers?.includes(userId)).map(({ userId }) => userId)
+	    })).filter(({ userId }) => !updateProps.sharedusers?.includes(userId)).map(({ userId }) => userId) : []
 
 	    datastore.allowedSMBUsers = newAllowedSMBUsers.filter((id) => !removedSharedUsers.includes(id))
 	    const { affected } = await DatastoreService.delete({ datastoreId, serviceName: ServiceNames.SMB, userId: Any(removedUsers) })
