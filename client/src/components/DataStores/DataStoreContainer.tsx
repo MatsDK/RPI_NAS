@@ -18,19 +18,85 @@ import { ToggleDatastoreServiceMutation } from "graphql/DataStores/toggleDatasto
 interface DataStoreContainerProps {}
 
 const DatastoreContainerWrapper = styled.div`
+  flex: 1;
   padding: 20px 30px;
 `;
 
 const DatastoreName = styled.h1`
   color: ${(props) => props.theme.textColors[0]};
-  font-size: 40px;
-  font-weight: 700;
+  font-size: 35px;
+  font-weight: 500;
 
   span {
     font-size: 18px;
     font-weight: normal;
     margin-left: 10px;
     color: ${(props) => props.theme.textColors[2]};
+  }
+`;
+
+const SmallTitle = styled.h3`
+  font-size: 20px;
+  font-weight: 600;
+  color: ${(props) => props.theme.textColors[0]};
+`;
+
+export const UserWrapper = styled.div`
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+
+  p {
+    margin-left: 10px;
+    flex: 1;
+    color: ${(props) => props.theme.textColors[0]};
+
+    span {
+      color: ${(props) => props.theme.textColors[2]};
+      margin-left: 2px;
+    }
+  }
+`;
+
+export const UserWrapperLeft = styled.div`
+  min-width: 60%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  margin: 0;
+
+  :hover > div > button {
+    opacity: 1;
+  }
+
+  > div {
+    width: 25px;
+
+    > button {
+      transition: 0.1s ease-in-out;
+      opacity: 0;
+      border: 0;
+      outline: none;
+      margin-top: 2px;
+      cursor: pointer;
+      background-color: transparent;
+    }
+  }
+`;
+
+const Headers = styled.div`
+  display: flex;
+  align-items: baseline;
+  width: 100%;
+  margin: 10px 0;
+
+  h3 {
+    min-width: 60%;
+  }
+
+  span {
+    color: ${(props) => props.theme.textColors[1]};
+    font-size: 16px;
   }
 `;
 
@@ -115,7 +181,6 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
       ({ id }) => id == me?.id
     )?.smbEnabled;
 
-  console.log(me, updatedDatastore);
   return (
     <DatastoreContainerWrapper>
       <DatastoreName>
@@ -123,14 +188,23 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
         {ds.sharedUsers.length ? <span>Shared</span> : null}
       </DatastoreName>
       <div>
-        Users:
+        <Headers>
+          <SmallTitle>Users</SmallTitle>
+          <span>SMB enabled</span>
+        </Headers>
         <div>
           {!isDatastoreOwner && (
-            <div>
-              <ProfilePicture
-                src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me?.id}`}
-              />
-              {me?.userName}(You)
+            <UserWrapper>
+              <UserWrapperLeft>
+                <div></div>
+                <ProfilePicture
+                  src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me?.id}`}
+                />
+                <p>
+                  {me?.userName}
+                  <span>(You)</span>
+                </p>
+              </UserWrapperLeft>
               {updatedDatastore?.allowedSMBUsers?.includes(Number(me?.id)) && (
                 <>
                   <input
@@ -138,20 +212,27 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
                     defaultChecked={defaultSMBEnabled}
                     onChange={(e) => setSmbEnabled(e.target.checked)}
                   />
-                  SMB enabled
                 </>
               )}
-            </div>
+            </UserWrapper>
           )}
-          <div>
-            <ProfilePicture
-              src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${ds.owner?.id}`}
-            />
-            {ds.owner?.userName}
-            (Owner)
-            {me?.id == ds.owner?.id && "(You)"}
+          <UserWrapper>
+            <UserWrapperLeft>
+              <div></div>
+              <ProfilePicture
+                src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${ds.owner?.id}`}
+              />
+              <p>
+                {ds.owner?.userName}
+                <span>
+                  (Owner)
+                  {me?.id == ds.owner?.id && "(You)"}
+                </span>
+              </p>
+            </UserWrapperLeft>
             {isDatastoreOwner && (
-              <button
+              <input
+                type="checkbox"
                 onClick={() =>
                   setUpdatedDatastore(
                     (uds) =>
@@ -164,11 +245,10 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
                       } as any)
                   )
                 }
-              >
-                {updatedDatastore?.owner?.smbEnabled ? "disable" : "enable"}
-              </button>
+                defaultChecked={!!updatedDatastore?.owner?.smbEnabled}
+              />
             )}
-          </div>
+          </UserWrapper>
         </div>
         <DatastoreUsers
           setUpdatedDatastore={setUpdatedDatastore}

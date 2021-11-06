@@ -218,7 +218,6 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
 }) => {
   const { me } = useMeState();
   const router = useRouter();
-  const isDataStoreOwner = dataStore.owner?.id == me?.id;
 
   return (
     <DataStoreItem>
@@ -256,11 +255,7 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
       <DataStoreInfo>
         <DataStoreItemHeader>
           <DataStoreItemTitle>
-            <span
-              onClick={() =>
-                isDataStoreOwner && router.push(`/datastore/${dataStore.id}`)
-              }
-            >
+            <span onClick={() => router.push(`/datastore/${dataStore.id}`)}>
               {dataStore.name}
             </span>
             {showGoToBtn && (
@@ -287,16 +282,6 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
         <DataStoreShared>
           <DataStoreSharedHeader>
             <div>Shared: </div>
-            {/* {isDataStoreOwner && (
-              <button
-                onClick={() => {
-                  setDataStoreId(Number(dataStore.id));
-                  setShowShareDataStoreForm((s) => !s);
-                }}
-              >
-                Share
-              </button>
-            )} */}
           </DataStoreSharedHeader>
           <DataStoreSharedUsers>
             {dataStore.sharedUsers.length ? (
