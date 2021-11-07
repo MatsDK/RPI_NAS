@@ -1,4 +1,5 @@
 import { ProfilePicture } from "src/ui/ProfilePicture";
+import { UpdateChanged } from "./UpdateChanged";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useApolloClient } from "react-apollo";
@@ -120,6 +121,7 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
   } as any);
 
   useEffect(() => {
+    console.log(ds?.owner, updatedDatastore?.owner);
     setHasChanged(datastoreUpdated(ds as Datastore | null, updatedDatastore));
 
     return () => {};
@@ -173,13 +175,17 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
     }
   };
 
-  if (loading) return <div>loading</div>;
-  if (error) console.log(error);
-
   const isDatastoreOwner = me?.id === ds.owner?.id,
     defaultSMBEnabled = !!updatedDatastore?.sharedUsers.find(
       ({ id }) => id == me?.id
     )?.smbEnabled;
+
+  useEffect(() => {
+    setSmbEnabled(defaultSMBEnabled);
+  }, [defaultSMBEnabled]);
+
+  if (loading) return <div>loading</div>;
+  if (error) console.log(error);
 
   return (
     <DatastoreContainerWrapper>
@@ -234,16 +240,13 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
               <input
                 type="checkbox"
                 onClick={() =>
-                  setUpdatedDatastore(
-                    (uds) =>
-                      ({
-                        ...uds,
-                        owner: {
-                          ...uds?.owner,
-                          smbEnabled: !uds?.owner?.smbEnabled,
-                        },
-                      } as any)
-                  )
+                  setUpdatedDatastore((uds) => {
+                    const newObj = { ...uds, owner: { ...uds?.owner } };
+                    newObj?.owner?.smbEnabled != null &&
+                      (newObj.owner.smbEnabled = !newObj?.owner?.smbEnabled);
+
+                    return { ...newObj } as any;
+                  })
                 }
                 defaultChecked={!!updatedDatastore?.owner?.smbEnabled}
               />
@@ -256,7 +259,23 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
           isDatastoreOwner={isDatastoreOwner}
         />
       </div>
-      <div>{hasChanged && <button onClick={update}>update</button>}</div>
+      <div>
+        {hasChanged && (
+          <UpdateChanged
+            updated={[
+              {
+                title: ds.name,
+                onUpdate: update,
+                onCancel: () => {
+                  setUpdatedDatastore(() => ({ ...ds } as any));
+                  setHasChanged(false);
+                  setSmbEnabled(defaultSMBEnabled);
+                },
+              },
+            ]}
+          />
+        )}
+      </div>
     </DatastoreContainerWrapper>
   );
 };

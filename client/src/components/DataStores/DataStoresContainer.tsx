@@ -87,8 +87,6 @@ const DataStoresContainer: React.FC = () => {
     return () => {};
   }, [me, data]);
 
-  if (loading) return <div>Loading</div>;
-
   if (error) {
     console.log(error);
 
@@ -114,9 +112,12 @@ const DataStoresContainer: React.FC = () => {
       <DataStoresHeader>
         <DataStoresTitle>
           Datastores
-          <span>
-            <p>{data?.getDataStores?.length}</p> Datastores
-          </span>
+          {!loading && (
+            <span>
+              <p>{data?.getDataStores?.length}</p> Datastore
+              {data?.getDataStores?.length === 1 ? "" : "s"}
+            </span>
+          )}
         </DataStoresTitle>
         {me?.isAdmin && (
           <BgButton onClick={() => setShowNewDataStoreForm((show) => !show)}>
@@ -124,34 +125,36 @@ const DataStoresContainer: React.FC = () => {
           </BgButton>
         )}
       </DataStoresHeader>
-      <DataStoresList>
-        {myDatastores.map((dataStore, idx) => {
-          return (
-            <DataStoreListItem
-              dataStore={dataStore as any}
-              setDataStoreId={setDataStoreId}
-              setShowShareDataStoreForm={setShowShareDataStoreForm}
-              key={idx}
-            />
-          );
-        })}
-        {me?.isAdmin && (
-          <>
-            <SmallTitle>Other datastores</SmallTitle>
-            {otherDatastores.map((dataStore, idx) => {
-              return (
-                <DataStoreListItem
-                  showGoToBtn={false}
-                  dataStore={dataStore as any}
-                  setDataStoreId={setDataStoreId}
-                  setShowShareDataStoreForm={setShowShareDataStoreForm}
-                  key={idx}
-                />
-              );
-            })}
-          </>
-        )}
-      </DataStoresList>
+      {!loading && (
+        <DataStoresList>
+          {myDatastores.map((dataStore, idx) => {
+            return (
+              <DataStoreListItem
+                dataStore={dataStore as any}
+                setDataStoreId={setDataStoreId}
+                setShowShareDataStoreForm={setShowShareDataStoreForm}
+                key={idx}
+              />
+            );
+          })}
+          {me?.isAdmin && (
+            <>
+              <SmallTitle>Other datastores</SmallTitle>
+              {otherDatastores.map((dataStore, idx) => {
+                return (
+                  <DataStoreListItem
+                    showGoToBtn={false}
+                    dataStore={dataStore as any}
+                    setDataStoreId={setDataStoreId}
+                    setShowShareDataStoreForm={setShowShareDataStoreForm}
+                    key={idx}
+                  />
+                );
+              })}
+            </>
+          )}
+        </DataStoresList>
+      )}
     </DataStoresWrapper>
   );
 };

@@ -89,7 +89,7 @@ export const DatastoreUsers: React.FC<DatastoreUsersProps> = ({
 
                   setUpdatedDatastore({ ...updatedDatastore! });
                 }}
-                defaultChecked={
+                checked={
                   !!updatedDatastore?.allowedSMBUsers?.includes(
                     Number(sharedUser.id)
                   )

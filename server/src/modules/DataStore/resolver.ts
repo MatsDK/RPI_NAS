@@ -6,7 +6,7 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { Any } from "typeorm"
+import { Any } from "typeorm";
 import fsPath from "path";
 import { User } from "../../entity/User";
 import { Node } from "../../entity/CloudNode";
@@ -24,6 +24,7 @@ import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFold
 import {
   createGroup,
   addUsersToGroup,
+  groups,
 } from "../../utils/dataStore/handleGroups";
 import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
 import { toggleService } from "../../utils/services/toggleService";
@@ -117,35 +118,31 @@ export class DataStoreResolver {
     const datastore = await Datastore.findOne({
       where: { id: datastoreId },
     });
-    if(!datastore) return null
+    if (!datastore) return null;
 
-    const isDatastoreOwner = datastore?.userId === req.userId
+    const isDatastoreOwner = datastore?.userId === req.userId;
 
-    const ret = (await getDatastoresWithSizesAndSharedUsers(
-            [datastore],
-            req.userId!,
-	    isDatastoreOwner
-    ))[0]
+    const ret = (
+      await getDatastoresWithSizesAndSharedUsers(
+        [datastore],
+        req.userId!,
+        isDatastoreOwner
+      )
+    )[0];
 
-    if(!isDatastoreOwner) {
-	    const sharedUser = ret.sharedUsers?.find(({ id }) => id == req.userId)
-	    sharedUser && (sharedUser.smbEnabled = !!(await DatastoreService.findOne({
-		    where: { userId: req.userId, datastoreId, serviceName: ServiceNames.SMB }
-	    })))
+    if (!isDatastoreOwner) {
+      const sharedUser = ret.sharedUsers?.find(({ id }) => id == req.userId);
+      sharedUser &&
+        (sharedUser.smbEnabled = !!(await DatastoreService.findOne({
+          where: {
+            userId: req.userId,
+            datastoreId,
+            serviceName: ServiceNames.SMB,
+          },
+        })));
     }
 
-
-    return ret
-    /*return datastore?.userId === req.userId
-      ? (
-          await getDatastoresWithSizesAndSharedUsers(
-            [datastore],
-            req.userId!,
-            true
-          )
-        )[0]
-      : null;
-      */
+    return ret;
   }
 
   @UseMiddleware(isAuth, getUser)
@@ -158,14 +155,13 @@ export class DataStoreResolver {
     const datastore = await Datastore.findOne({
       where: { id: datastoreId },
     });
+    if (!datastore || datastore.status !== DataStoreStatus.ONLINE) return null;
+
     if (
-      !datastore ||
-      datastore.status !== DataStoreStatus.ONLINE
+      req.userId != datastore.userId &&
+      !datastore.allowedSMBUsers.includes(req.userId)
     )
       return null;
-
-    if(req.userId != datastore.userId && !datastore.allowedSMBUsers.includes(req.userId)) 
-	    return null
 
     const host = await Node.findOne({
       where: { id: datastore.localNodeId },
@@ -187,15 +183,21 @@ export class DataStoreResolver {
     @Arg("dataStoreId") datastoreId: number,
     @Arg("updateProps") updateProps: UpdateDatastoreInput
   ): Promise<boolean | null> {
-    if(!Object.values(updateProps).filter(v => v != null).length) return null
+    if (!Object.values(updateProps).filter((v) => v != null).length)
+      return null;
 
     const datastore = await Datastore.findOne({
       where: { id: datastoreId, userId: req.userId },
     });
-    if (!datastore || datastore.status == DataStoreStatus.INIT || datastore.userId != req.userId) return null;
+    if (
+      !datastore ||
+      datastore.status == DataStoreStatus.INIT ||
+      datastore.userId != req.userId
+    )
+      return null;
 
-    const host = await Node.findOne({ where: { id: datastore.localNodeId } })
-    if(!host) return null
+    const host = await Node.findOne({ where: { id: datastore.localNodeId } });
+    if (!host) return null;
 
     let updateSMBRequired = false;
 
@@ -203,72 +205,123 @@ export class DataStoreResolver {
       where: { dataStoreId: datastoreId },
     });
 
-    if(updateProps.sharedusers) {
-	const newSharedUsers = updateProps.sharedusers?.filter(
-			(userId) => !sharedDatastoreUsers.find((u) => u.userId == userId)
-		),
-		removedSharedUsers = sharedDatastoreUsers.filter(
-			({ userId }) => !updateProps.sharedusers?.includes(userId)
-		);
+    if (updateProps.sharedusers) {
+      const newSharedUsers = updateProps.sharedusers?.filter(
+          (userId) => !sharedDatastoreUsers.find((u) => u.userId == userId)
+        ),
+        removedSharedUsers = sharedDatastoreUsers.filter(
+          ({ userId }) => !updateProps.sharedusers?.includes(userId)
+        );
 
-	if(newSharedUsers.length)
-	      await SharedDataStore.insert(newSharedUsers.map((id) => ({userId: id, dataStoreId: datastoreId})));
+      if (newSharedUsers.length) {
+        await SharedDataStore.insert(
+          newSharedUsers.map((id) => ({ userId: id, dataStoreId: datastoreId }))
+        );
+        await groups.add(
+          newSharedUsers.map((id) => ({
+            userId: id,
+            dataStoreId: datastore.id,
+          }))
+        );
+      }
 
-	if(removedSharedUsers.length) {
-	      await SharedDataStore.delete({ id : Any(removedSharedUsers.map(({ id }) => id)) })
-	      const ids = removedSharedUsers.map(({ userId }) => userId)
+      if (removedSharedUsers.length) {
+        await SharedDataStore.delete({
+          id: Any(removedSharedUsers.map(({ id }) => id)),
+        });
+        await groups.remove(removedSharedUsers);
 
-	      datastore.allowedSMBUsers = datastore.allowedSMBUsers.filter(id => !ids.includes(id));
+        const ids = removedSharedUsers.map(({ userId }) => userId);
 
-	      const deleteServices = await DatastoreService.delete({ datastoreId, userId: Any(ids) })
-	      if(deleteServices.affected) updateSMBRequired = true
-	}
+        datastore.allowedSMBUsers = datastore.allowedSMBUsers.filter(
+          (id) => !ids.includes(id)
+        );
+
+        const deleteServices = await DatastoreService.delete({
+          datastoreId,
+          userId: Any(ids),
+        });
+        if (deleteServices.affected) updateSMBRequired = true;
+      }
     }
 
-    const datastoreServices = await DatastoreService.find({ where: { datastoreId, serviceName: ServiceNames.SMB } })
-    if(updateProps.ownerSMBEnabled != null && !!datastoreServices.find(({ userId }) => datastore.userId === userId) != updateProps.ownerSMBEnabled) {
-	    updateSMBRequired = true
+    const datastoreServices = await DatastoreService.find({
+      where: { datastoreId, serviceName: ServiceNames.SMB },
+    });
+    if (
+      updateProps.ownerSMBEnabled != null &&
+      !!datastoreServices.find(({ userId }) => datastore.userId === userId) !=
+        updateProps.ownerSMBEnabled
+    ) {
+      updateSMBRequired = true;
 
-	    await toggleService({datastore, host, userId: datastore.userId, serviceName: "SMB", updateSMBEnabled: false })
+      await toggleService({
+        datastore,
+        host,
+        userId: datastore.userId,
+        serviceName: "SMB",
+        updateSMBEnabled: false,
+      });
     }
 
     if (updateProps.name != null) {
       const newName = updateProps.name.replace(/[^a-z0-9]/gi, "_");
 
-      if(newName != datastore.name && newName.trim()){
-	      datastore.name = newName;
-	      if(datastoreServices.length)
-		      updateSMBRequired = true
+      if (newName != datastore.name && newName.trim()) {
+        datastore.name = newName;
+        if (datastoreServices.length) updateSMBRequired = true;
       }
     }
-    
-    if(updateProps?.allowedSMBUsers?.length) {
-	    const removedUsers = updateProps.allowedSMBUsers.filter(({ allowed }) => !allowed).map(({ userId }) => userId)
-	    const newAllowedSMBUsers = Array.from(new Set([...datastore.allowedSMBUsers, ...updateProps.allowedSMBUsers.filter(({ allowed }) => allowed)
-							     .map(({ userId }) => userId)])).filter(id => !removedUsers.includes(id));
 
-	    const removedSharedUsers = updateProps.sharedusers != null  ? (await SharedDataStore.find({
-	      where: { dataStoreId: datastoreId },
-	    })).filter(({ userId }) => !updateProps.sharedusers?.includes(userId)).map(({ userId }) => userId) : []
+    if (updateProps?.allowedSMBUsers?.length) {
+      const removedUsers = updateProps.allowedSMBUsers
+        .filter(({ allowed }) => !allowed)
+        .map(({ userId }) => userId);
+      const newAllowedSMBUsers = Array.from(
+        new Set([
+          ...datastore.allowedSMBUsers,
+          ...updateProps.allowedSMBUsers
+            .filter(({ allowed }) => allowed)
+            .map(({ userId }) => userId),
+        ])
+      ).filter((id) => !removedUsers.includes(id));
 
-	    datastore.allowedSMBUsers = newAllowedSMBUsers.filter((id) => !removedSharedUsers.includes(id))
-	    const { affected } = await DatastoreService.delete({ datastoreId, serviceName: ServiceNames.SMB, userId: Any(removedUsers) })
-	    if(affected) updateSMBRequired = true
+      const removedSharedUsers =
+        updateProps.sharedusers != null
+          ? (
+              await SharedDataStore.find({
+                where: { dataStoreId: datastoreId },
+              })
+            )
+              .filter(
+                ({ userId }) => !updateProps.sharedusers?.includes(userId)
+              )
+              .map(({ userId }) => userId)
+          : [];
+
+      datastore.allowedSMBUsers = newAllowedSMBUsers.filter(
+        (id) => !removedSharedUsers.includes(id)
+      );
+      const { affected } = await DatastoreService.delete({
+        datastoreId,
+        serviceName: ServiceNames.SMB,
+        userId: Any(removedUsers),
+      });
+      if (affected) updateSMBRequired = true;
     }
 
-    if(updateSMBRequired) {
-	    datastore.status = DataStoreStatus.INIT
+    if (updateSMBRequired) {
+      datastore.status = DataStoreStatus.INIT;
 
-	    updateSMB(host.loginName).then(async (res) => {
-		    console.log(res)
+      updateSMB(host.loginName).then(async (res) => {
+        console.log(res);
 
-		    datastore.status = DataStoreStatus.ONLINE
-		    await datastore.save()
-	    })
-
+        datastore.status = DataStoreStatus.ONLINE;
+        await datastore.save();
+      });
     }
 
-    await datastore.save()
+    await datastore.save();
 
     return true;
   }
