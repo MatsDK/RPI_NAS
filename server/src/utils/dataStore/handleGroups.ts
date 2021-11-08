@@ -20,54 +20,66 @@ export const createGroup = async (
   return { err: false };
 };
 
-export const addUsersToGroup = async (
-  ids: SharedDataStoresIdsInput[]
-): Promise<{ err: any }> => {
+interface Props {
+  cmd: (groupName: string, osUserName: string) => Promise<any>;
+  ids: SharedDataStoresIdsInput[];
+}
+
+const addAndRemoveUsersFromGroup = async ({
+  cmd,
+  ids,
+}: Props): Promise<{ err: any }> => {
   const datastores = await Datastore.find({
       where: { id: Any(ids.map((i) => i.dataStoreId)) },
     }),
     users = await User.find({ where: { id: Any(ids.map((i) => i.userId)) } });
 
   for (const sharedDatastore of ids) {
-    const datastore = datastores.find(
-        (d) => d.id === sharedDatastore.dataStoreId
-      ),
-      user = users.find((d) => d.id === sharedDatastore.userId);
+    try {
+      const datastore = datastores.find(
+          (d) => d.id === sharedDatastore.dataStoreId
+        ),
+        user = users.find((d) => d.id === sharedDatastore.userId);
 
-    if (!datastore || !user) continue;
+      if (!datastore || !user) continue;
 
-    const { stderr: addUserToGroupErr } = await exec(
-      `usermod -aG ${fsPath.basename(datastore.basePath)} ${user.osUserName}`
-    );
-    if (addUserToGroupErr) return { err: addUserToGroupErr };
+      const { stderr } = await cmd(
+        fsPath.basename(datastore.basePath),
+        user.osUserName
+      );
+      if (stderr) return { err: stderr };
+    } catch (err) {
+      return { err };
+    }
   }
 
   return { err: false };
 };
+
+export const addUsersToGroup = async (
+  ids: SharedDataStoresIdsInput[]
+): Promise<{ err: any }> => ({
+  err:
+    (
+      await addAndRemoveUsersFromGroup({
+        cmd: (groupName, userName) =>
+          exec(`usermod -aG ${groupName} ${userName}`),
+        ids,
+      })
+    ).err || false,
+});
 
 export const removeUsersFromGroup = async (
   ids: SharedDataStoresIdsInput[]
-): Promise<{ err: any }> => {
-  const datastores = await Datastore.find({
-      where: { id: Any(ids.map((i) => i.dataStoreId)) },
-    }),
-    users = await User.find({ where: { id: Any(ids.map((i) => i.userId)) } });
-
-  for (const sharedDatastore of ids) {
-    const datastore = datastores.find(
-        (d) => d.id === sharedDatastore.dataStoreId
-      ),
-      user = users.find((d) => d.id === sharedDatastore.userId);
-
-    if (!datastore || !user) continue;
-
-    const { stderr: removeUserFromGroup } = await exec(
-      `gpasswd -d ${user.osUserName} ${fsPath.basename(datastore.basePath)}`
-    );
-    if (removeUserFromGroup) return { err: removeUserFromGroup };
-  }
-
-  return { err: false };
-};
+): Promise<{ err: any }> => ({
+  err:
+    (
+      await addAndRemoveUsersFromGroup({
+        cmd: (groupName, userName) =>
+          exec(`gpasswd -d ${userName} ${groupName}`),
+        ids,
+      })
+    ).err || false,
+});
 
 export const groups = { add: addUsersToGroup, remove: removeUsersFromGroup };

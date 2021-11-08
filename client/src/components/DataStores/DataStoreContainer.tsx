@@ -121,7 +121,6 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
   } as any);
 
   useEffect(() => {
-    console.log(ds?.owner, updatedDatastore?.owner);
     setHasChanged(datastoreUpdated(ds as Datastore | null, updatedDatastore));
 
     return () => {};
@@ -180,9 +179,9 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
       ({ id }) => id == me?.id
     )?.smbEnabled;
 
-  useEffect(() => {
-    setSmbEnabled(defaultSMBEnabled);
-  }, [defaultSMBEnabled]);
+  // useEffect(() => {
+  //   setSmbEnabled(defaultSMBEnabled);
+  // }, [defaultSMBEnabled]);
 
   if (loading) return <div>loading</div>;
   if (error) console.log(error);
@@ -215,7 +214,7 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
                 <>
                   <input
                     type="checkbox"
-                    defaultChecked={defaultSMBEnabled}
+                    checked={defaultSMBEnabled}
                     onChange={(e) => setSmbEnabled(e.target.checked)}
                   />
                 </>
@@ -248,7 +247,7 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
                     return { ...newObj } as any;
                   })
                 }
-                defaultChecked={!!updatedDatastore?.owner?.smbEnabled}
+                checked={!!updatedDatastore?.owner?.smbEnabled}
               />
             )}
           </UserWrapper>

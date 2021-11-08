@@ -41,27 +41,25 @@ const MyApp = (props: AppProps & Props) => {
   };
 
   return (
-    <div>
-      <ApolloProvider client={apolloClient}>
-        <FolderContext.Provider
-          value={{
-            ...FolderContextValue,
-            currentFolderPath: { folderPath, setFolderPath },
-            selected: Selected,
-            newFolderInput: {
-              showNewFolderInput,
-              setShowNewFolderInput,
-            },
-          }}
-        >
-          <MeContext.Provider value={{ me, setMe }}>
-            <ThemeProvider theme={theme}>
-              <Component {...pageProps} />
-            </ThemeProvider>
-          </MeContext.Provider>
-        </FolderContext.Provider>
-      </ApolloProvider>
-    </div>
+    <ApolloProvider client={apolloClient}>
+      <FolderContext.Provider
+        value={{
+          ...FolderContextValue,
+          currentFolderPath: { folderPath, setFolderPath },
+          selected: Selected,
+          newFolderInput: {
+            showNewFolderInput,
+            setShowNewFolderInput,
+          },
+        }}
+      >
+        <MeContext.Provider value={{ me, setMe }}>
+          <ThemeProvider theme={theme}>
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </MeContext.Provider>
+      </FolderContext.Provider>
+    </ApolloProvider>
   );
 };
 

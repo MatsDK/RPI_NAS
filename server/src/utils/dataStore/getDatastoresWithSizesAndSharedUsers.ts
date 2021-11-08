@@ -53,27 +53,32 @@ export const getDatastoresWithSizesAndSharedUsers = async (
     }
   });
 
-  return await getDataStoreSizes(
-    await Promise.all(
-      datastores.map(async (datastore) => {
-        const owner = users.find(({ id }) => id === datastore.userId)!;
+  const ownerDatastoreServicesSMB = await DatastoreService.find({
+    where: {
+      serviceName: ServiceNames.SMB,
+      datastoreId: Any(datastores.map(({ id }) => id)),
+      userId: Any(users.map(({ id }) => id)),
+    },
+  });
 
-        return {
-          ...datastore,
-          sharedUsers: sharedUsersMap.get(datastore.id) || [],
-          owner: {
-            ...owner,
-            smbEnabled: !!(await DatastoreService.findOne({
-              where: {
-                serviceName: ServiceNames.SMB,
-                datastoreId: datastore.id,
-                userId: owner.id,
-              },
-            })),
-          },
-        } as Datastore;
-      })
-    )
+  return await getDataStoreSizes(
+    datastores.map((datastore) => {
+      const owner = users.find(({ id }) => id === datastore.userId)!;
+
+      return {
+        ...datastore,
+        sharedUsers: sharedUsersMap.get(datastore.id) || [],
+        owner: {
+          ...owner,
+          smbEnabled: !!ownerDatastoreServicesSMB.find(
+            (s) =>
+              s.datastoreId === datastore.id &&
+              s.userId === owner.id &&
+              s.serviceName === ServiceNames.SMB
+          ),
+        },
+      } as Datastore;
+    })
   );
 };
 

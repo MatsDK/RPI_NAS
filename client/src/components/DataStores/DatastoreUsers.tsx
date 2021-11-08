@@ -46,23 +46,25 @@ export const DatastoreUsers: React.FC<DatastoreUsersProps> = ({
         <UserWrapper key={sharedUser.id}>
           <UserWrapperLeft>
             <div>
-              <button
-                onClick={() => {
-                  updatedDatastore!.sharedUsers =
-                    updatedDatastore!.sharedUsers?.filter(
-                      (u) => u.id != sharedUser.id
-                    );
+              {isDatastoreOwner && (
+                <button
+                  onClick={() => {
+                    updatedDatastore!.sharedUsers =
+                      updatedDatastore!.sharedUsers?.filter(
+                        (u) => u.id != sharedUser.id
+                      );
 
-                  setUpdatedDatastore(() => ({ ...updatedDatastore } as any));
-                }}
-              >
-                <Icon
-                  name="removeIcon"
-                  color={{ propName: "textColors", idx: 1 }}
-                  width={20}
-                  height={20}
-                />
-              </button>
+                    setUpdatedDatastore(() => ({ ...updatedDatastore } as any));
+                  }}
+                >
+                  <Icon
+                    name="removeIcon"
+                    color={{ propName: "textColors", idx: 1 }}
+                    width={20}
+                    height={20}
+                  />
+                </button>
+              )}
             </div>
             <ProfilePicture
               src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${sharedUser.id}`}

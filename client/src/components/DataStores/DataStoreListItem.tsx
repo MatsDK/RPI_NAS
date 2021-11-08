@@ -3,7 +3,7 @@ import { PlaceHolder } from "pages/friends";
 import Link from "next/link";
 import React from "react";
 import { useMeState } from "src/hooks/useMeState";
-import { ProfilePicture } from "src/ui/ProfilePicture";
+import { ProfilePicturesStack } from "src/ui/ProfilePicturesStack";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 
@@ -108,6 +108,10 @@ const DataStoreItemTitle = styled.div`
   font-weight: 600;
   font-size: 20px;
   color: ${(props) => props.theme.textColors[0]};
+
+  span {
+    cursor: pointer;
+  }
 
   button {
     background-color: transparent;
@@ -285,20 +289,26 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
           </DataStoreSharedHeader>
           <DataStoreSharedUsers>
             {dataStore.sharedUsers.length ? (
-              dataStore.sharedUsers.map((sharedUser, idx) => {
-                return (
-                  <SharedUser key={idx}>
-                    <ProfilePicture
-                      src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${sharedUser.id}`}
-                    />
-                    <span>
-                      {sharedUser.userName}
-                      <p>{sharedUser.id === me?.id && "(You)"}</p>
-                    </span>
-                  </SharedUser>
-                );
-              })
+              <ProfilePicturesStack
+                users={dataStore.sharedUsers.map(({ id, userName }) => ({
+                  id: Number(id),
+                  userName,
+                }))}
+              />
             ) : (
+              // dataStore.sharedUsers.map((sharedUser, idx) => {
+              //   return (
+              // <SharedUser key={idx}>
+              //   <ProfilePicture
+              //     src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${sharedUser.id}`}
+              //   />
+              //   <span>
+              //     {sharedUser.userName}
+              //     <p>{sharedUser.id === me?.id && "(You)"}</p>
+              //   </span>
+              // </SharedUser>
+              //   );
+              // })
               <PlaceHolder style={{ marginLeft: 4 }}>Not shared</PlaceHolder>
             )}
           </DataStoreSharedUsers>
