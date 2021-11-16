@@ -1,4 +1,5 @@
 import React from "react";
+import { useMeState } from "src/hooks/useMeState";
 import styled from "styled-components";
 import { ProfilePicture } from "./ProfilePicture";
 
@@ -29,19 +30,26 @@ const StackUser = styled.div`
 
 export const ProfilePicturesStack: React.FC<ProfilePicturesStackProps> = ({
   users,
-}) => (
-  <div>
-    {users.slice(0, 5).map(({ id, userName }, idx) => (
-      <StackUser
-        key={idx}
-        style={{ zIndex: 50 - idx, marginLeft: idx != 0 ? -15 : 0 }}
-      >
-        <ProfilePicture
-          src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${id}`}
-        />
-        <span>{userName}</span>
-      </StackUser>
-    ))}
-    {users.length > 5 && <div>+{users.length - 5}</div>}
-  </div>
-);
+}) => {
+  const { me } = useMeState();
+
+  return (
+    <div>
+      {users.slice(0, 5).map(({ id, userName }, idx) => (
+        <StackUser
+          key={idx}
+          style={{ zIndex: 50 - idx, marginLeft: idx != 0 ? -15 : 0 }}
+        >
+          <ProfilePicture
+            src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${id}`}
+          />
+          <span>
+            {userName}
+            {Number(me?.id) === id ? "(You)" : ""}
+          </span>
+        </StackUser>
+      ))}
+      {users.length > 5 && <div>+{users.length - 5}</div>}
+    </div>
+  );
+};

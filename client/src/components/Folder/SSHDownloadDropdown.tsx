@@ -15,7 +15,7 @@ interface SSHDownloadDropdownProps {
   close: () => any;
 }
 
-const Wrapper = styled.div`
+export const SSHDownloadDropdownWrapper = styled.div`
   position: absolute;
   padding: 4px 10px 6px 10px;
   box-shadow: 3px 3px 10px 3px #00000042;
@@ -95,7 +95,7 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
   };
 
   return (
-    <Wrapper>
+    <>
       <h1>Download</h1>
       <LabelInput label={"Path"} setValue={setPathInput} value={pathInput} />
       <div style={{ display: "flex" }}>
@@ -110,6 +110,6 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
           <LightButton onClick={createSSHDownloadSession}>Download</LightButton>
         </ConditionButton>
       </div>
-    </Wrapper>
+    </>
   );
 };

@@ -8,9 +8,12 @@ import { useApollo } from "src/hooks/useApollo";
 import { useTimeoutInput } from "src/hooks/useTimeoutInput";
 import styled from "styled-components";
 import { Scrollbar } from "src/ui/Scrollbar";
+import { Button } from "src/ui/Button";
 
 interface FindFriendsContainerProps {
-  friendsIds: string[];
+  friendsIds: number[];
+  friendRequestsIds: number[];
+  acceptFriendRequest: (userId: number) => Promise<void>;
 }
 
 const Header = styled.div`
@@ -80,6 +83,8 @@ const Friend = styled.div`
 
 export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
   friendsIds,
+  friendRequestsIds,
+  acceptFriendRequest,
 }) => {
   const { query, mutate } = useApollo();
 
@@ -155,15 +160,16 @@ export const FindFriendsContainer: React.FC<FindFriendsContainerProps> = ({
 
                 <span>{u.userName}</span>
               </div>
-              {friendsIds.includes(u.id) ? (
+              {friendsIds.includes(Number(u.id)) ? (
                 <PlaceHolder>Already your friend</PlaceHolder>
+              ) : friendRequestsIds.includes(Number(u.id)) ? (
+                <Button onClick={() => acceptFriendRequest(Number(u.id))}>
+                  Accept request
+                </Button>
               ) : (
-                <button
-                  type="submit"
-                  onClick={() => sendFriendRequest(Number(u.id))}
-                >
-                  Send friend request
-                </button>
+                <Button onClick={() => sendFriendRequest(Number(u.id))}>
+                  Send request
+                </Button>
               )}
             </Friend>
           ))

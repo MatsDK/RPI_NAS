@@ -15,12 +15,16 @@ import styled from "styled-components";
 import { DatastoreUsers } from "./DatastoreUsers";
 import { datastoreUpdated, getUpdateObj } from "./updateDatastore";
 import { ToggleDatastoreServiceMutation } from "graphql/DataStores/toggleDatastoreService";
+import { Scrollbar } from "src/ui/Scrollbar";
 
 interface DataStoreContainerProps {}
 
 const DatastoreContainerWrapper = styled.div`
+  ${Scrollbar}
+
   flex: 1;
-  padding: 20px 30px;
+  padding: 20px 30px 70px 30px;
+  overflow: auto;
 `;
 
 const DatastoreName = styled.h1`
@@ -136,6 +140,10 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
     setHasChanged(defaultSMBEnabled != smbEnabled);
   }, [smbEnabled]);
 
+  useEffect(() => {
+    setSmbEnabled(!!ds?.sharedUsers.find(({ id }) => id == me?.id)?.smbEnabled);
+  }, []);
+
   if (!ds) return null;
 
   const update = async () => {
@@ -175,13 +183,8 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
   };
 
   const isDatastoreOwner = me?.id === ds.owner?.id,
-    defaultSMBEnabled = !!updatedDatastore?.sharedUsers.find(
-      ({ id }) => id == me?.id
-    )?.smbEnabled;
-
-  // useEffect(() => {
-  //   setSmbEnabled(defaultSMBEnabled);
-  // }, [defaultSMBEnabled]);
+    defaultSMBEnabled = !!ds?.sharedUsers.find(({ id }) => id == me?.id)
+      ?.smbEnabled;
 
   if (loading) return <div>loading</div>;
   if (error) console.log(error);
@@ -214,7 +217,7 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
                 <>
                   <input
                     type="checkbox"
-                    checked={defaultSMBEnabled}
+                    checked={smbEnabled}
                     onChange={(e) => setSmbEnabled(e.target.checked)}
                   />
                 </>
@@ -238,7 +241,7 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
             {isDatastoreOwner && (
               <input
                 type="checkbox"
-                onClick={() =>
+                onChange={() =>
                   setUpdatedDatastore((uds) => {
                     const newObj = { ...uds, owner: { ...uds?.owner } };
                     newObj?.owner?.smbEnabled != null &&

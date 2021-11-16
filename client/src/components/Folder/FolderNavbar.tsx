@@ -1,15 +1,19 @@
 import { DeletePtahsMutation } from "graphql/Folder/deletePaths";
-import { MoveToWrapper } from "./CopyMove/MoveToWrapper";
-import { CopyToWrapper } from "./CopyMove/CopyToWrapper";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import { useRouter } from "next/dist/client/router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
+import { useDropdown } from "src/hooks/useDropdown";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import { BgButton, Button, ConditionButton } from "src/ui/Button";
 import styled from "styled-components";
-import { SSHDownloadDropdown } from "./SSHDownloadDropdown";
+import { CopyToWrapper } from "./CopyMove/CopyToWrapper";
+import { MoveToWrapper } from "./CopyMove/MoveToWrapper";
+import {
+  SSHDownloadDropdown,
+  SSHDownloadDropdownWrapper,
+} from "./SSHDownloadDropdown";
 import UploadWrapper from "./UploadWrapper";
 
 const FolderNavbarWrapper = styled.div`
@@ -27,14 +31,16 @@ const FolderNavbar = () => {
 
   const folderCtx: FolderContextType = useContext(FolderContext);
 
+  const downloadDropdown: any = useRef();
+  useDropdown(
+    downloadDropdown,
+    () => showSSHDownloadDropdown && setShowSSHDownloadDropdown(false)
+  );
+
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [showSSHDownloadDropdown, setShowSSHDownloadDropdown] = useState(false);
   const [showCopyToForm, setShowCopyToForm] = useState(false);
   const [showMoveToForm, setShowMoveToForm] = useState(false);
-
-  useEffect(() => {
-    setShowSSHDownloadDropdown(false);
-  }, [folderCtx]);
 
   const createDownloadSession = async (): Promise<void> => {
     if (!folderCtx) return;
@@ -98,14 +104,6 @@ const FolderNavbar = () => {
               path: folderCtx.currentFolderPath?.folderPath.path,
             },
           },
-          // {
-          //   query: getDirectoryTreeQuery,
-          //   variables: {
-          //     depth: 1,
-          //     dataStoreId: folderCtx.currentFolderPath?.folderPath.dataStoreId,
-          //     path: folderCtx.currentFolderPath?.folderPath.path,
-          //   },
-          // },
         ],
       }
     );
@@ -148,9 +146,11 @@ const FolderNavbar = () => {
           Download SSH
         </Button>
         {showSSHDownloadDropdown && (
-          <SSHDownloadDropdown
-            close={() => setShowSSHDownloadDropdown(false)}
-          />
+          <SSHDownloadDropdownWrapper ref={downloadDropdown}>
+            <SSHDownloadDropdown
+              close={() => setShowSSHDownloadDropdown(false)}
+            />
+          </SSHDownloadDropdownWrapper>
         )}
       </ConditionButton>
       <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>

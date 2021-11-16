@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { LargeProfilePicture, ProfileButton } from "src/ui/ProfilePicture";
 import Link from "next/link";
-import { useMeState } from "src/hooks/useMeState";
-import styled from "styled-components";
 import { useRouter } from "next/router";
+import React, { useRef, useState } from "react";
+import { useDropdown } from "src/hooks/useDropdown";
+import { useMeState } from "src/hooks/useMeState";
 import { LightButton } from "src/ui/Button";
 import { NavbarIcon } from "src/ui/NavbarIcon";
+import { LargeProfilePicture, ProfileButton } from "src/ui/ProfilePicture";
+import styled from "styled-components";
 
 const NavBar = styled.div`
   width: 100vw;
@@ -38,6 +39,9 @@ const Navbar: React.FC<Props> = ({ showHomeButton }) => {
   const { me } = useMeState();
 
   const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef: any = useRef();
+
+  useDropdown(dropdownRef, () => showDropdown && setShowDropdown(false));
 
   return (
     <NavBar>
@@ -53,11 +57,19 @@ const Navbar: React.FC<Props> = ({ showHomeButton }) => {
         <UserInfo onClick={() => setShowDropdown((s) => !s)}>
           {me && (
             <ProfileButton
-              src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me.id}`}
+              src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me?.id}`}
             />
           )}
         </UserInfo>
-        {showDropdown && <UserDropDown />}
+        <UserDropdownWrapper
+          style={{
+            opacity: showDropdown ? 1 : 0,
+            pointerEvents: showDropdown ? "all" : "none",
+          }}
+          ref={dropdownRef}
+        >
+          <UserDropDown />
+        </UserDropdownWrapper>
       </UserData>
     </NavBar>
   );
@@ -116,14 +128,14 @@ const UserDropDown: React.FC = () => {
   const { me } = useMeState();
 
   return (
-    <UserDropdownWrapper>
+    <>
       <LargeProfilePicture
-        src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me.id}`}
+        src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me?.id}`}
       />
       <div style={{ flex: 1 }}>
         <Names>
-          <span>{me.userName}</span>
-          <span>{me.email}</span>
+          <span>{me?.userName}</span>
+          <span>{me?.email}</span>
         </Names>
         <div
           style={{
@@ -138,7 +150,7 @@ const UserDropDown: React.FC = () => {
           <Btn onClick={() => router.push("/logout ")}>Sign out</Btn>
         </div>
       </div>
-    </UserDropdownWrapper>
+    </>
   );
 };
 

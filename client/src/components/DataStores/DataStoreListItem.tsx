@@ -170,32 +170,6 @@ const DataStoreSharedHeader = styled.div`
   }
 `;
 
-const SharedUser = styled.div`
-  position: relative;
-
-  > span {
-    position: absolute;
-    background-color: ${(props) => props.theme.bgColors[1]};
-    color: ${(props) => props.theme.textColors[3]};
-    top: 40px;
-    opacity: 0;
-    transition: 0.1s ease-in;
-    pointer-events: none;
-    padding: 1px 6px;
-    border-radius: 2px;
-    display: flex;
-
-    > p {
-      margin-left: 5px;
-    }
-  }
-
-  :hover > span {
-    top: 30px;
-    opacity: 1;
-  }
-`;
-
 interface StatusSectionProps {
   status: number;
 }
@@ -296,19 +270,6 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
                 }))}
               />
             ) : (
-              // dataStore.sharedUsers.map((sharedUser, idx) => {
-              //   return (
-              // <SharedUser key={idx}>
-              //   <ProfilePicture
-              //     src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${sharedUser.id}`}
-              //   />
-              //   <span>
-              //     {sharedUser.userName}
-              //     <p>{sharedUser.id === me?.id && "(You)"}</p>
-              //   </span>
-              // </SharedUser>
-              //   );
-              // })
               <PlaceHolder style={{ marginLeft: 4 }}>Not shared</PlaceHolder>
             )}
           </DataStoreSharedUsers>

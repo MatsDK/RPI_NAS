@@ -12,8 +12,7 @@ interface ProfileProps {}
 
 const Profile: NextFunctionComponentWithAuth<ProfileProps> = ({ me }) => {
   useMeState(me);
-
-  const { mutate } = useApollo({ context: "upload" });
+  const { mutate } = useApollo();
 
   const onDrop = useCallback(async ([file]) => {
     if (!file) return;
@@ -27,6 +26,7 @@ const Profile: NextFunctionComponentWithAuth<ProfileProps> = ({ me }) => {
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
+    accept: "image/png",
   });
 
   return (

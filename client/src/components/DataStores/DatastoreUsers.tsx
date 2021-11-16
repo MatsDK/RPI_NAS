@@ -10,6 +10,7 @@ import { useApolloClient } from "react-apollo";
 import { useMeState } from "src/hooks/useMeState";
 import { UserWrapper, UserWrapperLeft } from "./DataStoreContainer";
 import styled from "styled-components";
+import { Button } from "src/ui/Button";
 
 interface DatastoreUsersProps {
   updatedDatastore: Datastore | null;
@@ -22,6 +23,21 @@ const Divider = styled.div`
   width: 100%;
   background-color: ${(props) => props.theme.textColors[3]};
   margin: 5px 0;
+`;
+
+const AddSharedUsersButton = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: ${(props) => props.theme.textColors[0]};
+  margin-top: 15px;
+
+  > span {
+    font-weight: 500;
+  }
+  > div {
+    margin-left: 10px;
+  }
 `;
 
 export const DatastoreUsers: React.FC<DatastoreUsersProps> = ({
@@ -102,9 +118,23 @@ export const DatastoreUsers: React.FC<DatastoreUsersProps> = ({
         </UserWrapper>
       ))}
       {isDatastoreOwner && (
-        <button onClick={() => setShowAddSharedUserForm((s) => !s)}>
-          Add shared user
-        </button>
+        <AddSharedUsersButton
+          onClick={() => setShowAddSharedUserForm((s) => !s)}
+        >
+          <span>Add shared user</span>
+          <div
+            style={{
+              transform: !showAddSharedUserForm ? "rotate(0)" : "rotate(90deg)",
+            }}
+          >
+            <Icon
+              name={"folderArrow"}
+              color={{ idx: 0, propName: "textColors" }}
+              height={16}
+              width={16}
+            />
+          </div>
+        </AddSharedUsersButton>
       )}
       {showAddSharedUserForm && (
         <div>
@@ -114,12 +144,15 @@ export const DatastoreUsers: React.FC<DatastoreUsersProps> = ({
             )
             .map((u) => {
               return (
-                <div key={u.id}>
-                  <ProfilePicture
-                    src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${u.id}`}
-                  />
-                  {u.userName}
-                  <button
+                <UserWrapper key={u.id}>
+                  <UserWrapperLeft>
+                    <div />
+                    <ProfilePicture
+                      src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${u.id}`}
+                    />
+                    <p>{u.userName}</p>
+                  </UserWrapperLeft>
+                  <Button
                     onClick={() => {
                       updatedDatastore!.sharedUsers = [
                         ...(updatedDatastore?.sharedUsers || []),
@@ -130,10 +163,11 @@ export const DatastoreUsers: React.FC<DatastoreUsersProps> = ({
                         () => ({ ...updatedDatastore } as any)
                       );
                     }}
+                    style={{ fontSize: 15 }}
                   >
-                    add to shared
-                  </button>
-                </div>
+                    Share
+                  </Button>
+                </UserWrapper>
               );
             })}
         </div>

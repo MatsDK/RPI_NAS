@@ -181,7 +181,11 @@ const Friends: NextFunctionComponentWithAuth = ({ me }) => {
         </ContainerItem>
       </Container>
       <FindFriendsContainer
-        friendsIds={data?.friends?.friends.map((f) => f.id) || []}
+        friendsIds={data?.friends?.friends.map(({ id }) => Number(id)) || []}
+        friendRequestsIds={
+          data?.friends?.friendsRequest.map(({ id }) => Number(id)) || []
+        }
+        acceptFriendRequest={acceptFriendRequest}
       />
     </Layout>
   );
