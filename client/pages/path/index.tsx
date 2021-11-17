@@ -8,11 +8,17 @@ import SideBar from "src/components/SideBar";
 import Tree from "src/components/Tree/Tree";
 import { withAuth } from "src/HOC/withAuth";
 import { useMeState } from "src/hooks/useMeState";
+import styled from "styled-components";
 import { ApolloContext, NextFunctionComponentWithAuth } from "types/types";
 
 interface Props {
   tree: any;
 }
+
+export const Wrapper = styled.div`
+  display: flex;
+  flex: 1;
+`;
 
 const Page: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
   useMeState(me);
@@ -34,14 +40,14 @@ const Page: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
   return (
     <Layout>
       <SideBar />
-      <div style={{ display: "flex", width: "100%" }}>
+      <Wrapper>
         <Tree />
         <Folder
           path={""}
           dataStoreId={Number(router.query.d)}
           dataStoreName={dataStoreName}
         />
-      </div>
+      </Wrapper>
     </Layout>
   );
 };

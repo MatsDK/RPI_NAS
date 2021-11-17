@@ -142,7 +142,7 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
 
   useEffect(() => {
     setSmbEnabled(!!ds?.sharedUsers.find(({ id }) => id == me?.id)?.smbEnabled);
-  }, []);
+  }, [ds, me]);
 
   if (!ds) return null;
 

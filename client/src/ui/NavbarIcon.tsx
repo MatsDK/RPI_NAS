@@ -2,7 +2,7 @@ export const NavbarIcon = () => {
   return (
     <svg
       viewBox="0 0 108 112"
-      style={{ marginLeft: 10, marginTop: 10 }}
+      style={{ marginLeft: 10, marginTop: 0 }}
       width="45"
       height="45"
       fill="none"

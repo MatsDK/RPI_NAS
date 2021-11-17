@@ -31,6 +31,12 @@ const UserInfo = styled.div`
   cursor: pointer;
 `;
 
+const NavBarLeft = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`;
+
 interface Props {
   showHomeButton: boolean;
 }
@@ -45,14 +51,12 @@ const Navbar: React.FC<Props> = ({ showHomeButton }) => {
 
   return (
     <NavBar>
-      <NavbarIcon />
-      {showHomeButton ? (
-        <Link href={"/"}>
-          <LightButton>Files</LightButton>
-        </Link>
-      ) : (
-        <div />
-      )}
+      <Link href={"/"}>
+        <NavBarLeft>
+          <NavbarIcon />
+          {showHomeButton ? <LightButton>Home</LightButton> : <div />}
+        </NavBarLeft>
+      </Link>
       <UserData>
         <UserInfo onClick={() => setShowDropdown((s) => !s)}>
           {me && (

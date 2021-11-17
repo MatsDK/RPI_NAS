@@ -1,3 +1,4 @@
+import { Wrapper } from ".";
 import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import { useRouter } from "next/dist/client/router";
@@ -35,14 +36,14 @@ const Folder: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
   return (
     <Layout>
       <SideBar />
-      <div style={{ display: "flex", width: "100%" }}>
+      <Wrapper>
         <Tree />
         <FolderItems
           path={path}
           dataStoreId={dataStoreId}
           dataStoreName={dataStoreName}
         />
-      </div>
+      </Wrapper>
     </Layout>
   );
 };

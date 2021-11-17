@@ -54,10 +54,11 @@ const TreeFolder = styled.div`
 `;
 
 const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
+  const router = useRouter();
+
   const [nestedItems, setNestedItems] = useState<TreeItem[] | null>(null);
   const [showNestedItems, setShowNestedItems] = useState(false);
 
-  const router = useRouter();
   const client: any = useApolloClient();
   const FolderCtx = useContext(FolderContext);
 
@@ -78,7 +79,7 @@ const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
 
   useEffect(() => {
     if (!showNestedItems) setShowNestedItems(showNested);
-    // setShowNestedItems(showNested);
+    setShowNestedItems(showNested);
     if (showNested) {
       if (loading) return;
 
@@ -141,7 +142,13 @@ const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
                 }
                 color={{ propName: "bgColors", idx: 2 }}
               />
-              <p>{item.name}</p>
+              <p
+                onDoubleClick={(e) =>
+                  router.push(`/datastore/${item.dataStoreId}`)
+                }
+              >
+                {item.name}
+              </p>
             </DataStoreFolderItem>
           ) : (
             <TreeFolder>{item.name}</TreeFolder>
@@ -152,13 +159,6 @@ const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
         {showNestedItems &&
           nestedItems &&
           nestedItems.map((i, idx) => {
-            // const show =
-            //   !!FolderCtx?.currentFolderPath?.folderPath.path?.startsWith(
-            //     i.relativePath.replace(/\\/g, "/")
-            //   )&&
-            // FolderCtx.currentFolderPath.folderPath.path !=
-            //   i.relativePath.replace(/\\/g, "/");
-
             const show = !fsPath
               .relative(
                 i.relativePath.replace(/\\/g, "/"),
