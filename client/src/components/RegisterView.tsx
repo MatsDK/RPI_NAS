@@ -1,4 +1,4 @@
-import { loginMutation } from "graphql/User/login";
+import { registerMutation } from "graphql/User/register";
 import {
   Input,
   Label,
@@ -7,55 +7,62 @@ import {
   SubmitButton,
   Title,
 } from "./LoginRegisterPage";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FormEvent } from "react";
-import { useApolloClient } from "react-apollo";
 import { useApollo } from "src/hooks/useApollo";
 import { useInput } from "src/hooks/useInput";
 import styled from "styled-components";
+import Link from "next/link";
 import { ConditionButton } from "../ui/Button";
 
-interface loginViewProps {}
+interface RegisterViewProps {}
 
-const LoginForm = styled.form`
+const RegisterForm = styled.form`
   z-index: 100;
   padding: 100px 80px;
   display: flex;
   flex-direction: column;
 `;
-export const LoginView: React.FC<loginViewProps> = ({}) => {
+
+export const RegisterView: React.FC<RegisterViewProps> = ({}) => {
   const { mutate } = useApollo();
   const router = useRouter();
-  const client = useApolloClient();
 
+  const [userNameInput, setUserNameInput] = useInput("");
   const [emailInput, setEmailInput] = useInput("");
   const [passwordInput, setPasswordInput] = useInput("");
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!passwordInput.trim() || !emailInput.trim()) return;
+    if (!userNameInput.trim() || !passwordInput.trim() || !emailInput.trim())
+      return;
 
-    const { data } = await mutate(loginMutation, {
-      password: passwordInput,
+    const { data } = await mutate(registerMutation, {
+      userName: userNameInput,
       email: emailInput,
+      password: passwordInput,
     });
 
-    if (data.login) {
-      await client.resetStore();
-      router.push("/");
+    if (data.register) {
+      router.push("/login");
     }
   };
 
   return (
     <LoginRegisterPage>
-      <LoginForm onSubmit={submit}>
-        <Title>Sign In</Title>
+      <RegisterForm onSubmit={submit}>
+        <Title>Sign Up</Title>
+        <Label>Username</Label>
+        <Input
+          type="text"
+          placeholder="username"
+          value={userNameInput}
+          onChange={setUserNameInput}
+        />
         <Label>E-mail</Label>
         <Input
           type="text"
-          name="email"
           placeholder="@email.com"
           value={emailInput}
           onChange={setEmailInput}
@@ -63,20 +70,23 @@ export const LoginView: React.FC<loginViewProps> = ({}) => {
         <Label>Password</Label>
         <Input
           type="password"
-          name="password"
           placeholder="password"
           value={passwordInput}
           onChange={setPasswordInput}
         />
         <ConditionButton
-          condition={!!emailInput.trim() && !!passwordInput.trim()}
+          condition={
+            !!emailInput.trim() &&
+            !!passwordInput.trim() &&
+            !!userNameInput.trim()
+          }
         >
-          <SubmitButton type="submit">Sign In</SubmitButton>
+          <SubmitButton type="submit">Sign Up</SubmitButton>
         </ConditionButton>
-        <Link href="/register">
-          <PageLink>Sign Up</PageLink>
+        <Link href="/login">
+          <PageLink>Sign In</PageLink>
         </Link>
-      </LoginForm>
+      </RegisterForm>
     </LoginRegisterPage>
   );
 };
