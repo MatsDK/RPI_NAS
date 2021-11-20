@@ -149,7 +149,7 @@ const UserDropDown: React.FC = () => {
           }}
         >
           <Link href="/profile">
-            <Btn>My Profile</Btn>
+            <Btn style={{ textDecoration: "underline" }}>My Profile</Btn>
           </Link>
           <Btn onClick={() => router.push("/logout ")}>Sign out</Btn>
         </div>

@@ -5,10 +5,11 @@ import {
   LoginRegisterPage,
   PageLink,
   SubmitButton,
+  Error,
   Title,
 } from "./LoginRegisterPage";
 import { useRouter } from "next/router";
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
 import { useInput } from "src/hooks/useInput";
 import styled from "styled-components";
@@ -31,6 +32,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({}) => {
   const [userNameInput, setUserNameInput] = useInput("");
   const [emailInput, setEmailInput] = useInput("");
   const [passwordInput, setPasswordInput] = useInput("");
+  const [err, setErr] = useState("");
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -38,14 +40,19 @@ export const RegisterView: React.FC<RegisterViewProps> = ({}) => {
     if (!userNameInput.trim() || !passwordInput.trim() || !emailInput.trim())
       return;
 
-    const { data } = await mutate(registerMutation, {
-      userName: userNameInput,
-      email: emailInput,
-      password: passwordInput,
-    });
+    try {
+      const { data } = await mutate(registerMutation, {
+        userName: userNameInput,
+        email: emailInput,
+        password: passwordInput,
+      });
 
-    if (data.register) {
-      router.push("/login");
+      if (data.register) {
+        setErr("");
+        router.push("/login");
+      }
+    } catch (e) {
+      setErr(e.message.replace("GraphQL error: ", ""));
     }
   };
 
@@ -60,6 +67,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({}) => {
           value={userNameInput}
           onChange={setUserNameInput}
         />
+        <Error>{err.includes("Username") && err}</Error>
         <Label>E-mail</Label>
         <Input
           type="text"
@@ -67,6 +75,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({}) => {
           value={emailInput}
           onChange={setEmailInput}
         />
+        <Error>{err.includes("Email") && err}</Error>
         <Label>Password</Label>
         <Input
           type="password"
@@ -74,6 +83,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({}) => {
           value={passwordInput}
           onChange={setPasswordInput}
         />
+        <Error>{err.includes("password") && err}</Error>
         <ConditionButton
           condition={
             !!emailInput.trim() &&

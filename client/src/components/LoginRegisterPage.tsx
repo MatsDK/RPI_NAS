@@ -9,6 +9,13 @@ export const Title = styled.h1`
   color: ${(props) => props.theme.textColors[0]};
 `;
 
+export const Error = styled.span`
+  color: ${(props) => props.theme.statusColors[2]};
+  font-size: 15px;
+  margin: -2px 0 10px 2px;
+  height: 10px;
+`;
+
 export const Input = styled.input`
   border: 1px solid ${(props) => props.theme.textColors[3]};
   max-width: 300px;

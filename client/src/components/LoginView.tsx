@@ -1,6 +1,7 @@
 import { loginMutation } from "graphql/User/login";
 import {
   Input,
+  Error,
   Label,
   LoginRegisterPage,
   PageLink,
@@ -9,7 +10,7 @@ import {
 } from "./LoginRegisterPage";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { useApolloClient } from "react-apollo";
 import { useApollo } from "src/hooks/useApollo";
 import { useInput } from "src/hooks/useInput";
@@ -24,6 +25,7 @@ const LoginForm = styled.form`
   display: flex;
   flex-direction: column;
 `;
+
 export const LoginView: React.FC<loginViewProps> = ({}) => {
   const { mutate } = useApollo();
   const router = useRouter();
@@ -31,20 +33,26 @@ export const LoginView: React.FC<loginViewProps> = ({}) => {
 
   const [emailInput, setEmailInput] = useInput("");
   const [passwordInput, setPasswordInput] = useInput("");
+  const [err, setErr] = useState("");
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!passwordInput.trim() || !emailInput.trim()) return;
 
-    const { data } = await mutate(loginMutation, {
-      password: passwordInput,
-      email: emailInput,
-    });
+    try {
+      const { data } = await mutate(loginMutation, {
+        password: passwordInput,
+        email: emailInput,
+      });
 
-    if (data.login) {
-      await client.resetStore();
-      router.push("/");
+      if (data.login) {
+        setErr("");
+        await client.resetStore();
+        router.push("/");
+      }
+    } catch (e) {
+      setErr(e.message.replace("GraphQL error: ", ""));
     }
   };
 
@@ -60,6 +68,7 @@ export const LoginView: React.FC<loginViewProps> = ({}) => {
           value={emailInput}
           onChange={setEmailInput}
         />
+        <Error>{err.includes("email") && err}</Error>
         <Label>Password</Label>
         <Input
           type="password"
@@ -68,6 +77,7 @@ export const LoginView: React.FC<loginViewProps> = ({}) => {
           value={passwordInput}
           onChange={setPasswordInput}
         />
+        <Error>{err.includes("password") && err}</Error>
         <ConditionButton
           condition={!!emailInput.trim() && !!passwordInput.trim()}
         >
