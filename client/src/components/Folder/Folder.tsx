@@ -19,6 +19,7 @@ import { FolderPath } from "./FolderPath";
 import { Scrollbar } from "src/ui/Scrollbar";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import { useApollo } from "src/hooks/useApollo";
+import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 
 interface Props {
   path: string;
@@ -108,6 +109,16 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
         dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
       },
       {
+        refetchQueries: [
+          {
+            query: getDirectoryTreeQuery,
+            variables: {
+              depth: 1,
+              path: folderCtx?.currentFolderPath?.folderPath.path,
+              dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+            },
+          },
+        ],
         update: (cache, { data }) => {
           try {
             const cacheData: any = cache.readQuery({
@@ -132,24 +143,6 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
               variables: { depth: 1, path, dataStoreId },
               data: cacheData,
             });
-
-            // const cacheFolderData: any = cache.readQuery({
-            //   query: getDirectoryTreeQuery,
-            //   variables: { depth: 1, path, dataStoreId },
-            // });
-
-            // if (!cacheFolderData?.directoryTree) return;
-
-            // cacheFolderData.directoryTree.tree = [
-            //   { ...newItem, dataStoreId, sharedDataStore: null },
-            //   ...cacheFolderData.directoryTree.tree,
-            // ];
-
-            // cache.writeQuery({
-            //   query: getDirectoryTreeQuery,
-            //   variables: { depth: 1, path, dataStoreId },
-            //   data: cacheFolderData,
-            // });
           } catch (error) {
             console.log(error);
           }

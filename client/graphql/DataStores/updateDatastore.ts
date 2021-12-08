@@ -11,7 +11,7 @@ export const UpdateDatastoreMutation = gql`
     updateDatastore(
       dataStoreId: $datastoreId
       updateProps: {
-        sharedusers: $sharedUsers
+        sharedUsers: $sharedUsers
         allowedSMBUsers: $allowedSMBUsers
         name: $name
         ownerSMBEnabled: $ownerSMBEnabled

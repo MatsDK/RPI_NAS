@@ -5,7 +5,7 @@ import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 @Entity()
 export class Node extends BaseEntity {
   @Field(() => ID)
-  @PrimaryColumn("int")
+  @PrimaryColumn("int", { generated: true })
   id: number;
 
   @Field()

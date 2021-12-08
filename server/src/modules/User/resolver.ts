@@ -1,6 +1,8 @@
 import { compare, hash } from "bcrypt";
-import { createUser } from "../../utils/createUser";
 import { createWriteStream } from "fs";
+import fs from "fs-extra";
+import { GraphQLUpload } from "graphql-upload";
+import fsPath from "path";
 import {
   Arg,
   Ctx,
@@ -9,23 +11,19 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import fsPath from "path";
-import { IMGS_FOLDER } from "../../constants";
-import fs from "fs-extra";
 import { getConnection, ILike, In, Not } from "typeorm";
+import { IMGS_FOLDER } from "../../constants";
 import { Datastore } from "../../entity/Datastore";
-import { GraphQLUpload } from "graphql-upload";
 import { FriendRequest } from "../../entity/FriendRequest";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
 import { getUser } from "../../middleware/getUser";
-import { Node } from "../../entity/CloudNode";
 import { MyContext } from "../../types/Context";
 import { Upload } from "../../types/Upload";
 import { createTokens } from "../../utils/createTokens";
+import { createUser } from "../../utils/createUser";
 import { FriendsQueryReturn } from "./FriendsQueryReturn";
 import { RegisterInput } from "./RegisterInput";
-import { updateSMB } from "../../utils/services/updateSMB";
 
 @Resolver()
 export class UserResolver {
@@ -62,10 +60,10 @@ export class UserResolver {
     return true;
   }
 
-  @Mutation(() => User)
+  @Mutation(() => User, { nullable: true })
   async register(
     @Arg("data") { email, password, userName }: RegisterInput
-  ): Promise<User> {
+  ): Promise<User | null> {
     const hashedPassword = await hash(password, 10),
       osUserName = userName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
 
@@ -76,9 +74,11 @@ export class UserResolver {
       osUserName,
     }).save();
 
-    createUser(osUserName, password).then((res: any) => {
-      if (res.err) console.log(res.err);
-    });
+    const { err } = await createUser(osUserName, password);
+    if (err) {
+      await User.delete({ id: user.id });
+      return null;
+    }
 
     return user;
   }

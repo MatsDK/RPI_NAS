@@ -1,5 +1,5 @@
 import { Datastore } from "../../entity/Datastore";
-import { User } from "../../entity/User"
+import { User } from "../../entity/User";
 import { Any } from "typeorm";
 import { DatastoreService, ServiceNames } from "../../entity/DatastoreService";
 import { exec } from "../exec";
@@ -16,21 +16,31 @@ const baseConf = [
   "directory mask = 0770",
 ];
 
-export const updateSMB = async (hostUserName: string): Promise<{err: any}> => {
+export const updateSMB = async (
+  hostUserName: string
+): Promise<{ err: any }> => {
   return new Promise(async (res, rej) => {
     try {
-      const DatastoreServices = await DatastoreService.find({ where: { serviceName: ServiceNames.SMB } }),
+      const DatastoreServices = await DatastoreService.find({
+          where: { serviceName: ServiceNames.SMB },
+        }),
         SMBDatastores = await Datastore.find({
           where: { id: Any(DatastoreServices.map((ds) => ds.datastoreId)) },
         }),
-	users = await User.find({ where: { id: Any(DatastoreServices.map((ds) => ds.userId)) } }),
+        users = await User.find({
+          where: { id: Any(DatastoreServices.map((ds) => ds.userId)) },
+        }),
         baseConfPath = fsPath.join(__dirname, "../../../assets/base_smb.conf");
 
       let file = fs.readFileSync(baseConfPath).toString().split("\n");
 
       for (const datastore of SMBDatastores) {
-        const userIds = DatastoreServices.filter(({ datastoreId }) => datastoreId === datastore.id).map(({ userId } ) => userId),
-		validUsers  = users.filter(({ id }) => userIds.includes(id)).map(({ osUserName }) => osUserName)
+        const userIds = DatastoreServices.filter(
+            ({ datastoreId }) => datastoreId === datastore.id
+          ).map(({ userId }) => userId),
+          validUsers = users
+            .filter(({ id }) => userIds.includes(id))
+            .map(({ osUserName }) => osUserName);
 
         const newLines: string[] = [`[${datastore.name}]`, ...baseConf];
 
@@ -52,7 +62,7 @@ export const updateSMB = async (hostUserName: string): Promise<{err: any}> => {
 
       res({ err: false });
     } catch (err) {
-	    console.log(err)
+      console.log(err);
       res({ err: false });
     }
   });

@@ -136,7 +136,7 @@ export type Mutation = {
   createDownloadSession?: Maybe<DownloadSessionReturn>;
   login?: Maybe<User>;
   logout?: Maybe<Scalars['Boolean']>;
-  register: User;
+  register?: Maybe<User>;
   setDefaultDownloadPath?: Maybe<Scalars['Boolean']>;
   sendFriendRequest?: Maybe<Scalars['Boolean']>;
   acceptFriendRequest?: Maybe<Scalars['Boolean']>;
@@ -320,7 +320,7 @@ export type TreeItem = {
 export type UpdateDatastoreInput = {
   name?: Maybe<Scalars['String']>;
   ownerSMBEnabled?: Maybe<Scalars['Boolean']>;
-  sharedusers?: Maybe<Array<Scalars['Float']>>;
+  sharedUsers?: Maybe<Array<Scalars['Float']>>;
   allowedSMBUsers?: Maybe<Array<AllowedSmbUser>>;
 };
 
@@ -541,7 +541,7 @@ export type RegisterMutationMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutationMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string } };
+export type RegisterMutationMutation = { __typename?: 'Mutation', register?: Maybe<{ __typename?: 'User', id: string }> };
 
 export type SetDefaultDownloadPathMutationVariables = Exact<{
   path: Scalars['String'];
@@ -806,7 +806,7 @@ export const UpdateDatastoreMutationDocument = gql`
     mutation UpdateDatastoreMutation($datastoreId: Float!, $sharedUsers: [Float!], $name: String, $ownerSMBEnabled: Boolean, $allowedSMBUsers: [AllowedSMBUser!]) {
   updateDatastore(
     dataStoreId: $datastoreId
-    updateProps: {sharedusers: $sharedUsers, allowedSMBUsers: $allowedSMBUsers, name: $name, ownerSMBEnabled: $ownerSMBEnabled}
+    updateProps: {sharedUsers: $sharedUsers, allowedSMBUsers: $allowedSMBUsers, name: $name, ownerSMBEnabled: $ownerSMBEnabled}
   )
 }
     `;

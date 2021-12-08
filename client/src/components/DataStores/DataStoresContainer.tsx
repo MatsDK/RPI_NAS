@@ -1,4 +1,5 @@
 import { Datastore, useGetDataStoresQuery } from "generated/apolloComponents";
+import Link from "next/link";
 import { BgButton } from "src/ui/Button";
 import React, { useEffect, useState } from "react";
 import NewDataStoreWrapper from "./NewDataStoreWrapper";
@@ -22,11 +23,15 @@ const DataStoresList = styled.div`
 `;
 
 const DataStoresTitle = styled.h2`
-  font-weight: 500;
-  font-size: 25px;
-  color: ${(props) => props.theme.bgColors[0]};
   display: flex;
   align-items: baseline;
+
+  > p {
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 25px;
+    color: ${(props) => props.theme.bgColors[0]};
+  }
 
   span {
     margin-left: 5px;
@@ -111,7 +116,9 @@ const DataStoresContainer: React.FC = () => {
       )}
       <DataStoresHeader>
         <DataStoresTitle>
-          Datastores
+          <Link href="/datastore">
+            <p>Datastores</p>
+          </Link>
           {!loading && (
             <span>
               <p>{data?.getDataStores?.length}</p> Datastore
@@ -137,7 +144,7 @@ const DataStoresContainer: React.FC = () => {
               />
             );
           })}
-          {me?.isAdmin && (
+          {me?.isAdmin && !!otherDatastores.length && (
             <>
               <SmallTitle>Other datastores</SmallTitle>
               {otherDatastores.map((dataStore, idx) => {

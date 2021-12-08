@@ -7,6 +7,8 @@ import { checkPermissions } from "../../middleware/checkPermissions";
 import { DeletePathsInput } from "./deletePathsInput";
 import { CopyMoveInput } from "./copyMoveMutationInput";
 import { MoveCopyData } from "./moveCopyData";
+import { exec } from "../../utils/exec";
+import { Node } from "../../entity/CloudNode";
 
 @Resolver()
 export class FolderResolver {
@@ -19,8 +21,17 @@ export class FolderResolver {
     const dataStore = await Datastore.findOne({ where: { id: dataStoreId } });
     if (!dataStore) return null;
 
+    const host = await Node.findOne({ where: { id: dataStore.localNodeId } });
+    if (!host) return null;
+
     try {
-      fs.mkdirSync(fsPath.join(dataStore.basePath, path));
+      const full_path = fsPath.join(dataStore.basePath, path);
+      fs.mkdirSync(full_path);
+      await exec(
+        `chown ${full_path} ${host.loginName}:${fsPath.basename(
+          dataStore.basePath
+        )}`
+      );
     } catch (error) {
       console.log(error);
       return null;

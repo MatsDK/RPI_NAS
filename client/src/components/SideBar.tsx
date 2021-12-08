@@ -78,6 +78,22 @@ const sideBar = () => {
           </SideBarItemText>
         </SideBarItem>
       </Link>
+      <Link href={"/hosts"}>
+        <SideBarItem>
+          <span style={{ marginRight: 5 }}>
+            <Icon
+              name="hostIcon"
+              color={{ propName: "lightBgColors", idx: 1 }}
+              height={30}
+              width={45}
+              viewPort={30}
+            />
+          </span>
+          <SideBarItemText>
+            <span>Hosts</span>
+          </SideBarItemText>
+        </SideBarItem>
+      </Link>
       <Link href={"/friends"}>
         <SideBarItem>
           <span style={{ marginRight: 5 }}>

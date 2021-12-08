@@ -9,7 +9,7 @@ export class UpdateDatastoreInput {
   ownerSMBEnabled?: boolean;
 
   @Field(() => [Number], { nullable: true })
-  sharedusers?: number[];
+  sharedUsers?: number[];
 
   @Field(() => [AllowedSMBUser], { nullable: true })
   allowedSMBUsers?: AllowedSMBUser[];

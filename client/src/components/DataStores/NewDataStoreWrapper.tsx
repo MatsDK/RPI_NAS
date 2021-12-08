@@ -156,7 +156,7 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
                 <FormItem>
                   <div>
                     <Select
-                      data={[me, ...(friends?.friends?.friends || [])]}
+                      data={[me, ...(friends?.getFriends || [])]}
                       label="Owner"
                       setValue={setSelectedOwner}
                       propName={"userName"}

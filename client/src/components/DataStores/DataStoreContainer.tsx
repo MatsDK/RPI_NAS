@@ -201,7 +201,7 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
           <span>SMB enabled</span>
         </Headers>
         <div>
-          {!isDatastoreOwner && (
+          {!isDatastoreOwner && ds.sharedUsers.find(({ id }) => me?.id == id) && (
             <UserWrapper>
               <UserWrapperLeft>
                 <div></div>

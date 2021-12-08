@@ -205,12 +205,12 @@ export class DataStoreResolver {
       where: { dataStoreId: datastoreId },
     });
 
-    if (updateProps.sharedusers) {
-      const newSharedUsers = updateProps.sharedusers?.filter(
+    if (updateProps.sharedUsers) {
+      const newSharedUsers = updateProps.sharedUsers?.filter(
           (userId) => !sharedDatastoreUsers.find((u) => u.userId == userId)
         ),
         removedSharedUsers = sharedDatastoreUsers.filter(
-          ({ userId }) => !updateProps.sharedusers?.includes(userId)
+          ({ userId }) => !updateProps.sharedUsers?.includes(userId)
         );
 
       if (newSharedUsers.length) {
@@ -287,14 +287,14 @@ export class DataStoreResolver {
       ).filter((id) => !removedUsers.includes(id));
 
       const removedSharedUsers =
-        updateProps.sharedusers != null
+        updateProps.sharedUsers != null
           ? (
               await SharedDataStore.find({
                 where: { dataStoreId: datastoreId },
               })
             )
               .filter(
-                ({ userId }) => !updateProps.sharedusers?.includes(userId)
+                ({ userId }) => !updateProps.sharedUsers?.includes(userId)
               )
               .map(({ userId }) => userId)
           : [];
