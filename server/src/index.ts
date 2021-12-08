@@ -40,12 +40,11 @@ dotenv.config();
     cors({
       credentials: true,
       origin: process.env.CLIENT_URL,
-      exposedHeaders: ["Cookie"],
+      exposedHeaders: ["Cookie", "authorization"],
     })
   );
 
   app.use("/", router);
-
 
   await apolloServer.start();
 

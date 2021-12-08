@@ -27,10 +27,11 @@ export class FolderResolver {
     try {
       const full_path = fsPath.join(dataStore.basePath, path);
       fs.mkdirSync(full_path);
+      const cmd = `chown ${host.loginName}:${fsPath.basename(
+        dataStore.basePath
+      )} "${full_path}"`;
       await exec(
-        `chown ${full_path} ${host.loginName}:${fsPath.basename(
-          dataStore.basePath
-        )}`
+        cmd
       );
     } catch (error) {
       console.log(error);
