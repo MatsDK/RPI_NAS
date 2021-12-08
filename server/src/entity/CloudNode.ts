@@ -9,11 +9,11 @@ export class Node extends BaseEntity {
   id: number;
 
   @Field()
-  @Column("text")
+  @Column("text", { unique: true })
   name: string;
 
   @Field()
-  @Column("text")
+  @Column("text", {unique: true})
   ip: string;
 
   @Field()
