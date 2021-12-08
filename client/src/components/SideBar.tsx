@@ -2,6 +2,7 @@ import Link from "next/link";
 import Icon from "src/ui/Icon";
 import React from "react";
 import styled from "styled-components";
+import { useMeState } from "src/hooks/useMeState";
 
 const SideBar = styled.div`
   height: 100%;
@@ -44,6 +45,8 @@ const SideBarItemText = styled.div`
 `;
 
 const sideBar = () => {
+  const { me } = useMeState();
+
   return (
     <SideBar>
       <Link href={"/"}>
@@ -78,22 +81,24 @@ const sideBar = () => {
           </SideBarItemText>
         </SideBarItem>
       </Link>
-      <Link href={"/hosts"}>
-        <SideBarItem>
-          <span style={{ marginRight: 5 }}>
-            <Icon
-              name="hostIcon"
-              color={{ propName: "lightBgColors", idx: 1 }}
-              height={30}
-              width={45}
-              viewPort={30}
-            />
-          </span>
-          <SideBarItemText>
-            <span>Hosts</span>
-          </SideBarItemText>
-        </SideBarItem>
-      </Link>
+      {me?.isAdmin && (
+        <Link href={"/hosts"}>
+          <SideBarItem>
+            <span style={{ marginRight: 5 }}>
+              <Icon
+                name="hostIcon"
+                color={{ propName: "lightBgColors", idx: 1 }}
+                height={30}
+                width={45}
+                viewPort={30}
+              />
+            </span>
+            <SideBarItemText>
+              <span>Hosts</span>
+            </SideBarItemText>
+          </SideBarItem>
+        </Link>
+      )}
       <Link href={"/friends"}>
         <SideBarItem>
           <span style={{ marginRight: 5 }}>

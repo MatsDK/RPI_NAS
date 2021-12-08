@@ -1,16 +1,37 @@
+import { getNodesQuery } from "graphql/DataStores/getNodes";
+import { useRouter } from "next/router";
 import React from "react";
 import { Layout } from "src/components/Layout";
 import SideBar from "src/components/SideBar";
+import { withAuth } from "src/HOC/withAuth";
+import { useMeState } from "src/hooks/useMeState";
+import { HostsContainer } from "src/components/Hosts/HostsContainer";
 
-interface hostsProps {}
+import { ApolloContext, NextFunctionComponentWithAuth } from "types/types";
 
-const Hosts: React.FC<hostsProps> = ({}) => {
-  return (
-    <Layout>
-      <SideBar />
-      <h1>Hosts</h1>
-    </Layout>
-  );
+const Hosts: NextFunctionComponentWithAuth = ({ me }) => {
+    const { me: _me } = useMeState(me);
+    const router = useRouter();
+
+    if (me && !me.isAdmin) {
+        router.back();
+    }
+
+    return (
+        <Layout>
+            <SideBar />
+            <HostsContainer />
+        </Layout>
+    );
 };
 
-export default Hosts;
+Hosts.getInitialProps = async ({ apolloClient }: ApolloContext) => {
+    const { loading, data } = await apolloClient.query({
+        query: getNodesQuery,
+    });
+    if (loading) return { nodes: null };
+
+    return { nodes: data.getNodes };
+};
+
+export default withAuth(Hosts);

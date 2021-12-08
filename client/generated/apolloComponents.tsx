@@ -44,6 +44,12 @@ export type CreateDataStoreInput = {
   ownerId: Scalars['Float'];
 };
 
+export type CreateNodeInput = {
+  name: Scalars['String'];
+  loginName: Scalars['String'];
+  password: Scalars['String'];
+};
+
 export type CreateSharedDataStoreInput = {
   ids: Array<SharedDataStoresIdsInput>;
 };
@@ -132,6 +138,7 @@ export type Mutation = {
   delete?: Maybe<Scalars['Boolean']>;
   copy?: Maybe<Scalars['Boolean']>;
   move?: Maybe<Scalars['Boolean']>;
+  createNode?: Maybe<Node>;
   createUploadSession?: Maybe<UploadSessionReturn>;
   createDownloadSession?: Maybe<DownloadSessionReturn>;
   login?: Maybe<User>;
@@ -185,6 +192,11 @@ export type MutationCopyArgs = {
 
 export type MutationMoveArgs = {
   data: CopyMoveInput;
+};
+
+
+export type MutationCreateNodeArgs = {
+  data: CreateNodeInput;
 };
 
 
@@ -383,7 +395,7 @@ export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: Maybe<{ _
 export type GetNodesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNodesQuery = { __typename?: 'Query', getNodes?: Maybe<Array<{ __typename?: 'Node', name: string, id: string, host: string }>> };
+export type GetNodesQuery = { __typename?: 'Query', getNodes?: Maybe<Array<{ __typename?: 'Node', name: string, id: string, ip: string }>> };
 
 export type ToggleDatastoreServiceMutationMutationVariables = Exact<{
   serviceName: Scalars['String'];
@@ -461,6 +473,20 @@ export type SendFriendRequestMutationVariables = Exact<{
 
 
 export type SendFriendRequestMutation = { __typename?: 'Mutation', sendFriendRequest?: Maybe<boolean> };
+
+export type CreateHostNodeMutationMutationVariables = Exact<{
+  name: Scalars['String'];
+  loginName: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type CreateHostNodeMutationMutation = { __typename?: 'Mutation', createNode?: Maybe<{ __typename?: 'Node', id: string }> };
+
+export type GetNodesQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: Maybe<Array<{ __typename?: 'Node', id: string, ip: string, name: string, loginName: string, host: string, basePath: string, hostNode: boolean }>> };
 
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadPathsInput> | DownloadPathsInput;
@@ -739,7 +765,7 @@ export const GetNodesDocument = gql`
   getNodes {
     name
     id
-    host
+    ip
   }
 }
     `;
@@ -1108,6 +1134,81 @@ export function useSendFriendRequestMutation(baseOptions?: Apollo.MutationHookOp
 export type SendFriendRequestMutationHookResult = ReturnType<typeof useSendFriendRequestMutation>;
 export type SendFriendRequestMutationResult = Apollo.MutationResult<SendFriendRequestMutation>;
 export type SendFriendRequestMutationOptions = Apollo.BaseMutationOptions<SendFriendRequestMutation, SendFriendRequestMutationVariables>;
+export const CreateHostNodeMutationDocument = gql`
+    mutation CreateHostNodeMutation($name: String!, $loginName: String!, $password: String!) {
+  createNode(data: {name: $name, loginName: $loginName, password: $password}) {
+    id
+  }
+}
+    `;
+export type CreateHostNodeMutationMutationFn = Apollo.MutationFunction<CreateHostNodeMutationMutation, CreateHostNodeMutationMutationVariables>;
+
+/**
+ * __useCreateHostNodeMutationMutation__
+ *
+ * To run a mutation, you first call `useCreateHostNodeMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateHostNodeMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createHostNodeMutationMutation, { data, loading, error }] = useCreateHostNodeMutationMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      loginName: // value for 'loginName'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useCreateHostNodeMutationMutation(baseOptions?: Apollo.MutationHookOptions<CreateHostNodeMutationMutation, CreateHostNodeMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateHostNodeMutationMutation, CreateHostNodeMutationMutationVariables>(CreateHostNodeMutationDocument, options);
+      }
+export type CreateHostNodeMutationMutationHookResult = ReturnType<typeof useCreateHostNodeMutationMutation>;
+export type CreateHostNodeMutationMutationResult = Apollo.MutationResult<CreateHostNodeMutationMutation>;
+export type CreateHostNodeMutationMutationOptions = Apollo.BaseMutationOptions<CreateHostNodeMutationMutation, CreateHostNodeMutationMutationVariables>;
+export const GetNodesQueryDocument = gql`
+    query GetNodesQuery {
+  getNodes {
+    id
+    ip
+    name
+    loginName
+    host
+    basePath
+    hostNode
+  }
+}
+    `;
+
+/**
+ * __useGetNodesQueryQuery__
+ *
+ * To run a query within a React component, call `useGetNodesQueryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNodesQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNodesQueryQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetNodesQueryQuery(baseOptions?: Apollo.QueryHookOptions<GetNodesQueryQuery, GetNodesQueryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetNodesQueryQuery, GetNodesQueryQueryVariables>(GetNodesQueryDocument, options);
+      }
+export function useGetNodesQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetNodesQueryQuery, GetNodesQueryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetNodesQueryQuery, GetNodesQueryQueryVariables>(GetNodesQueryDocument, options);
+        }
+export type GetNodesQueryQueryHookResult = ReturnType<typeof useGetNodesQueryQuery>;
+export type GetNodesQueryLazyQueryHookResult = ReturnType<typeof useGetNodesQueryLazyQuery>;
+export type GetNodesQueryQueryResult = Apollo.QueryResult<GetNodesQueryQuery, GetNodesQueryQueryVariables>;
 export const CreateSessionDocument = gql`
     mutation createSession($data: [DownloadPathsInput!]!, $type: String!, $dataStoreId: Float!) {
   createDownloadSession(
