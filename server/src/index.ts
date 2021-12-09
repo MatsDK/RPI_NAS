@@ -36,13 +36,13 @@ dotenv.config();
     console.log("> Connected to postgreSQL database")
   );
 
-  app.use(
-    cors({
-      credentials: true,
-      origin: process.env.CLIENT_URL,
-      exposedHeaders: ["Cookie", "authorization"],
-    })
-  );
+	app.use(cors({
+	          credentials: true,
+		  exposedHeaders: ["Cookie", "authorization"],
+		  origin: (_origin, cb) => {
+			  cb(null, true);
+		  }
+	}));
 
   app.use("/", router);
 
@@ -52,7 +52,7 @@ dotenv.config();
 
   apolloServer.applyMiddleware({
     app,
-    cors: { credentials: true, origin: process.env.CLIENT_URL },
+    cors: { credentials: false, origin: process.env.CLIENT_URL },
   });
 
   app.listen(4000, () => {

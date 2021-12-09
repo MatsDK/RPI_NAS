@@ -30,4 +30,9 @@ export class NodeResolver {
 
 		return node;
 	}
+
+	@Query(() => Boolean)
+	ping() {
+		return true
+	}
 }
