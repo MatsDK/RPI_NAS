@@ -1,26 +1,27 @@
 require("dotenv").config();
-import {
-	ApolloClient,
-	InMemoryCache,
-	gql,
-} from "@apollo/client/core";
+import "reflect-metadata";
 import 'cross-fetch/polyfill';
-
+import { ApolloServer } from "apollo-server-express";
+import { buildSchema } from "type-graphql"
+import Express from "express";
+import { getOrCreateConnection } from "./utils/client";
 
 (async () => {
-	const uri = `http://${process.env.HOST_IP}:${process.env.HOST_PORT}/graphql`;
-	const client = new ApolloClient({
-		uri ,
-		cache: new InMemoryCache()
+	const app = Express();
+	const apolloServer = new ApolloServer({
+		schema: await buildSchema({
+			resolvers: [__dirname + "/modules/**/*.ts"],
+		}),
+		context: ({ req, res }) => ({ req, res }),
 	});
 
-	const PING_QUERY = gql`
-		{
-			ping  
-		}
-	`
+	getOrCreateConnection();
 
-	const { data }  = await client.query({query: PING_QUERY})
+	await apolloServer.start();
+	apolloServer.applyMiddleware({
+		app,
+		cors: false,
+	});
 
-	console.log(data)
+	app.listen(process.env.PORT, () => console.log(`> Graphql server listening on port: ${process.env.PORT}`));
 })()

@@ -2,7 +2,10 @@ server/node_modules
 server/dist
 server/yarn-error.log
 server/.env
-server/images
+server/images/*
+!server/images/default.png
+
 node-server/node_modules
 node-server/dist
+
 tmp
