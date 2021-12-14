@@ -39,4 +39,8 @@ export class Node extends BaseEntity {
   @Field()
   @Column("bool", { default: false })
   hostNode: boolean;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  token?: string;
 }
