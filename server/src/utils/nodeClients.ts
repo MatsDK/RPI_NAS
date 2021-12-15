@@ -5,10 +5,10 @@ const PING_QUERY = gql`
 {
 	query
 }
-` 
+`
 
 interface GlobalType {
-	  CONNECTIONS?:  Map<number, any>
+	CONNECTIONS?: Map<number, any>
 }
 
 const Global = global as unknown as GlobalType;
@@ -25,10 +25,10 @@ export const getOrCreateNodeClient = async (node: Node): Promise<any> => {
 
 	try {
 		const res = await client.query({ query: PING_QUERY });
-		if(res.data?.ping) return client
+		if (res.data?.ping) return client
 	} catch {
 		return null
 	}
-	
+
 	return null
 }

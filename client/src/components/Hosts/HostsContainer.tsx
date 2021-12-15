@@ -3,7 +3,7 @@ import { CreateHostNodeForm } from "./CreateHostNodeForm";
 import React, { useState } from "react";
 import { useApolloClient } from "react-apollo";
 
-export const HostsContainer: React.FC = ({}) => {
+export const HostsContainer: React.FC = ({ }) => {
     const client: any = useApolloClient();
     const { data, loading, error } = useGetNodesQueryQuery({ client });
 
@@ -22,22 +22,29 @@ export const HostsContainer: React.FC = ({}) => {
                 <CreateHostNodeForm />
             ) : (
                 <div>
-                    {data?.getNodes?.map(({ name, ip }, idx) => (
+                    {data?.getNodes?.nodes.map(({ name, ip, hostNode }, idx) => (
                         <div key={idx}>
                             {name}
                             {ip}
+                            {hostNode && "Host"}
                         </div>
                     ))}
-                    {!data?.getNodes?.filter(({ hostNode }) => !!hostNode)
+                    {!data?.getNodes?.nodes.filter(({ hostNode }) => !!hostNode)
                         .length && (
-                        <div>
-                            <button
-                                onClick={() => setCreateHostNode((s) => !s)}
-                            >
-                                Create host node
-                            </button>
+                            <div>
+                                <button
+                                    onClick={() => setCreateHostNode((s) => !s)}
+                                >
+                                    Create host node
+                                </button>
+                            </div>
+                        )}
+                    {data?.getNodes?.nodeRequests.map(({ ip, id, port }, idx) => (
+                        <div key={idx}>
+                            {ip}:{port}
+                            <button>Accept</button>
                         </div>
-                    )}
+                    ))}
                 </div>
             )}
         </div>

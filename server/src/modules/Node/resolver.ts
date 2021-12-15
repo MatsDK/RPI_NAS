@@ -12,6 +12,7 @@ import { v4 } from "uuid";
 import { MyContext } from "../../types/Context"
 import { getOrCreateNodeClient } from "../../utils/nodeClients";
 import { gql } from "@apollo/client/core";
+import { GetNodesReturn } from "./GetNodesReturn";
 
 const SETUPNODE_MUTATION = gql`
 mutation SetupNodeMutation($data: Node!) {
@@ -22,15 +23,20 @@ mutation SetupNodeMutation($data: Node!) {
 @Resolver()
 export class NodeResolver {
 	@UseMiddleware(isAuth, isAdmin)
-	@Query(() => [Node], { nullable: true })
-	getNodes(): Promise<Node[]> {
-		return Node.find()
+	@Query(() => GetNodesReturn, { nullable: true })
+	async getNodes(): Promise<GetNodesReturn> {
+		const ret = new GetNodesReturn()
+		ret.nodes = await Node.find();
+		ret.nodeRequests = await NodeRequest.find();
+		return ret
 	}
+
+
 
 	@UseMiddleware(isAuth, isAdmin)
 	@Mutation(() => Node, { nullable: true })
 	async createNode(@Arg("data") { name, loginName, password }: CreateNodeInput): Promise<Node | null> {
-		if(!name.trim() || !loginName.trim() || !password.trim()) return null;
+		if (!name.trim() || !loginName.trim() || !password.trim()) return null;
 
 		const osLoginName = loginName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
 		if ((await Node.count({ where: { hostNode: true } })) || (await User.count({ where: { osUserName: osLoginName } }))) return null
@@ -51,21 +57,21 @@ export class NodeResolver {
 		return true
 	}
 
-	@Mutation(() => Boolean) 
+	@Mutation(() => Boolean)
 	async createNodeRequest(@Ctx() { req }: MyContext, @Arg("ip") ip: string, @Arg("port") port: number): Promise<boolean> {
 		console.log(req.headers);
-		if((await Node.count({ where: { ip, port } }))) return true
-	
-		if (!(await NodeRequest.count({ where: { ip, port } }))) 
-			await NodeRequest.insert([{ ip, port }])	
+		if ((await Node.count({ where: { ip, port } }))) return true
+
+		if (!(await NodeRequest.count({ where: { ip, port } })))
+			await NodeRequest.insert([{ ip, port }])
 
 		return false
 	}
 
 	@UseMiddleware(isAuth, isAdmin)
-	@Mutation(() => Node, { nullable: true }) 
-	async acceptNodeRequest(@Arg("data") { id, name, loginName, password}: AcceptNodeRequestInput): Promise<Node | null> {
-		if(!name.trim() || !loginName.trim() || !password.trim()) return null;
+	@Mutation(() => Node, { nullable: true })
+	async acceptNodeRequest(@Arg("data") { id, name, loginName, password }: AcceptNodeRequestInput): Promise<Node | null> {
+		if (!name.trim() || !loginName.trim() || !password.trim()) return null;
 
 		const request = await NodeRequest.findOne({ where: { id } });
 		if (!request) return null;
@@ -77,19 +83,18 @@ export class NodeResolver {
 		const deleteNode = () => Node.delete({ id: node.id });
 
 		const nodeClient = await getOrCreateNodeClient(node);
-		if(!nodeClient) {
+		if (!nodeClient) {
 			await deleteNode()
 			throw new ApolloError("Could not connect to host");
-			return null
 		}
 
 		try {
 			const res = nodeClient.mutate({ mutation: SETUPNODE_MUTATION, variables: { data: node } });
-			if(!res.data?.setupNode) {
+			if (!res.data?.setupNode) {
 				await deleteNode()
 				return null
 			}
-		} catch(e) {
+		} catch (e) {
 			console.log(e);
 			await deleteNode();
 			return null

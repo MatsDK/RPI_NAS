@@ -16,6 +16,13 @@ export type Scalars = {
   Upload: any;
 };
 
+export type AcceptNodeRequestInput = {
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  loginName: Scalars['String'];
+  password: Scalars['String'];
+};
+
 export type AllowedSmbUser = {
   userId: Scalars['Float'];
   allowed: Scalars['Boolean'];
@@ -122,6 +129,12 @@ export type FriendsQueryReturn = {
   friendsRequest: Array<User>;
 };
 
+export type GetNodesReturn = {
+  __typename?: 'GetNodesReturn';
+  nodes: Array<Node>;
+  nodeRequests: Array<NodeRequest>;
+};
+
 export type GetTreeInput = {
   path: Scalars['String'];
   dataStoreId?: Maybe<Scalars['Float']>;
@@ -139,6 +152,8 @@ export type Mutation = {
   copy?: Maybe<Scalars['Boolean']>;
   move?: Maybe<Scalars['Boolean']>;
   createNode?: Maybe<Node>;
+  createNodeRequest: Scalars['Boolean'];
+  acceptNodeRequest?: Maybe<Node>;
   createUploadSession?: Maybe<UploadSessionReturn>;
   createDownloadSession?: Maybe<DownloadSessionReturn>;
   login?: Maybe<User>;
@@ -200,6 +215,17 @@ export type MutationCreateNodeArgs = {
 };
 
 
+export type MutationCreateNodeRequestArgs = {
+  port: Scalars['Float'];
+  ip: Scalars['String'];
+};
+
+
+export type MutationAcceptNodeRequestArgs = {
+  data: AcceptNodeRequestInput;
+};
+
+
 export type MutationCreateUploadSessionArgs = {
   data: UploadSessionInput;
 };
@@ -251,12 +277,21 @@ export type Node = {
   host: Scalars['String'];
   basePath: Scalars['String'];
   hostNode: Scalars['Boolean'];
+  token?: Maybe<Scalars['String']>;
+};
+
+export type NodeRequest = {
+  __typename?: 'NodeRequest';
+  id: Scalars['Float'];
+  ip: Scalars['String'];
+  port: Scalars['Float'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  getNodes?: Maybe<Array<Node>>;
+  getNodes?: Maybe<GetNodesReturn>;
   getDatastore?: Maybe<Datastore>;
+  ping: Scalars['Boolean'];
   tree?: Maybe<Tree>;
   directoryTree?: Maybe<Tree>;
   getDataStores?: Maybe<Array<Datastore>>;
@@ -395,7 +430,7 @@ export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: Maybe<{ _
 export type GetNodesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNodesQuery = { __typename?: 'Query', getNodes?: Maybe<Array<{ __typename?: 'Node', name: string, id: string, ip: string }>> };
+export type GetNodesQuery = { __typename?: 'Query', getNodes?: Maybe<{ __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', name: string, id: string, ip: string }> }> };
 
 export type ToggleDatastoreServiceMutationMutationVariables = Exact<{
   serviceName: Scalars['String'];
@@ -486,7 +521,7 @@ export type CreateHostNodeMutationMutation = { __typename?: 'Mutation', createNo
 export type GetNodesQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: Maybe<Array<{ __typename?: 'Node', id: string, ip: string, name: string, loginName: string, host: string, basePath: string, hostNode: boolean }>> };
+export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: Maybe<{ __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, name: string, loginName: string, host: string, basePath: string, hostNode: boolean }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> }> };
 
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadPathsInput> | DownloadPathsInput;
@@ -763,9 +798,11 @@ export type GetDatastoreQueryResult = Apollo.QueryResult<GetDatastoreQuery, GetD
 export const GetNodesDocument = gql`
     query GetNodes {
   getNodes {
-    name
-    id
-    ip
+    nodes {
+      name
+      id
+      ip
+    }
   }
 }
     `;
@@ -1172,13 +1209,20 @@ export type CreateHostNodeMutationMutationOptions = Apollo.BaseMutationOptions<C
 export const GetNodesQueryDocument = gql`
     query GetNodesQuery {
   getNodes {
-    id
-    ip
-    name
-    loginName
-    host
-    basePath
-    hostNode
+    nodes {
+      id
+      ip
+      name
+      loginName
+      host
+      basePath
+      hostNode
+    }
+    nodeRequests {
+      id
+      ip
+      port
+    }
   }
 }
     `;

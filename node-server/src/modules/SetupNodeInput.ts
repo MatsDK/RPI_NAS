@@ -7,7 +7,7 @@ export class SetupNodeInput {
 
 	@Field()
 	name: string
-	
+
 	@Field()
 	ip: string
 

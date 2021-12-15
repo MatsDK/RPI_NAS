@@ -1,8 +1,9 @@
 import gql from "graphql-tag";
 
 export const getNodesQuery = gql`
-  query GetNodesQuery {
-    getNodes {
+query GetNodesQuery {
+  getNodes {
+    nodes {
       id
       ip
       name
@@ -11,5 +12,11 @@ export const getNodesQuery = gql`
       basePath
       hostNode
     }
+    nodeRequests {
+      id
+      ip
+      port
+    }
   }
+}
 `;

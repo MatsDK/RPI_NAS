@@ -182,7 +182,7 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
                                         />
                                         <div style={{ marginLeft: 15 }}>
                                             <Select
-                                                data={nodes?.getNodes || []}
+                                                data={nodes?.getNodes?.nodes || []}
                                                 label="CloudNode"
                                                 setValue={setSelectedNode}
                                                 propName={"name"}

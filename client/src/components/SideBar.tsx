@@ -94,7 +94,7 @@ const sideBar = () => {
               />
             </span>
             <SideBarItemText>
-              <span>Hosts</span>
+              <span>Nodes</span>
             </SideBarItemText>
           </SideBarItem>
         </Link>

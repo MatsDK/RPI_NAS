@@ -31,7 +31,7 @@ Hosts.getInitialProps = async ({ apolloClient }: ApolloContext) => {
     });
     if (loading) return { nodes: null };
 
-    return { nodes: data.getNodes };
+    return { nodes: data.getNodes.nodes };
 };
 
 export default withAuth(Hosts);

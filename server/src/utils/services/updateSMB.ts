@@ -22,8 +22,8 @@ export const updateSMB = async (
   return new Promise(async (res, rej) => {
     try {
       const DatastoreServices = await DatastoreService.find({
-          where: { serviceName: ServiceNames.SMB },
-        }),
+        where: { serviceName: ServiceNames.SMB },
+      }),
         SMBDatastores = await Datastore.find({
           where: { id: Any(DatastoreServices.map((ds) => ds.datastoreId)) },
         }),
@@ -36,8 +36,8 @@ export const updateSMB = async (
 
       for (const datastore of SMBDatastores) {
         const userIds = DatastoreServices.filter(
-            ({ datastoreId }) => datastoreId === datastore.id
-          ).map(({ userId }) => userId),
+          ({ datastoreId }) => datastoreId === datastore.id
+        ).map(({ userId }) => userId),
           validUsers = users
             .filter(({ id }) => userIds.includes(id))
             .map(({ osUserName }) => osUserName);

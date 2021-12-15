@@ -12,10 +12,10 @@ export class resolver {
 	}
 
 	@Mutation(() => Boolean, { nullable: true })
-	async setupNode(@Arg("data",() => SetupNodeInput) { loginName, password, token, id }: SetupNodeInput ): Promise<boolean | null> {
+	async setupNode(@Arg("data", () => SetupNodeInput) { loginName, password, token, id }: SetupNodeInput): Promise<boolean | null> {
 		const { err } = await createUser(loginName, password);
 
-		if(err) throw new ApolloError(err);
+		if (err) throw new ApolloError(err);
 
 		const conn = getOrCreateConnection();
 		conn.id = id;
@@ -29,8 +29,8 @@ export class resolver {
 	@Mutation(() => Boolean, { nullable: true })
 	async connectRequest(@Arg("token") token: string, @Arg("id") id: number): Promise<boolean | null> {
 		const conn = getOrCreateConnection();
-		if(conn.token == null || conn.token !== token) return null
-		if(conn.id == null || conn.id !== id) return null
+		if (conn.token == null || conn.token !== token) return null
+		if (conn.id == null || conn.id !== id) return null
 
 		return true
 	}

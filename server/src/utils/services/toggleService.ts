@@ -30,7 +30,7 @@ export const toggleService = async ({
       service
         ? await DatastoreService.delete(obj)
         : datastore.allowedSMBUsers.includes(userId) &&
-          (await DatastoreService.insert(obj));
+        (await DatastoreService.insert(obj));
 
       updateSMBEnabled && updateSMB(host.loginName).then((res) => {
         console.log(res);

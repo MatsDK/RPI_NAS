@@ -12,7 +12,7 @@ export class Connection {
 	uri: string
 	token: string | null
 	id: number | null
-	client: any 
+	client: any
 	headersCallback: (() => ({ id: null | number, token: null | string })) | null
 
 	constructor(uri: string) {
@@ -21,7 +21,7 @@ export class Connection {
 		this.headersCallback = null;
 
 		this.loadToken().then((res) => {
-			if(res.err) console.log(res.err.message)
+			if (res.err) console.log(res.err.message)
 			else this.setHeadersCallback();
 
 			this.uri = uri;
@@ -42,7 +42,7 @@ export class Connection {
 			return {
 				headers: {
 					...headers,
-					authorization: token && token.id != null && token.token != null ? 
+					authorization: token && token.id != null && token.token != null ?
 						`${token.id}_${token.token}` : "",
 				}
 			}
@@ -57,9 +57,9 @@ export class Connection {
 	}
 
 	async connect() {
-		const res = await this.client.mutate({ 
-			mutation: CREATE_NODE_REQUEST_MUTATION, 
-			variables: { ip: process.env.LOCAL_IP, port: Number(process.env.PORT) } 
+		const res = await this.client.mutate({
+			mutation: CREATE_NODE_REQUEST_MUTATION,
+			variables: { ip: process.env.LOCAL_IP, port: Number(process.env.PORT) }
 		})
 
 		console.log(res);
@@ -73,7 +73,7 @@ export class Connection {
 				this.token = tokens.token || null;
 				res({ err: false })
 
-			} catch(err) {
+			} catch (err) {
 				res({ err })
 			}
 		})
@@ -82,23 +82,23 @@ export class Connection {
 	saveToken() {
 		try {
 			fs.writeFileSync("token.json", JSON.stringify({ token: this.token, id: this.id }))
-		} catch(err: any) {
+		} catch (err: any) {
 			console.log(`> Error writing token: ${err.message}`)
 		}
 	}
 
 	setHeadersCallback() {
-		if(this.token == null || this.id == null) this.headersCallback = null
+		if (this.token == null || this.id == null) this.headersCallback = null
 		else this.headersCallback = () => ({ token: this.token, id: this.id })
 	}
 }
 
 
 interface GlobalType {
-	  CONNECTION: Connection
+	CONNECTION: Connection
 }
 const Global = global as unknown as GlobalType;
 
-export const getOrCreateConnection = (): Connection => 
-	Global.CONNECTION || (Global.CONNECTION =  new Connection(`http://${process.env.HOST_IP}:${process.env.HOST_PORT}/graphql`))
-	
+export const getOrCreateConnection = (): Connection =>
+	Global.CONNECTION || (Global.CONNECTION = new Connection(`http://${process.env.HOST_IP}:${process.env.HOST_PORT}/graphql`))
+
