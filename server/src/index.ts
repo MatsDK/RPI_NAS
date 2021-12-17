@@ -12,6 +12,7 @@ import {
 } from "apollo-server-core";
 import { router } from "./routers/indexRouter";
 import { createConnection } from "typeorm";
+import "cross-fetch/polyfill"
 
 dotenv.config();
 
@@ -36,13 +37,13 @@ dotenv.config();
     console.log("> Connected to postgreSQL database")
   );
 
-	app.use(cors({
-	          credentials: true,
-		  exposedHeaders: ["Cookie", "authorization"],
-		  origin: (_origin, cb) => {
-			  cb(null, true);
-		  }
-	}));
+  app.use(cors({
+    credentials: true,
+    exposedHeaders: ["Cookie", "authorization"],
+    origin: (_origin, cb) => {
+      cb(null, true);
+    }
+  }));
 
   app.use("/", router);
 

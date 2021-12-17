@@ -1,4 +1,3 @@
-import { getNodesQuery } from "graphql/DataStores/getNodes";
 import { useRouter } from "next/router";
 import React from "react";
 import { Layout } from "src/components/Layout";
@@ -8,6 +7,7 @@ import { useMeState } from "src/hooks/useMeState";
 import { HostsContainer } from "src/components/Hosts/HostsContainer";
 
 import { ApolloContext, NextFunctionComponentWithAuth } from "types/types";
+import { getNodesQuery } from "graphql/Node/getNodes";
 
 const Hosts: NextFunctionComponentWithAuth = ({ me }) => {
     const { me: _me } = useMeState(me);

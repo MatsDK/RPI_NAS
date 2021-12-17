@@ -3,7 +3,7 @@ import { ApolloClient, InMemoryCache, gql } from "@apollo/client/core";
 
 const PING_QUERY = gql`
 {
-	query
+	ping
 }
 `
 
@@ -13,22 +13,27 @@ interface GlobalType {
 
 const Global = global as unknown as GlobalType;
 
-export const getOrCreateNodeClient = async (node: Node): Promise<any> => {
-	if (!Global.CONNECTIONS) Global.CONNECTIONS = new Map()
-	//if (Global.CONNECTIONS.get(node.id)) return Global.CONNECTIONS.get(node.id)
+type getOrCreateNodeClientProps = { node?: Node, uri?: string }
 
-	const client = Global.CONNECTIONS.get(node.id) || new ApolloClient({
-		uri: `http://${node.ip}:${node.port}/graphql`,
-		cache: new InMemoryCache()
-	});
-	Global.CONNECTIONS.set(node.id, client);
+export const getOrCreateNodeClient = async ({ node, uri }: getOrCreateNodeClientProps): Promise<any> => {
+	return new Promise(async (res, rej) => {
+		uri = node == null ? uri : `http://${node.ip}:${node.port}/graphql`
+		if (!uri) return null
 
-	try {
-		const res = await client.query({ query: PING_QUERY });
-		if (res.data?.ping) return client
-	} catch {
-		return null
-	}
+		if (!Global.CONNECTIONS) Global.CONNECTIONS = new Map()
+		//if (Global.CONNECTIONS.get(node.id)) return Global.CONNECTIONS.get(node.id)
 
-	return null
+		console.log(node, uri);
+		const client = new ApolloClient({
+			uri,
+			cache: new InMemoryCache()
+		});
+		console.log("Client: ", client);
+		if (node) Global.CONNECTIONS.set(node.id, client);
+
+		const r = await client.query({ query: PING_QUERY });
+		console.log(r)
+
+		res(client)
+	})
 }

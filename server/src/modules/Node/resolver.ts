@@ -71,27 +71,29 @@ export class NodeResolver {
 	@UseMiddleware(isAuth, isAdmin)
 	@Mutation(() => Node, { nullable: true })
 	async acceptNodeRequest(@Arg("data") { id, name, loginName, password }: AcceptNodeRequestInput): Promise<Node | null> {
-		if (!name.trim() || !loginName.trim() || !password.trim()) return null;
+		const osLoginName = loginName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+		if (!name.trim() || !osLoginName.trim() || !password.trim()) return null;
 
 		const request = await NodeRequest.findOne({ where: { id } });
 		if (!request) return null;
 
-		const osLoginName = loginName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
 		if ((await User.count({ where: { osUserName: osLoginName } }))) return null
 
 		const node = await Node.create({ name: name.trim(), loginName: osLoginName, password, port: request.port, host: process.env.HOST_IP, ip: request.ip, basePath: `/home/${osLoginName}`, hostNode: false, token: v4() }).save();
 		const deleteNode = () => Node.delete({ id: node.id });
 
-		const nodeClient = await getOrCreateNodeClient(node);
+		const nodeClient = await getOrCreateNodeClient({ node });
 		if (!nodeClient) {
 			await deleteNode()
+			console.log("Could not connect to host")
 			throw new ApolloError("Could not connect to host");
 		}
 
 		try {
-			const res = nodeClient.mutate({ mutation: SETUPNODE_MUTATION, variables: { data: node } });
+			const res = await nodeClient.mutate({ mutation: SETUPNODE_MUTATION, variables: { data: { ...node } } });
 			if (!res.data?.setupNode) {
-				await deleteNode()
+				console.log("failed to setup");
+				await deleteNode();
 				return null
 			}
 		} catch (e) {
@@ -102,5 +104,11 @@ export class NodeResolver {
 
 		await NodeRequest.delete({ id: request!.id });
 		return node
+	}
+
+	@Mutation(() => Boolean, { nullable: true })
+	async createConnection(@Arg("uri") uri: string): Promise<boolean | null> {
+		const client = await getOrCreateNodeClient({ uri })
+		return true
 	}
 }
