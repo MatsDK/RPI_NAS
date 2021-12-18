@@ -1,34 +1,34 @@
 import { InputType, Field } from "type-graphql";
 
 @InputType()
-export class SetupNodeInput {
+export class Node {
 	@Field()
-	id: number
+	id: number;
 
 	@Field()
-	name: string
+	name: string;
 
 	@Field()
-	ip: string
+	ip: string;
 
 	@Field()
-	loginName: string
+	loginName: string;
 
 	@Field()
-	password: string
+	password: string;
 
 	@Field()
-	port: number
+	port: number;
 
 	@Field()
-	host: string
+	host: string;
 
 	@Field()
-	basePath: string
+	basePath: string;
 
 	@Field()
-	hostNode: boolean
+	hostNode: boolean;
 
 	@Field()
-	token: string
+	token: string;
 }

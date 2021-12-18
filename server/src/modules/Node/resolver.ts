@@ -31,8 +31,6 @@ export class NodeResolver {
 		return ret
 	}
 
-
-
 	@UseMiddleware(isAuth, isAdmin)
 	@Mutation(() => Node, { nullable: true })
 	async createNode(@Arg("data") { name, loginName, password }: CreateNodeInput): Promise<Node | null> {
@@ -59,8 +57,14 @@ export class NodeResolver {
 
 	@Mutation(() => Boolean)
 	async createNodeRequest(@Ctx() { req }: MyContext, @Arg("ip") ip: string, @Arg("port") port: number): Promise<boolean> {
-		console.log(req.headers);
-		if ((await Node.count({ where: { ip, port } }))) return true
+
+		const id_token = req.headers["authorization"]?.split("_")
+		if (id_token?.length == 2) {
+			const [id, token] = id_token
+
+			if (token != null && id != null && (await Node.count({ where: { token, id: Number(id) } })))
+				return true
+		}
 
 		if (!(await NodeRequest.count({ where: { ip, port } })))
 			await NodeRequest.insert([{ ip, port }])

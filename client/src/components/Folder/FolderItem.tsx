@@ -98,7 +98,7 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
         <input
           type="checkbox"
           checked={selected || false}
-          onChange={() => {}}
+          onChange={() => { }}
         />
       </SelectButtonWrapper>
       <IconWrapper>
@@ -122,7 +122,7 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
           </div>
         )}
       </IconWrapper>
-      <div style={{ minWidth: 200 }}>
+      <div>
         {item.isDirectory ? (
           <div onClick={(e) => e.stopPropagation()}>
             <Link href={`/path/${item.relativePath}?d=${dataStoreId}`}>

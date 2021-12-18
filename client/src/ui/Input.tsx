@@ -10,18 +10,24 @@ interface InputProps {
 
 type Props = { moved: boolean };
 
-const Input = styled.input`
-  color: ${(props) => props.theme.textColors[3]};
-  background-color: transparent;
-  padding: 3px 4px;
+export const Input = styled.input`
+  border: 1px solid ${(props) => props.theme.textColors[3]};
+  max-width: 300px;
+  padding: 8px 15px;
   font-size: 16px;
-  border: 0;
-  border-bottom: 1px solid ${(props) => props.theme.textColors[2]};
-  outline: 0;
-  padding-top: 7px;
+  outline: none;
+  border-radius: 7px;
+  color: ${(props) => props.theme.textColors[0]};
 `;
 
-const Label = styled.div<Props>`
+export const Label = styled.label`
+  margin-top: 15px;
+  color: ${(props) => props.theme.textColors[0]};
+  font-weight: 600;
+  font-size: 18px;
+`;
+
+const LabelInputLabel = styled.div<Props>`
   position: absolute;
   margin-left: 3px;
   transition: 0.1s ease-in-out;
@@ -44,7 +50,7 @@ export const LabelInput: React.FC<InputProps> = ({
     <div
       style={{ position: "relative", display: "flex", alignItems: "center" }}
     >
-      <Label moved={moveLabel}>{label}</Label>
+      <LabelInputLabel moved={moveLabel}>{label}</LabelInputLabel>
       <Input
         onFocus={() => setMoveLabel(true)}
         onBlur={() => !value.trim() && setMoveLabel(false)}
@@ -55,3 +61,15 @@ export const LabelInput: React.FC<InputProps> = ({
     </div>
   );
 };
+
+interface InputComponentProps {
+  label: string,
+  type?: string
+}
+
+export const InputComponent: React.FC<InputComponentProps> = ({ label, type = "text" }) => {
+  return <div>
+    <label>{label}</label>
+    <input type={type} />
+  </div>
+}

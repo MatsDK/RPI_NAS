@@ -1,8 +1,7 @@
 import { loginMutation } from "graphql/User/login";
+import { Input, Label } from "src/ui/Input";
 import {
-  Input,
   Error,
-  Label,
   LoginRegisterPage,
   PageLink,
   SubmitButton,
@@ -17,7 +16,7 @@ import { useInput } from "src/hooks/useInput";
 import styled from "styled-components";
 import { ConditionButton } from "../ui/Button";
 
-interface loginViewProps {}
+interface loginViewProps { }
 
 const LoginForm = styled.form`
   z-index: 100;
@@ -26,7 +25,7 @@ const LoginForm = styled.form`
   flex-direction: column;
 `;
 
-export const LoginView: React.FC<loginViewProps> = ({}) => {
+export const LoginView: React.FC<loginViewProps> = ({ }) => {
   const { mutate } = useApollo();
   const router = useRouter();
   const client = useApolloClient();

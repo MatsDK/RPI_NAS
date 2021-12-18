@@ -36,7 +36,7 @@ export class DataStoreResolver {
   @UseMiddleware(isAuth, getUser, isAdmin)
   @Mutation(() => Datastore, { nullable: true })
   async createDataStore(
-    @Arg("data") { localNodeId, name, ownerId, sizeInMB }: CreateDataStoreInput
+    @Arg("data") { localNodeId, name, ownerId, sizeInMB, }: CreateDataStoreInput
   ): Promise<Datastore | null> {
     const hostNode = await Node.findOne({ where: { hostNode: true } }),
       thisNode = await Node.findOne({ where: { id: localNodeId } }),
@@ -44,10 +44,15 @@ export class DataStoreResolver {
 
     if (!hostNode || !thisNode || !owner) return null;
 
-    const path = fsPath.join(thisNode.basePath, nanoid(10));
+    if (hostNode.id != thisNode.id) {
+      console.log("create remote")
+      return null
+    }
+
+    const basePath = fsPath.join(thisNode.basePath, nanoid(10));
 
     const newDatastore = await Datastore.create({
-      basePath: path,
+      basePath,
       userId: ownerId,
       localHostNodeId: hostNode.id,
       localNodeId,
@@ -55,12 +60,14 @@ export class DataStoreResolver {
       name: name.replace(/[^a-z0-9]/gi, "_"),
       allowedSMBUsers: [ownerId],
     }).save();
-    const groupName = fsPath.basename(path);
 
+    const groupName = fsPath.basename(basePath);
     const { err } = await createGroup(groupName, owner.osUserName);
-    if (err) console.log(err);
+    if (err) {
+      console.log(err)
+    };
 
-    createDatastoreFolder(path, sizeInMB, {
+    createDatastoreFolder(basePath, sizeInMB, {
       folderUser: thisNode.loginName,
       folderGroup: groupName,
     }).then(async (res) => {
@@ -207,8 +214,8 @@ export class DataStoreResolver {
 
     if (updateProps.sharedUsers) {
       const newSharedUsers = updateProps.sharedUsers?.filter(
-          (userId) => !sharedDatastoreUsers.find((u) => u.userId == userId)
-        ),
+        (userId) => !sharedDatastoreUsers.find((u) => u.userId == userId)
+      ),
         removedSharedUsers = sharedDatastoreUsers.filter(
           ({ userId }) => !updateProps.sharedUsers?.includes(userId)
         );
@@ -251,7 +258,7 @@ export class DataStoreResolver {
     if (
       updateProps.ownerSMBEnabled != null &&
       !!datastoreServices.find(({ userId }) => datastore.userId === userId) !=
-        updateProps.ownerSMBEnabled
+      updateProps.ownerSMBEnabled
     ) {
       updateSMBRequired = true;
 
@@ -289,14 +296,14 @@ export class DataStoreResolver {
       const removedSharedUsers =
         updateProps.sharedUsers != null
           ? (
-              await SharedDataStore.find({
-                where: { dataStoreId: datastoreId },
-              })
+            await SharedDataStore.find({
+              where: { dataStoreId: datastoreId },
+            })
+          )
+            .filter(
+              ({ userId }) => !updateProps.sharedUsers?.includes(userId)
             )
-              .filter(
-                ({ userId }) => !updateProps.sharedUsers?.includes(userId)
-              )
-              .map(({ userId }) => userId)
+            .map(({ userId }) => userId)
           : [];
 
       datastore.allowedSMBUsers = newAllowedSMBUsers.filter(

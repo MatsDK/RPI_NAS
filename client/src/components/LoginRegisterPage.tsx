@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-interface LoginRegisterPageProps {}
+interface LoginRegisterPageProps { }
 
 export const Title = styled.h1`
   font-size: 36px;
@@ -14,23 +14,6 @@ export const Error = styled.span`
   font-size: 15px;
   margin: -2px 0 10px 2px;
   height: 10px;
-`;
-
-export const Input = styled.input`
-  border: 1px solid ${(props) => props.theme.textColors[3]};
-  max-width: 300px;
-  padding: 8px 15px;
-  font-size: 16px;
-  outline: none;
-  border-radius: 7px;
-  color: ${(props) => props.theme.textColors[0]};
-`;
-
-export const Label = styled.label`
-  margin-top: 15px;
-  color: ${(props) => props.theme.textColors[0]};
-  font-weight: 600;
-  font-size: 18px;
 `;
 
 export const SubmitButton = styled.button`

@@ -7,9 +7,9 @@ import { useApollo } from "src/hooks/useApollo";
 import { useInput } from "src/hooks/useInput";
 import { useMeState } from "src/hooks/useMeState";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
-import { ConditionButton, LightButton } from "src/ui/Button";
-import { LabelInput } from "src/ui/Input";
+import { ConditionButton, Button, BgButton } from "src/ui/Button";
 import styled from "styled-components";
+import { Input, Label } from "../../ui/Input"
 
 interface SSHDownloadDropdownProps {
   close: () => any;
@@ -18,17 +18,28 @@ interface SSHDownloadDropdownProps {
 export const SSHDownloadDropdownWrapper = styled.div`
   position: absolute;
   padding: 4px 10px 6px 10px;
-  box-shadow: 3px 3px 10px 3px #00000042;
+  box-shadow: 3px 3px 10px 3px #00000012;
+  border: 1px solid ${(props) => props.theme.lightBgColors[2]};
   border-radius: 3px;
-  background-color: ${(props) => props.theme.bgColors[2]};
+  background-color: ${(props) => props.theme.lightBgColors[0]};
 
   h1 {
     padding-bottom: 10px;
     font-size: 25px;
-    color: ${(props) => props.theme.textColors[3]};
+    color: ${(props) => props.theme.textColors[1]};
   }
 `;
 
+const PathInput = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  margin-bottom: 10px;
+
+  > label {
+    margin-top: 0;
+  }
+`
 export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
   close,
 }) => {
@@ -96,18 +107,26 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
 
   return (
     <>
-      <h1>Download</h1>
-      <LabelInput label={"Path"} setValue={setPathInput} value={pathInput} />
-      <div style={{ display: "flex" }}>
+      <h1>Download SSH</h1>
+      <PathInput>
+        <Label>Path</Label>
+        <Input
+          type="text"
+          placeholder="Path"
+          value={pathInput}
+          onChange={setPathInput}
+        />
+      </PathInput>
+      <div style={{ display: "flex", justifyContent: "flex-end  " }}>
         <ConditionButton
           condition={
             !!pathInput.trim() && pathInput.trim() !== me.defaultDownloadPath
           }
         >
-          <LightButton onClick={setDefaultPath}>Set as default</LightButton>
+          <Button onClick={setDefaultPath}>Set as default</Button>
         </ConditionButton>
         <ConditionButton condition={!!pathInput.trim()}>
-          <LightButton onClick={createSSHDownloadSession}>Download</LightButton>
+          <BgButton onClick={createSSHDownloadSession}>Download</BgButton>
         </ConditionButton>
       </div>
     </>

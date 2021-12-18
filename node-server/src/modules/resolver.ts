@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Query, Arg } from "type-graphql";
-import { SetupNodeInput } from "./SetupNodeInput";
+import { Node } from "./SetupNodeInput";
 import { createUser } from "../utils/createUser";
 import { getOrCreateConnection } from "../utils/client";
 import { ApolloError } from "apollo-server-express";
@@ -12,10 +12,9 @@ export class resolver {
 	}
 
 	@Mutation(() => Boolean, { nullable: true })
-	async setupNode(@Arg("data", () => SetupNodeInput) { loginName, password, token, id }: SetupNodeInput): Promise<boolean | null> {
-		const { err } = await createUser(loginName, password);
-
-		if (err) throw new ApolloError(err);
+	async setupNode(@Arg("data", () => Node) { loginName, password, token, id }: Node): Promise<boolean | null> {
+		const { err } = await createUser(loginName, password)
+		if (err) throw new ApolloError(err)
 
 		const conn = getOrCreateConnection();
 		conn.id = id;

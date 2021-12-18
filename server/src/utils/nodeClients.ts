@@ -23,16 +23,13 @@ export const getOrCreateNodeClient = async ({ node, uri }: getOrCreateNodeClient
 		if (!Global.CONNECTIONS) Global.CONNECTIONS = new Map()
 		//if (Global.CONNECTIONS.get(node.id)) return Global.CONNECTIONS.get(node.id)
 
-		console.log(node, uri);
 		const client = new ApolloClient({
 			uri,
 			cache: new InMemoryCache()
 		});
-		console.log("Client: ", client);
 		if (node) Global.CONNECTIONS.set(node.id, client);
 
-		const r = await client.query({ query: PING_QUERY });
-		console.log(r)
+		await client.query({ query: PING_QUERY });
 
 		res(client)
 	})

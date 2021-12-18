@@ -3,8 +3,8 @@ import { setContext } from '@apollo/client/link/context';
 import fs from "fs-extra";
 
 const CREATE_NODE_REQUEST_MUTATION = gql`
-mutation CreateNodeRequestMutation($ip:String!, $port:Float!) {
-	  createNodeRequest(port:$port, ip:$ip)
+mutation CreateNodeRequestMutation($ip:String!, $port:Float!, $token: String, $id: Float) {
+          createNodeRequest(port: $port, ip: $ip, token: $token, id: $id)
 }
 `;
 
@@ -59,7 +59,7 @@ export class Connection {
 	async connect() {
 		const res = await this.client.mutate({
 			mutation: CREATE_NODE_REQUEST_MUTATION,
-			variables: { ip: process.env.LOCAL_IP, port: Number(process.env.PORT) }
+			variables: { ip: process.env.LOCAL_IP, port: Number(process.env.PORT), token: this.token, id: this.id }
 		})
 
 		console.log(res);
@@ -101,4 +101,3 @@ const Global = global as unknown as GlobalType;
 
 export const getOrCreateConnection = (): Connection =>
 	Global.CONNECTION || (Global.CONNECTION = new Connection(`http://${process.env.HOST_IP}:${process.env.HOST_PORT}/graphql`))
-
