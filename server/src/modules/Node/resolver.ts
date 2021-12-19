@@ -10,7 +10,7 @@ import { CreateNodeInput } from "./CreateNodeInput";
 import { createUser } from "../../utils/createUser";
 import { v4 } from "uuid";
 import { MyContext } from "../../types/Context"
-import { getOrCreateNodeClient } from "../../utils/nodeClients";
+import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { gql } from "@apollo/client/core";
 import { GetNodesReturn } from "./GetNodesReturn";
 
@@ -86,7 +86,7 @@ export class NodeResolver {
 		const node = await Node.create({ name: name.trim(), loginName: osLoginName, password, port: request.port, host: process.env.HOST_IP, ip: request.ip, basePath: `/home/${osLoginName}`, hostNode: false, token: v4() }).save();
 		const deleteNode = () => Node.delete({ id: node.id });
 
-		const nodeClient = await getOrCreateNodeClient({ node });
+		const nodeClient = await getOrCreateNodeClient({ node, ping: true });
 		if (!nodeClient) {
 			await deleteNode()
 			console.log("Could not connect to host")
@@ -94,7 +94,7 @@ export class NodeResolver {
 		}
 
 		try {
-			const res = await nodeClient.mutate({ mutation: SETUPNODE_MUTATION, variables: { data: { ...node } } });
+			const res = await nodeClient.conn.mutate({ mutation: SETUPNODE_MUTATION, variables: { data: { ...node } } });
 			if (!res.data?.setupNode) {
 				console.log("failed to setup");
 				await deleteNode();
@@ -112,7 +112,7 @@ export class NodeResolver {
 
 	@Mutation(() => Boolean, { nullable: true })
 	async createConnection(@Arg("uri") uri: string): Promise<boolean | null> {
-		const client = await getOrCreateNodeClient({ uri })
+		const client = await getOrCreateNodeClient({ uri, ping: true })
 		return true
 	}
 }

@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { connectNodes } from "./utils/nodes/connectNodes"
 import { graphqlUploadExpress } from 'graphql-upload';
 import { ApolloServer } from "apollo-server-express";
 import cookieParser from "cookie-parser";
@@ -58,5 +59,9 @@ dotenv.config();
 
   app.listen(4000, () => {
     console.log("> Server started on http://localhost:4000/graphql");
+
+    connectNodes().then((res) => {
+      console.log("Connected Nodes", res)
+    })
   });
 })();
