@@ -27,10 +27,8 @@ export class resolver {
 	}
 
 	@Mutation(() => Boolean, { nullable: true })
-	async connectRequest(@Arg("token") token: string, @Arg("id") id: number): Promise<boolean | null> {
-		const conn = getOrCreateConnection();
-		if (conn.token == null || conn.token !== token) return null
-		if (conn.id == null || conn.id !== id) return null
+	async connectRequest(): Promise<boolean | null> {
+		await getOrCreateConnection().connect()
 
 		return true
 	}
