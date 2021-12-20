@@ -3,10 +3,11 @@ import { ConditionButton } from "src/ui/Button";
 import { useInput } from "src/hooks/useInput";
 import { useApollo } from "src/hooks/useApollo";
 import { CreateHostNodeMutation } from "graphql/Node/createHostNode";
+import { getNodesQuery } from "graphql/Node/getNodes";
 
-interface CreateHostNodeFormProps {}
+interface CreateHostNodeFormProps { }
 
-export const CreateHostNodeForm: React.FC<CreateHostNodeFormProps> = ({}) => {
+export const CreateHostNodeForm: React.FC<CreateHostNodeFormProps> = ({ }) => {
     const { mutate } = useApollo();
 
     const [name, setName] = useInput("");
@@ -22,7 +23,7 @@ export const CreateHostNodeForm: React.FC<CreateHostNodeFormProps> = ({}) => {
             name,
             loginName,
             password,
-        });
+        }, { refetchQueries: [{ query: getNodesQuery, variables: {} }] });
 
         console.log(res);
     };

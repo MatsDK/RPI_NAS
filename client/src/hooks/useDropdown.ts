@@ -11,7 +11,7 @@ export const useDropdown = (ref: any, cb: (e: any) => void) => {
   }, [cb]);
 
   useEffect(() => {
-    const handler = (e) => (cbRef.current as any)(e);
+    const handler = (e: Event) => (cbRef.current as any)(e);
     document.addEventListener("click", handler);
 
     return () => document.removeEventListener("click", handler);

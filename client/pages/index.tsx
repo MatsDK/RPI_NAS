@@ -18,7 +18,7 @@ const Page: NextFunctionComponentWithAuth<Props> = ({ me }) => {
   useMeState(me);
 
   return (
-    <Layout>
+    <Layout title="Home">
       <SideBar />
       <Tree />
     </Layout>

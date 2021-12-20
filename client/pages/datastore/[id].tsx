@@ -11,7 +11,7 @@ const Datastores: NextFunctionComponentWithAuth = ({ me }) => {
   useMeState(me);
 
   return (
-    <Layout>
+    <Layout title="Datastore">
       <SideBar />
       <DataStoresContainer />
       <DataStoreContainer />

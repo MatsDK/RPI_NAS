@@ -9,8 +9,7 @@ import { useInput } from "src/hooks/useInput";
 import { CreateDataStoreMutation } from "graphql/DataStores/createDataStore";
 import styled from "styled-components";
 import {
-    useGetFriendsQueryQuery,
-    useGetNodesQuery,
+    useGetFriendsQueryQuery, useGetNodesQueryQuery,
 } from "generated/apolloComponents";
 import { getDataStoresQuery } from "graphql/DataStores/getDataStores";
 import { useMeState } from "src/hooks/useMeState";
@@ -94,7 +93,7 @@ const NewDataStoreWrapper: React.FC<Props> = ({ hide }) => {
         client,
     });
 
-    const { data: nodes, error: NodesError } = useGetNodesQuery({
+    const { data: nodes, error: NodesError } = useGetNodesQueryQuery({
         client,
     });
 

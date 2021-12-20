@@ -40,7 +40,7 @@ export const LoginView: React.FC<loginViewProps> = ({ }) => {
     if (!passwordInput.trim() || !emailInput.trim()) return;
 
     try {
-      const { data } = await mutate(loginMutation, {
+      const { data, } = await mutate(loginMutation, {
         password: passwordInput,
         email: emailInput,
       });

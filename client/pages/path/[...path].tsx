@@ -34,7 +34,7 @@ const Folder: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
   }, [path, dataStoreId]);
 
   return (
-    <Layout>
+    <Layout title={`Datastore - ${path}`}>
       <SideBar />
       <Wrapper>
         <Tree />
@@ -55,8 +55,8 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
         ? Number(ctx.req.query.d)
         : null
       : ctx?.query?.d
-      ? Number(ctx.query?.d)
-      : null;
+        ? Number(ctx.query?.d)
+        : null;
 
   const res = await ctx.apolloClient.query({
     query: getDirectoryTreeQuery,

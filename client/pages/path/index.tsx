@@ -17,7 +17,7 @@ interface Props {
 
 export const Wrapper = styled.div`
   display: flex;
-  flex: 1;
+  width: calc(100vw - 70px);
 `;
 
 const Page: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
@@ -38,7 +38,7 @@ const Page: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
   }, [dataStoreId]);
 
   return (
-    <Layout>
+    <Layout title="Datastore">
       <SideBar />
       <Wrapper>
         <Tree />
@@ -58,8 +58,8 @@ Page.getInitialProps = async (ctx: ApolloContext) => {
       ? Number(ctx.req.query.d)
       : null
     : ctx?.query?.d
-    ? Number(ctx.query?.d)
-    : null;
+      ? Number(ctx.query?.d)
+      : null;
 
   const res = await ctx.apolloClient.query({
     query: getDirectoryTreeQuery,

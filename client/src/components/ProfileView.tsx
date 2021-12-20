@@ -7,7 +7,7 @@ import fsPath from "path";
 import { useMeState } from "src/hooks/useMeState";
 import styled from "styled-components";
 
-interface ProfileViewProps {}
+interface ProfileViewProps { }
 
 const ProfilePicture = styled.img`
   width: 150px;
@@ -48,7 +48,7 @@ const UserEmail = styled.div`
   color: ${(props) => props.theme.textColors[1]};
 `;
 
-export const ProfileView: React.FC<ProfileViewProps> = ({}) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ }) => {
   const { me } = useMeState();
   const { mutate } = useApollo();
 
@@ -56,8 +56,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({}) => {
 
   useEffect(() => {
     setImageSrc(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${
-        me?.id
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me?.id
       }?${new Date().getTime()}`
     );
   }, [me]);
@@ -72,8 +71,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({}) => {
     if (errors) return console.log(errors);
 
     setImageSrc(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${
-        me?.id
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me?.id
       }?${new Date().getTime()}`
     );
   }, []);
@@ -84,7 +82,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({}) => {
   });
 
   return (
-    <Layout showHomeButton={true}>
+    <Layout showHomeButton={true} title="Profile">
       <Container>
         <div
           {...getRootProps({

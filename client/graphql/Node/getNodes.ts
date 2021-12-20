@@ -8,7 +8,6 @@ query GetNodesQuery {
       ip
       name
       loginName
-      host
       basePath
       hostNode
     }

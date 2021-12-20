@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const Button = styled.button`
   background: transparent;
   border: 0;
+  white-space: nowrap;
   color: ${(props) => props.theme.textColors[1]};
   font-size: 16px;
   cursor: pointer;
@@ -31,6 +32,7 @@ export const LightButton = styled.button`
 `;
 
 export const BgButton = styled.button`
+  white-space: nowrap;
   background: ${(props) => props.theme.bgColors[1]};
   border: 0;
   border-radius: 3px;

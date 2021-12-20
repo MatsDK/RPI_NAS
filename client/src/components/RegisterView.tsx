@@ -1,7 +1,5 @@
 import { registerMutation } from "graphql/User/register";
 import {
-  Input,
-  Label,
   LoginRegisterPage,
   PageLink,
   SubmitButton,
@@ -15,8 +13,9 @@ import { useInput } from "src/hooks/useInput";
 import styled from "styled-components";
 import Link from "next/link";
 import { ConditionButton } from "../ui/Button";
+import { Label, Input } from "../ui/Input"
 
-interface RegisterViewProps {}
+interface RegisterViewProps { }
 
 const RegisterForm = styled.form`
   z-index: 100;
@@ -25,7 +24,7 @@ const RegisterForm = styled.form`
   flex-direction: column;
 `;
 
-export const RegisterView: React.FC<RegisterViewProps> = ({}) => {
+export const RegisterView: React.FC<RegisterViewProps> = ({ }) => {
   const { mutate } = useApollo();
   const router = useRouter();
 
@@ -67,7 +66,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({}) => {
           value={userNameInput}
           onChange={setUserNameInput}
         />
-        <Error>{err.includes("Username") && err}</Error>
+        <Error>{err.includes("username") && err}</Error>
         <Label>E-mail</Label>
         <Input
           type="text"

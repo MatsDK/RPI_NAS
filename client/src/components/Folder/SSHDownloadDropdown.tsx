@@ -2,14 +2,17 @@ import axios from "axios";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { setDefaultDownloadPathMutation } from "graphql/User/setDefaultDownloadPath";
 import router from "next/router";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
 import { useInput } from "src/hooks/useInput";
 import { useMeState } from "src/hooks/useMeState";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
-import { ConditionButton, Button, BgButton } from "src/ui/Button";
+import { BgButton, Button, ConditionButton } from "src/ui/Button";
 import styled from "styled-components";
-import { Input, Label } from "../../ui/Input"
+import { Input, Label } from "../../ui/Input";
+import { ClipLoader } from "react-spinners";
+// import { css } from "@emotion/react"
+
 
 interface SSHDownloadDropdownProps {
   close: () => any;
@@ -40,6 +43,7 @@ const PathInput = styled.div`
     margin-top: 0;
   }
 `
+
 export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
   close,
 }) => {
@@ -48,14 +52,20 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
   const folderCtx: FolderContextType = useContext(FolderContext);
   const { mutate } = useApollo();
 
+  const [loading, setLoading] = useState(false)
+
   const [pathInput, setPathInput] = useInput<string>(
     me.defaultDownloadPath || ""
   );
 
   const setDefaultPath = async () => {
+    if (!pathInput.trim()) return null
+
+    setLoading(true)
     const { errors, data } = await mutate(setDefaultDownloadPathMutation, {
       path: pathInput.trim(),
     });
+    setLoading(false)
 
     me.defaultDownloadPath = pathInput.trim();
 
@@ -75,6 +85,7 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
 
     if (!router.query.d) return;
 
+    setLoading(true)
     const { data } = await mutate(createSessionMutation, {
       data: selected.map(({ isDirectory, relativePath }) => ({
         path: relativePath,
@@ -99,6 +110,7 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
         },
       },
     });
+    setLoading(false)
 
     if (res.data.err) console.log(res.data.err);
 
@@ -117,15 +129,17 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
           onChange={setPathInput}
         />
       </PathInput>
-      <div style={{ display: "flex", justifyContent: "flex-end  " }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+        <ClipLoader color={"#000000"} loading={loading} size={16} />
         <ConditionButton
           condition={
+            !loading &&
             !!pathInput.trim() && pathInput.trim() !== me.defaultDownloadPath
           }
         >
           <Button onClick={setDefaultPath}>Set as default</Button>
         </ConditionButton>
-        <ConditionButton condition={!!pathInput.trim()}>
+        <ConditionButton condition={!loading && !!pathInput.trim()}>
           <BgButton onClick={createSSHDownloadSession}>Download</BgButton>
         </ConditionButton>
       </div>

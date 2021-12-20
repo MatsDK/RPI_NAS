@@ -126,7 +126,7 @@ const Friends: NextFunctionComponentWithAuth = ({ me }) => {
   };
 
   return (
-    <Layout>
+    <Layout title="Friends">
       <SideBar />
       <Container>
         <ContainerItem>

@@ -157,7 +157,8 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
   return (
     <div
       style={{
-        width: "100%",
+        flex: 1,
+        overflow: "hidden",
       }}
     >
       <FolderNavbar />

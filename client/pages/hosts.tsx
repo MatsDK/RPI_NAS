@@ -18,7 +18,7 @@ const Hosts: NextFunctionComponentWithAuth = ({ me }) => {
     }
 
     return (
-        <Layout>
+        <Layout title="Nodes">
             <SideBar />
             <HostsContainer />
         </Layout>
