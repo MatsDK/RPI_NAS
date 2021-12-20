@@ -29,7 +29,7 @@ export class TreeResolver {
     returnObj.hostIp = localNode.ip;
     returnObj.password = localNode.password;
     returnObj.username = localNode.loginName;
-    returnObj.port = localNode.port;
+    returnObj.port = localNode.sshPort!;
 
     return returnObj;
   }
@@ -70,7 +70,7 @@ export class TreeResolver {
         returnObj.hostIp = localNode.ip;
         returnObj.password = localNode.password;
         returnObj.username = localNode.loginName;
-        returnObj.port = localNode.port;
+        returnObj.port = localNode.sshPort!;
         break;
 
       default:

@@ -1,34 +1,32 @@
+import { nanoid } from "nanoid";
+import fsPath from "path";
 import {
   Arg,
   Ctx,
   Mutation,
   Query,
   Resolver,
-  UseMiddleware,
+  UseMiddleware
 } from "type-graphql";
-import { Any } from "typeorm";
-import fsPath from "path";
-import { User } from "../../entity/User";
 import { Node } from "../../entity/CloudNode";
-import { DatastoreService, ServiceNames } from "../../entity/DatastoreService";
 import { Datastore, DataStoreStatus } from "../../entity/Datastore";
+import { DatastoreService, ServiceNames } from "../../entity/DatastoreService";
+import { SharedDataStore } from "../../entity/SharedDataStore";
+import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
 import { getUser } from "../../middleware/getUser";
-import { MyContext } from "../../types/Context";
-import { CreateDataStoreInput } from "./CreateDataStoreInput";
-import { nanoid } from "nanoid";
-import { SharedDataStore } from "../../entity/SharedDataStore";
-import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { isAdmin } from "../../middleware/isAdmin";
+import { MyContext } from "../../types/Context";
 import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder";
-import {
-  createGroup,
-  addUsersToGroup,
-  groups,
-} from "../../utils/dataStore/handleGroups";
 import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
+import {
+  addUsersToGroup, createGroup
+} from "../../utils/dataStore/handleGroups";
+import { updateDatastoreOwnerAndName, updateSharedUsers, updateSharedUsersServices } from "../../utils/dataStore/updateDatastore";
 import { toggleService } from "../../utils/services/toggleService";
 import { updateSMB } from "../../utils/services/updateSMB";
+import { CreateDataStoreInput } from "./CreateDataStoreInput";
+import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { UpdateDatastoreInput } from "./UpdateDatastoreInput";
 
 @Resolver()
@@ -208,114 +206,9 @@ export class DataStoreResolver {
 
     let updateSMBRequired = false;
 
-    const sharedDatastoreUsers = await SharedDataStore.find({
-      where: { dataStoreId: datastoreId },
-    });
-
-    if (updateProps.sharedUsers) {
-      const newSharedUsers = updateProps.sharedUsers?.filter(
-        (userId) => !sharedDatastoreUsers.find((u) => u.userId == userId)
-      ),
-        removedSharedUsers = sharedDatastoreUsers.filter(
-          ({ userId }) => !updateProps.sharedUsers?.includes(userId)
-        );
-
-      if (newSharedUsers.length) {
-        await SharedDataStore.insert(
-          newSharedUsers.map((id) => ({ userId: id, dataStoreId: datastoreId }))
-        );
-        await groups.add(
-          newSharedUsers.map((id) => ({
-            userId: id,
-            dataStoreId: datastore.id,
-          }))
-        );
-      }
-
-      if (removedSharedUsers.length) {
-        await SharedDataStore.delete({
-          id: Any(removedSharedUsers.map(({ id }) => id)),
-        });
-        await groups.remove(removedSharedUsers);
-
-        const ids = removedSharedUsers.map(({ userId }) => userId);
-
-        datastore.allowedSMBUsers = datastore.allowedSMBUsers.filter(
-          (id) => !ids.includes(id)
-        );
-
-        const deleteServices = await DatastoreService.delete({
-          datastoreId,
-          userId: Any(ids),
-        });
-        if (deleteServices.affected) updateSMBRequired = true;
-      }
-    }
-
-    const datastoreServices = await DatastoreService.find({
-      where: { datastoreId, serviceName: ServiceNames.SMB },
-    });
-    if (
-      updateProps.ownerSMBEnabled != null &&
-      !!datastoreServices.find(({ userId }) => datastore.userId === userId) !=
-      updateProps.ownerSMBEnabled
-    ) {
-      updateSMBRequired = true;
-
-      await toggleService({
-        datastore,
-        host,
-        userId: datastore.userId,
-        serviceName: "SMB",
-        updateSMBEnabled: false,
-      });
-    }
-
-    if (updateProps.name != null) {
-      const newName = updateProps.name.replace(/[^a-z0-9]/gi, "_");
-
-      if (newName != datastore.name && newName.trim()) {
-        datastore.name = newName;
-        if (datastoreServices.length) updateSMBRequired = true;
-      }
-    }
-
-    if (updateProps?.allowedSMBUsers?.length) {
-      const removedUsers = updateProps.allowedSMBUsers
-        .filter(({ allowed }) => !allowed)
-        .map(({ userId }) => userId);
-      const newAllowedSMBUsers = Array.from(
-        new Set([
-          ...datastore.allowedSMBUsers,
-          ...updateProps.allowedSMBUsers
-            .filter(({ allowed }) => allowed)
-            .map(({ userId }) => userId),
-        ])
-      ).filter((id) => !removedUsers.includes(id));
-
-      const removedSharedUsers =
-        updateProps.sharedUsers != null
-          ? (
-            await SharedDataStore.find({
-              where: { dataStoreId: datastoreId },
-            })
-          )
-            .filter(
-              ({ userId }) => !updateProps.sharedUsers?.includes(userId)
-            )
-            .map(({ userId }) => userId)
-          : [];
-
-      datastore.allowedSMBUsers = newAllowedSMBUsers.filter(
-        (id) => !removedSharedUsers.includes(id)
-      );
-      const { affected } = await DatastoreService.delete({
-        datastoreId,
-        serviceName: ServiceNames.SMB,
-        userId: Any(removedUsers),
-      });
-      if (affected) updateSMBRequired = true;
-    }
+    if (updateProps.sharedUsers) updateSMBRequired = await updateSharedUsers({ datastore, datastoreId, sharedUsers: updateProps.sharedUsers || [], updateSMBRequired })
+    updateSMBRequired = await updateDatastoreOwnerAndName({ host, datastore, updateProps, updateSMBRequired })
+    if (updateProps?.allowedSMBUsers?.length) updateSMBRequired = await updateSharedUsersServices({ updateProps, updateSMBRequired, datastore })
 
     if (updateSMBRequired) {
       datastore.status = DataStoreStatus.INIT;

@@ -18,6 +18,5 @@ export const connectNodes = async () => {
 		if (data.connectRequest) {
 			client.ping = true
 		}
-		console.log(data)
 	}
 }

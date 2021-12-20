@@ -13,7 +13,7 @@ export class Node extends BaseEntity {
   name: string;
 
   @Field()
-  @Column("text", {unique: true})
+  @Column("text", { unique: true })
   ip: string;
 
   @Field()
@@ -28,9 +28,9 @@ export class Node extends BaseEntity {
   @Column("int")
   port: number;
 
-  @Field()
-  @Column("text")
-  host: string;
+  @Field(() => Number)
+  @Column("int", { default: 22 })
+  sshPort?: number;
 
   @Field()
   @Column("text")

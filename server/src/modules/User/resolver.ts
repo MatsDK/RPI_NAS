@@ -34,10 +34,10 @@ export class UserResolver {
     @Ctx() { res }: MyContext
   ): Promise<User | null> {
     const user = await User.findOne({ where: { email } });
-    if (!user) return null;
+    if (!user) throw new Error("Invalid email address")
 
     const valid = await compare(password, user.password);
-    if (!valid) return null;
+    if (!valid) throw new Error("Incorrect password")
 
     const { accessToken, refreshToken } = createTokens(user);
 
@@ -77,7 +77,7 @@ export class UserResolver {
     const { err } = await createUser(osUserName, password);
     if (err) {
       await User.delete({ id: user.id });
-      return null;
+      throw new Error("Invalid username");
     }
 
     return user;

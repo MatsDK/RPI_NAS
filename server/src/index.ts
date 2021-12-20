@@ -61,7 +61,9 @@ dotenv.config();
     console.log("> Server started on http://localhost:4000/graphql");
 
     connectNodes().then((res) => {
-      console.log("Connected Nodes", res)
+      // console.log("Connected Nodes", res)
+    }).catch(err => {
+      console.log(err)
     })
   });
 })();

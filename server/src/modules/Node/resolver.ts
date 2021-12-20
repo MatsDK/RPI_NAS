@@ -39,7 +39,15 @@ export class NodeResolver {
 		const osLoginName = loginName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
 		if ((await Node.count({ where: { hostNode: true } })) || (await User.count({ where: { osUserName: osLoginName } }))) return null
 
-		const node = await Node.create({ name: name.trim(), loginName: osLoginName, password, port: 4000, host: process.env.HOST_IP, ip: process.env.HOST_IP, basePath: `/home/${osLoginName}`, hostNode: true }).save();
+		const node = await Node.create({
+			name: name.trim(),
+			loginName: osLoginName,
+			password,
+			port: 4000,
+			ip: process.env.HOST_IP,
+			basePath: `/home/${osLoginName}`,
+			hostNode: true
+		}).save()
 
 		const { err } = await createUser(osLoginName, password, false);
 		if (err) {
@@ -57,7 +65,6 @@ export class NodeResolver {
 
 	@Mutation(() => Boolean)
 	async createNodeRequest(@Ctx() { req }: MyContext, @Arg("ip") ip: string, @Arg("port") port: number): Promise<boolean> {
-
 		const id_token = req.headers["authorization"]?.split("_")
 		if (id_token?.length == 2) {
 			const [id, token] = id_token
@@ -73,6 +80,14 @@ export class NodeResolver {
 	}
 
 	@UseMiddleware(isAuth, isAdmin)
+	@Mutation(() => Boolean)
+	async deleteNodeRequest(@Arg("id") id: number): Promise<boolean> {
+		await NodeRequest.delete({ id });
+
+		return true
+	}
+
+	@UseMiddleware(isAuth, isAdmin)
 	@Mutation(() => Node, { nullable: true })
 	async acceptNodeRequest(@Arg("data") { id, name, loginName, password }: AcceptNodeRequestInput): Promise<Node | null> {
 		const osLoginName = loginName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
@@ -83,7 +98,16 @@ export class NodeResolver {
 
 		if ((await User.count({ where: { osUserName: osLoginName } }))) return null
 
-		const node = await Node.create({ name: name.trim(), loginName: osLoginName, password, port: request.port, host: process.env.HOST_IP, ip: request.ip, basePath: `/home/${osLoginName}`, hostNode: false, token: v4() }).save();
+		const node = await Node.create({
+			name: name.trim(),
+			loginName: osLoginName,
+			password,
+			port: request.port,
+			ip: request.ip,
+			basePath: `/home/${osLoginName}`,
+			hostNode: false,
+			token: v4(),
+		}).save();
 		const deleteNode = () => Node.delete({ id: node.id });
 
 		const nodeClient = await getOrCreateNodeClient({ node, ping: true });
