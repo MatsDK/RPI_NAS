@@ -1,5 +1,6 @@
 import { Resolver, Mutation, Query, Arg } from "type-graphql";
 import { Node } from "./SetupNodeInput";
+import { CreateDatastoreInput } from "./CreateDatastoreInput";
 import { createUser } from "../utils/createUser";
 import { getOrCreateConnection } from "../utils/client";
 import { ApolloError } from "apollo-server-express";
@@ -27,7 +28,14 @@ export class resolver {
 
 	@Mutation(() => Boolean, { nullable: true })
 	async connectRequest(): Promise<boolean | null> {
-		await getOrCreateConnection().connect()
+		getOrCreateConnection().connect()
+
+		return true
+	}
+
+	@Mutation(() => Boolean)
+	async createDatastore(@Arg("data", () => CreateDatastoreInput) { path, groupName, ownerUserName, sizeInMB }: CreateDatastoreInput): Promise<boolean> {
+		console.log(path, groupName, ownerUserName, sizeInMB)
 
 		return true
 	}

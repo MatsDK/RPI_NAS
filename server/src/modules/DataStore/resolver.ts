@@ -28,26 +28,31 @@ import { updateSMB } from "../../utils/services/updateSMB";
 import { CreateDataStoreInput } from "./CreateDataStoreInput";
 import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { UpdateDatastoreInput } from "./UpdateDatastoreInput";
+import { createRemoteDatastore } from "../../utils/nodes/createDatastore"
 
 @Resolver()
 export class DataStoreResolver {
   @UseMiddleware(isAuth, getUser, isAdmin)
   @Mutation(() => Datastore, { nullable: true })
   async createDataStore(
-    @Arg("data") { localNodeId, name, ownerId, sizeInMB, }: CreateDataStoreInput
+    @Arg("data") data: CreateDataStoreInput
   ): Promise<Datastore | null> {
+    const { localNodeId, name, ownerId, sizeInMB } = data
+
     const hostNode = await Node.findOne({ where: { hostNode: true } }),
       thisNode = await Node.findOne({ where: { id: localNodeId } }),
       owner = await User.findOne({ where: { id: ownerId } });
 
     if (!hostNode || !thisNode || !owner) return null;
 
+    const basePath = fsPath.join(thisNode.basePath, nanoid(10)),
+      groupName = fsPath.basename(basePath);
+
     if (hostNode.id != thisNode.id) {
-      console.log("create remote")
+      const { err } = await createRemoteDatastore({ node: thisNode, path: basePath, groupName, sizeInMB, ownerUserName: owner.osUserName })
+      if (err) throw new Error(err)
       return null
     }
-
-    const basePath = fsPath.join(thisNode.basePath, nanoid(10));
 
     const newDatastore = await Datastore.create({
       basePath,
@@ -59,7 +64,6 @@ export class DataStoreResolver {
       allowedSMBUsers: [ownerId],
     }).save();
 
-    const groupName = fsPath.basename(basePath);
     const { err } = await createGroup(groupName, owner.osUserName);
     if (err) {
       console.log(err)

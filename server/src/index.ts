@@ -62,7 +62,7 @@ dotenv.config();
 
     connectNodes().then((res) => {
       // console.log("Connected Nodes", res)
-    }).catch(err => {
+    }).catch((err) => {
       console.log(err)
     })
   });
