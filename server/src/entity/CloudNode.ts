@@ -43,4 +43,8 @@ export class Node extends BaseEntity {
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   token?: string;
+
+  @Field(() => [Number])
+  @Column("int", { array: true, default: [] })
+  initializedUsers: number[]
 }

@@ -13,4 +13,13 @@ export class CreateDatastoreInput {
 
 	@Field()
 	ownerUserName: string
+
+	@Field()
+	ownerPassword: string
+
+	@Field()
+	initOwner: boolean
+
+	@Field()
+	hostLoginName: string
 }

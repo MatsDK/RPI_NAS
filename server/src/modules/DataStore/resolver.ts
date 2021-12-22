@@ -37,7 +37,7 @@ export class DataStoreResolver {
   async createDataStore(
     @Arg("data") data: CreateDataStoreInput
   ): Promise<Datastore | null> {
-    const { localNodeId, name, ownerId, sizeInMB } = data
+    const { localNodeId, name, ownerId, sizeInMB, ownerPassword } = data
 
     const hostNode = await Node.findOne({ where: { hostNode: true } }),
       thisNode = await Node.findOne({ where: { id: localNodeId } }),
@@ -47,12 +47,6 @@ export class DataStoreResolver {
 
     const basePath = fsPath.join(thisNode.basePath, nanoid(10)),
       groupName = fsPath.basename(basePath);
-
-    if (hostNode.id != thisNode.id) {
-      const { err } = await createRemoteDatastore({ node: thisNode, path: basePath, groupName, sizeInMB, ownerUserName: owner.osUserName })
-      if (err) throw new Error(err)
-      return null
-    }
 
     const newDatastore = await Datastore.create({
       basePath,
@@ -64,21 +58,29 @@ export class DataStoreResolver {
       allowedSMBUsers: [ownerId],
     }).save();
 
-    const { err } = await createGroup(groupName, owner.osUserName);
-    if (err) {
-      console.log(err)
-    };
+    const isUserInitialized = thisNode.initializedUsers.includes(ownerId)
+    if (!isUserInitialized && !ownerPassword?.trim()) throw new Error("User not initialized")
 
-    createDatastoreFolder(basePath, sizeInMB, {
-      folderUser: thisNode.loginName,
-      folderGroup: groupName,
-    }).then(async (res) => {
-      newDatastore &&
-        (await Datastore.update(
-          { id: newDatastore.id },
-          { status: DataStoreStatus.ONLINE }
-        ));
-    });
+    const setStatusToOnline = async () => newDatastore && await Datastore.update({ id: newDatastore.id }, { status: DataStoreStatus.ONLINE })
+
+    if (hostNode.id != thisNode.id) {
+      const { err } = await createRemoteDatastore({ node: thisNode, path: basePath, groupName, sizeInMB, ownerUserName: owner.osUserName, ownerPassword, initOwner: !isUserInitialized })
+      await setStatusToOnline()
+
+      if (err) throw new Error(err)
+
+      return null
+    } else {
+      const { err } = await createGroup(groupName, owner.osUserName);
+      if (err) {
+        console.log(err)
+      };
+
+      createDatastoreFolder(basePath, sizeInMB, {
+        folderUser: thisNode.loginName,
+        folderGroup: groupName,
+      }).then(async () => await setStatusToOnline());
+    }
 
     return newDatastore;
   }

@@ -13,4 +13,7 @@ export class CreateDataStoreInput {
 
   @Field()
   ownerId: number;
+
+  @Field({nullable: true})
+  ownerPassword: string;
 }

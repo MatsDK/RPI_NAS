@@ -13,7 +13,7 @@ export const createGroup = async (
   if (createGroupErr) return { err: createGroupErr };
 
   const { stderr: addOwnerToGroupErr } = await exec(
-    `usermod -a -G ${groupName} ${userName}`
+    `usermod -aG ${groupName} ${userName}`
   );
   if (addOwnerToGroupErr) return { err: addOwnerToGroupErr };
 
@@ -30,15 +30,15 @@ const addAndRemoveUsersFromGroup = async ({
   ids,
 }: Props): Promise<{ err: any }> => {
   const datastores = await Datastore.find({
-      where: { id: Any(ids.map((i) => i.dataStoreId)) },
-    }),
+    where: { id: Any(ids.map((i) => i.dataStoreId)) },
+  }),
     users = await User.find({ where: { id: Any(ids.map((i) => i.userId)) } });
 
   for (const sharedDatastore of ids) {
     try {
       const datastore = datastores.find(
-          (d) => d.id === sharedDatastore.dataStoreId
-        ),
+        (d) => d.id === sharedDatastore.dataStoreId
+      ),
         user = users.find((d) => d.id === sharedDatastore.userId);
 
       if (!datastore || !user) continue;

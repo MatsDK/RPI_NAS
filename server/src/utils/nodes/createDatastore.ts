@@ -3,8 +3,8 @@ import { Node } from "../../entity/CloudNode"
 import { getOrCreateNodeClient } from "./nodeClients"
 
 const CREATE_REMOTE_DATASTORE_MUTATION = gql`
-mutation CreateDatastore($path: String!, $groupName: String!, $sizeInMB: Float!, $ownerUserName: String!) {
-	createDatastore(data: { path: $path, groupName: $groupName, sizeInMB: $sizeInMB, ownerUserName: $ownerUserName })
+mutation CreateDatastore($path: String!, $groupName: String!, $sizeInMB: Float!, $ownerUserName: String!, $ownerPassword: String!, $initOwner:Boolean!, $hostLoginName: String!) {
+	createDatastore(data: { path: $path, groupName: $groupName, sizeInMB: $sizeInMB, ownerUserName: $ownerUserName, ownerPassword: $ownerPassword, initOwner: $initOwner, hostLoginName: $hostLoginName })
 }
 `
 
@@ -13,7 +13,9 @@ interface CreateRemoteDatastoreProps {
 	path: string
 	groupName: string
 	sizeInMB: number
-	ownerUserName: string
+	ownerUserName: string | null
+	ownerPassword: string | null
+	initOwner: boolean
 }
 
 export const createRemoteDatastore = async ({ node, ...data }: CreateRemoteDatastoreProps): Promise<{ err: any }> => {
@@ -21,7 +23,7 @@ export const createRemoteDatastore = async ({ node, ...data }: CreateRemoteDatas
 		const client = await getOrCreateNodeClient({ node, ping: true });
 		if (!client) return { err: "Could not connect to client" }
 
-		const res = await client.conn.mutate({ mutation: CREATE_REMOTE_DATASTORE_MUTATION, variables: { ...data } });
+		const res = await client.conn.mutate({ mutation: CREATE_REMOTE_DATASTORE_MUTATION, variables: { ...data, hostLoginName: node.loginName } });
 		console.log(res)
 
 		return { err: false }
