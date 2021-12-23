@@ -2,7 +2,7 @@ import { Datastore, useGetDataStoresQuery } from "generated/apolloComponents";
 import Link from "next/link";
 import { BgButton } from "src/ui/Button";
 import React, { useEffect, useState } from "react";
-import NewDataStoreWrapper from "./NewDataStoreWrapper";
+import { NewDatastoreForm } from "./NewDatastoreForm";
 import ShareDataStoreWrapper from "./ShareDataStoreWrapper";
 import { useApolloClient } from "react-apollo";
 import { useMeState } from "src/hooks/useMeState";
@@ -89,7 +89,7 @@ const DataStoresContainer: React.FC = () => {
           d.owner?.id === me?.id || d.sharedUsers.find((su) => su.id === me?.id)
       ) || []) as any
     );
-    return () => {};
+    return () => { };
   }, [me, data]);
 
   if (error) {
@@ -101,7 +101,7 @@ const DataStoresContainer: React.FC = () => {
   return (
     <DataStoresWrapper>
       {showNewDataStoreForm && (
-        <NewDataStoreWrapper hide={() => setShowNewDataStoreForm(false)} />
+        <NewDatastoreForm />
       )}
       {showShareDataStoreForm && (
         <ShareDataStoreWrapper

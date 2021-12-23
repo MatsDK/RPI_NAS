@@ -1,102 +1,103 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useDropdown } from "src/hooks/useDropdown";
 import styled from "styled-components";
 import Icon from "./Icon";
+import { Scrollbar } from "./Scrollbar";
 
 interface SelectProps {
-  selectedIdx?: number;
   data: any[];
   label: string;
   setValue: React.Dispatch<any>;
-  propName?: string;
-  minWidth?: number;
-  renderItem?: (item: any, idx: number, onClick: () => void) => JSX.Element;
+  renderItem: (item: any, idx: number, onClick: () => void) => JSX.Element;
+  uniqueKey: string
+  selectedLabelKey: string
 }
 
-const SelectWrapper = styled.div`
-  height: 39px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: fit-content;
+const Wrapper = styled.div`
   position: relative;
-`;
+`
 
-const SelectContainer = styled.div`
+type ContainerProps = { showDropDown: boolean }
+const Container = styled.div<ContainerProps>`
+  position: relative;
+  width: 300px;
+  height: 40px;
   display: flex;
-  height: 29px;
+  cursor: pointer;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid ${(props) => props.theme.textColors[2]};
-  cursor: pointer;
-  padding: 0 3px;
-`;
+  border-radius: 7px;
+  border-bottom-left-radius: ${props => props.showDropDown ? 0 : 7}px;
+  border-bottom-right-radius: ${props => props.showDropDown ? 0 : 7}px;
+  border: 1px solid ${props => props.theme.lightBgColors[1]};
+  background: ${props => props.theme.lightBgColors[0]};
+  transition: border-radius .15s ease-in-out;
+`
 
 const Label = styled.span`
-  color: ${(props) => props.theme.textColors[3]};
-`;
+  color: ${props => props.theme.textColors[1]};
+  padding: 0 15px;
+`
 
-const SelectDropDown = styled.div`
-  margin-top: -4px;
+const DropDownButton = styled.div`
+  height: calc(100% - 10px);
+  width: 40px;
+  border-left: 1px solid ${props => props.theme.lightBgColors[2]};
+  padding:  5px;
+  display: grid;
+  place-items: center;
+`
+
+const DropDown = styled.div`
+  ${Scrollbar}
+
   position: absolute;
-  top: 100%;
   width: 100%;
-  background-color: ${(props) => props.theme.bgColors[0]};
+  padding: 0;
+  margin-top: -1px;
+  background: ${props => props.theme.lightBgColors[0]};
+  border: 1px solid ${props => props.theme.lightBgColors[1]};
+  border-bottom-right-radius: 7px;
+  border-bottom-left-radius: 7px;
+  max-height: 200px;
+  overflow-y: auto;
   z-index: 200;
-  padding: 2px 3px;
-  box-shadow: 3px 3px 10px 5px #0000007a;
+`
 
-  .item:not(:last-child) {
-    border-bottom: 1px solid ${(props) => props.theme.bgColors[2]};
-  }
-`;
-
-const DropDownItem = styled.p`
-  p {
-    padding: 2px;
-  }
-`;
+const SelectedValue = styled.span`
+  padding: 0 15px;
+  color: ${props => props.theme.textColors[0]};
+`
 
 export const Select: React.FC<SelectProps> = ({
-  selectedIdx,
   data,
   label,
   setValue,
-  propName,
-  minWidth = 85,
   renderItem,
+  uniqueKey,
+  selectedLabelKey
 }) => {
-  if (selectedIdx == -1) selectedIdx = undefined;
+  const [showDropDown, setShowDropDown] = useState(false)
+  const [selected, setSelected] = useState<any>(null)
 
-  const [selected, setSelectedIdx] = useState(
-    selectedIdx != null ? selectedIdx : null
-  );
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  useEffect(() => {
-    selected != null && setValue(data[selected]);
-  }, [selectedIdx, selected]);
+  const dropDownRef = useRef()
+  useDropdown(dropDownRef, () => showDropDown && setShowDropDown(false))
 
   useEffect(() => {
-    setSelectedIdx(selectedIdx != null ? selectedIdx : null);
-  }, [selectedIdx]);
+    const newVal = data.find((item) => item[uniqueKey] == selected)
+    if (newVal) setValue(newVal)
+    setShowDropDown(false)
+  }, [selected])
 
-  return (
-    <SelectWrapper>
-      <SelectContainer
-        style={{ minWidth }}
-        onClick={() => setDropdownOpen((s) => !s)}
-      >
-        {selected != null ? (
-          <Label>{propName ? data[selected][propName] : data[selected]}</Label>
-        ) : (
-          <Label>{label}</Label>
-        )}
-        <div
-          style={{
-            marginLeft: 10,
-            transform: !dropdownOpen ? "rotate(90deg)" : "rotate(-90deg)",
-          }}
-        >
+  const selectedItem = selected && data.find((item) => item[uniqueKey] == selected)
+
+  return <Wrapper>
+    <Container showDropDown={showDropDown} onClick={() => setShowDropDown(s => !s)}>
+      {selectedItem ? <SelectedValue>{selectedItem[selectedLabelKey]}</SelectedValue> :
+        <Label>{label}</Label>
+      }
+      <DropDownButton >
+        <div style={{ transform: `rotate(${showDropDown ? 270 : 90}deg)` }}>
           <Icon
             name={"folderArrow"}
             color={{ idx: 2, propName: "textColors" }}
@@ -104,30 +105,14 @@ export const Select: React.FC<SelectProps> = ({
             width={16}
           />
         </div>
-      </SelectContainer>
-      {dropdownOpen && (
-        <SelectDropDown>
-          {data.map((v, idx) => {
-            const onClick = () => {
-              idx != selected && setSelectedIdx(idx);
-              setDropdownOpen(false);
-            };
-
-            return renderItem ? (
-              renderItem(v, idx, onClick)
-            ) : (
-              <DropDownItem
-                className={"item"}
-                key={idx}
-                style={{ cursor: "pointer" }}
-                onClick={onClick}
-              >
-                {propName ? v[propName] : v}
-              </DropDownItem>
-            );
-          })}
-        </SelectDropDown>
-      )}
-    </SelectWrapper>
-  );
+      </DropDownButton>
+    </Container>
+    {showDropDown && <DropDown ref={dropDownRef as any}>
+      {data.map((item, idx) => {
+        return renderItem(item, idx, () => {
+          setSelected(() => item[uniqueKey])
+        })
+      })}
+    </DropDown>}
+  </Wrapper>
 };

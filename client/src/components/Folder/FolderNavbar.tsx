@@ -7,6 +7,7 @@ import { useApollo } from "src/hooks/useApollo";
 import { useDropdown } from "src/hooks/useDropdown";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import { BgButton, Button, ConditionButton } from "src/ui/Button";
+import Icon from "src/ui/Icon";
 import { Scrollbar } from "src/ui/Scrollbar";
 import styled from "styled-components";
 import { CopyToWrapper } from "./CopyMove/CopyToWrapper";
@@ -15,14 +16,13 @@ import {
   SSHDownloadDropdown,
   SSHDownloadDropdownWrapper,
 } from "./SSHDownloadDropdown";
-import UploadWrapper from "./UploadWrapper";
+import UploadWrapper from "./upload/UploadWrapper";
 
 const FolderNavbarWrapper = styled.div`
   height: 100%;
-  margin: 5px 10px 0 10px;
-  width: fit-content;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 `;
 
 const FolderNavBarContainer = styled.div`
@@ -34,6 +34,22 @@ const FolderNavBarContainer = styled.div`
   border-bottom: 1px solid ${(props) => props.theme.textColors[3]};
   width: calc(100% - 20px);
 `;
+
+const FolderNavBarButtons = styled.div`
+  height: 100%;
+  display: flex;
+  align-items: center;
+`
+
+const SearchButton = styled.div`
+  opacity: .75;
+  cursor: pointer;
+  transition: .15s ease-in-out;
+
+  :hover {
+    opacity: 1;
+  }
+`
 
 const FolderNavbar = () => {
   const { mutate } = useApollo();
@@ -128,51 +144,56 @@ const FolderNavbar = () => {
   return (
     <FolderNavBarContainer>
       <FolderNavbarWrapper>
-        {showUploadForm && (
-          <UploadWrapper hide={() => setShowUploadForm(false)} />
-        )}
-        {showCopyToForm && (
-          <CopyToWrapper hide={() => setShowCopyToForm(false)} />
-        )}
-        {showMoveToForm && (
-          <MoveToWrapper hide={() => setShowMoveToForm(false)} />
-        )}
-        <BgButton
-          onClick={() => {
-            folderCtx?.newFolderInput?.setShowNewFolderInput((s) => !s);
-          }}
-        >
-          New Folder
-        </BgButton>
-        <Button
-          onClick={() => setShowUploadForm((showUploadForm) => !showUploadForm)}
-        >
-          Upload
-        </Button>
-        <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
-          <Button onClick={() => createDownloadSession()}>Download</Button>
-        </ConditionButton>
-        <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
-          <Button onClick={() => setShowSSHDownloadDropdown((s) => !s)}>
-            Download SSH
-          </Button>
-          {showSSHDownloadDropdown && (
-            <SSHDownloadDropdownWrapper ref={downloadDropdown}>
-              <SSHDownloadDropdown
-                close={() => setShowSSHDownloadDropdown(false)}
-              />
-            </SSHDownloadDropdownWrapper>
+        <FolderNavBarButtons>
+          {showUploadForm && (
+            <UploadWrapper hide={() => setShowUploadForm(false)} />
           )}
-        </ConditionButton>
-        <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
-          <Button onClick={deleteSelected}>Delete</Button>
-        </ConditionButton>
-        <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
-          <Button onClick={() => setShowMoveToForm((s) => !s)}>Move To</Button>
-        </ConditionButton>
-        <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
-          <Button onClick={() => setShowCopyToForm((s) => !s)}>Copy To</Button>
-        </ConditionButton>
+          {showCopyToForm && (
+            <CopyToWrapper hide={() => setShowCopyToForm(false)} />
+          )}
+          {showMoveToForm && (
+            <MoveToWrapper hide={() => setShowMoveToForm(false)} />
+          )}
+          <BgButton
+            onClick={() => {
+              folderCtx?.newFolderInput?.setShowNewFolderInput((s) => !s);
+            }}
+          >
+            New Folder
+          </BgButton>
+          <Button
+            onClick={() => setShowUploadForm((showUploadForm) => !showUploadForm)}
+          >
+            Upload
+          </Button>
+          <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+            <Button onClick={() => createDownloadSession()}>Download</Button>
+          </ConditionButton>
+          <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+            <Button onClick={() => setShowSSHDownloadDropdown((s) => !s)}>
+              Download SSH
+            </Button>
+            {showSSHDownloadDropdown && (
+              <SSHDownloadDropdownWrapper ref={downloadDropdown}>
+                <SSHDownloadDropdown
+                  close={() => setShowSSHDownloadDropdown(false)}
+                />
+              </SSHDownloadDropdownWrapper>
+            )}
+          </ConditionButton>
+          <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+            <Button onClick={deleteSelected}>Delete</Button>
+          </ConditionButton>
+          <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+            <Button onClick={() => setShowMoveToForm((s) => !s)}>Move To</Button>
+          </ConditionButton>
+          <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
+            <Button onClick={() => setShowCopyToForm((s) => !s)}>Copy To</Button>
+          </ConditionButton>
+        </FolderNavBarButtons>
+        <SearchButton>
+          <Icon name="searchIcon" width={20} height={20} color={{ idx: 1, propName: "textColors" }} />
+        </SearchButton>
       </FolderNavbarWrapper>
     </FolderNavBarContainer>
   );

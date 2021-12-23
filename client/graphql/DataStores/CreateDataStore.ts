@@ -6,6 +6,7 @@ export const CreateDataStoreMutation = gql`
     $name: String!
     $sizeInMb: Float!
     $ownerId: Float!
+    $ownerPassword: String
   ) {
     createDataStore(
       data: {
@@ -13,6 +14,7 @@ export const CreateDataStoreMutation = gql`
         name: $name
         sizeInMB: $sizeInMb
         ownerId: $ownerId
+        ownerPassword: $ownerPassword
       }
     ) {
       id

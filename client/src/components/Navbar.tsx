@@ -86,11 +86,10 @@ const UserDropdownWrapper = styled.div`
   min-width: 300px;
   border-radius: 1px;
   right: 0;
-
+  z-index: 1000;
   padding: 10px;
   color: ${(props) => props.theme.bgColors[1]};
   box-shadow: 0 24px 54px rgb(0 0 0 / 15%), 0 4.5px 13.5px rgb(0 0 0 / 8%);
-
   display: flex;
   align-items: center;
 
