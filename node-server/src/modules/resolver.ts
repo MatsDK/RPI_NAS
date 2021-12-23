@@ -6,6 +6,8 @@ import { getOrCreateConnection } from "../utils/client";
 import { ApolloError } from "apollo-server-express";
 import { createDatastoreFolder } from "../utils/datastore/createDatastoreFolder"
 import { createGroup } from "../utils/datastore/handleGroups";
+import { GetDatastoreSizes, GetDatastoreSizesInput } from "./GetDatastoreSizes";
+import { getDatastoreSizes } from "../utils/datastore/getDatastoreSizes";
 
 @Resolver()
 export class resolver {
@@ -14,6 +16,7 @@ export class resolver {
 		return true
 	}
 
+	@Mutation(() => Boolean, { nullable: true })
 	async setupNode(@Arg("data", () => Node) { loginName, password, token, id }: Node): Promise<boolean | null> {
 		const { err } = await createUser(loginName, password)
 		if (err) throw new ApolloError(err)
@@ -49,5 +52,10 @@ export class resolver {
 		if (createDatastoreFolderErr) throw new ApolloError(createDatastoreFolderErr);
 
 		return true
+	}
+
+	@Query(() => [GetDatastoreSizes])
+	getDatastoresSizes(@Arg("datastores", () => [GetDatastoreSizesInput]) datastores: [GetDatastoreSizesInput]) {
+		return datastores.length ? getDatastoreSizes(datastores) : []
 	}
 }
