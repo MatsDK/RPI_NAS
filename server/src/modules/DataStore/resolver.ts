@@ -59,7 +59,10 @@ export class DataStoreResolver {
     }).save();
 
     const isUserInitialized = thisNode.initializedUsers.includes(ownerId)
-    if (!isUserInitialized && !ownerPassword?.trim()) throw new Error("User not initialized")
+    if (!isUserInitialized && !ownerPassword?.trim()) {
+      Datastore.delete({ id: newDatastore.id })
+      throw new Error("User not initialized")
+    }
 
     const setStatusToOnline = async () => newDatastore && await Datastore.update({ id: newDatastore.id }, { status: DataStoreStatus.ONLINE })
 

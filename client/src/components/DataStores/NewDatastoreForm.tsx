@@ -1,13 +1,21 @@
 import { useGetFriendsQueryQuery, useGetNodesQueryQuery } from 'generated/apolloComponents';
+import { ClipLoader } from 'react-spinners';
 import React, { useState } from 'react';
 import { useApolloClient } from 'react-apollo';
+import { useInput } from 'src/hooks/useInput';
 import { useMeState } from 'src/hooks/useMeState';
 import { ProfilePicture } from "src/ui/ProfilePicture";
 import { Select } from 'src/ui/Select';
 import styled from 'styled-components';
 import { Input } from "../../ui/Input";
+import { BgButton, ConditionButton } from "../../ui/Button"
+import { useApollo } from 'src/hooks/useApollo';
+import { CreateDataStoreMutation } from 'graphql/DataStores/CreateDataStore';
+import { getDataStoresQuery } from 'graphql/DataStores/getDataStores';
 
-interface NewDatastoreFormProps { }
+interface NewDatastoreFormProps {
+	hide: () => void
+}
 
 const Wrapper = styled.div`
 	position: absolute;
@@ -34,6 +42,8 @@ const Container = styled.div`
 	box-shadow:  0 0 30px 5px #00000012;
 	padding: 10px 20px;
 	pointer-events: all;
+	display: flex;
+	flex-direction: column;
 `
 
 const Title = styled.h1`
@@ -103,13 +113,28 @@ const SelectOwnerItem = styled.div`
 	}
 `;
 
+const Bottom = styled.div`
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	height: 40px;
+`
 
-export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ }) => {
+const Loader = styled.div`
+	margin-right: 10px;
+	height: 16px;
+`
+
+export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 	const { me } = useMeState()
 	const [name, setName] = useState("")
 	const [selectedOwner, setSelectedOwner] = useState<number | null>(null)
 	const [selectedNode, setSelectedNode] = useState<number | null>(null)
+	const [sizeInput, setSizeInput] = useInput<string | null>(null)
+
+	const [loading, setLoading] = useState<boolean>(false)
 	const client: any = useApolloClient();
+	const { mutate } = useApollo()
 
 	const { data: friends, error: friendsError } = useGetFriendsQueryQuery({
 		client,
@@ -124,6 +149,26 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ }) => {
 		return null
 	}
 
+	const createDatastore = async () => {
+		if (!name.trim() || selectedNode == null || selectedOwner == null || !isValidSize(sizeInput || "")) return null
+
+		setLoading(true)
+		const { data } = await mutate(
+			CreateDataStoreMutation,
+			{
+				ownerId: Number(selectedOwner),
+				localNodeId: Number(selectedNode),
+				name: name.trim(),
+				sizeInMb: isValidSize(sizeInput!),
+				ownerPassword: null
+			},
+			{ refetchQueries: [{ query: getDataStoresQuery, variables: {} }] },
+		);
+		setLoading(false)
+
+		console.log(data);
+	}
+
 	return (
 		<Wrapper>
 			<Container >
@@ -131,44 +176,74 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ }) => {
 					New datastore
 					<span>Configure a new datastore</span>
 				</Title>
-				<Section>
-					<Label>Name</Label>
-					<Input placeholder="Name" value={name} onChange={(e) => setName(e.currentTarget.value.replace(/[^a-z0-9]/gi, "_"))} />
-				</Section>
-				<Section>
-					<Label>Datastore owner</Label>
-					<Select data={[me, ...(friends?.getFriends || [])]} label="Datastore owner" setValue={(owner) => setSelectedOwner(owner.id)} renderItem={
-						(item, idx, setSelected) => (<SelectOwnerItem
-							key={idx}
-							onClick={setSelected}
-						>
-							<ProfilePicture
-								src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${item.id}`}
-							/>
-							<span>{item.userName}</span>
-						</SelectOwnerItem>)
-					} uniqueKey="id" selectedLabelKey="userName" />
-				</Section>
-				<Section>
-					<Label>Datastore host</Label>
-					<Select data={nodes?.getNodes?.nodes || []} label="Datastore host" setValue={(node) => setSelectedNode(node.id)} renderItem={
-						(item, idx, setSelected) => (
-							<SelectCloudDropdownItem
+				<div style={{ flex: 1 }}>
+					<Section>
+						<Label>Name</Label>
+						<Input placeholder="Name" value={name} onChange={(e) => setName(e.currentTarget.value.replace(/[^a-z0-9]/gi, "_"))} />
+					</Section>
+					<Section>
+						<Label>Datastore owner</Label>
+						<Select data={[me, ...(friends?.getFriends || [])]} label="Datastore owner" setValue={(owner) => setSelectedOwner(owner.id)} renderItem={
+							(item, idx, setSelected) => (<SelectOwnerItem
 								key={idx}
 								onClick={setSelected}
 							>
-								{item.name}
-								<p>{item.ip}</p>
-							</SelectCloudDropdownItem>
-						)
-					} uniqueKey="id" selectedLabelKey="name" />
-				</Section>
-				<Section>
-					<Label>Size</Label>
-					<Input placeholder="Size" />
-				</Section>
+								<ProfilePicture
+									src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${item.id}`}
+								/>
+								<span>{item.userName}</span>
+							</SelectOwnerItem>)
+						} uniqueKey="id" selectedLabelKey="userName" />
+					</Section>
+					<Section>
+						<Label>Datastore host</Label>
+						<Select data={nodes?.getNodes?.nodes || []} label="Datastore host" setValue={(node) => setSelectedNode(node.id)} renderItem={
+							(item, idx, setSelected) => (
+								<SelectCloudDropdownItem
+									key={idx}
+									onClick={setSelected}
+								>
+									{item.name}
+									<p>{item.ip}</p>
+								</SelectCloudDropdownItem>
+							)
+						} uniqueKey="id" selectedLabelKey="name" />
+					</Section>
+					<Section>
+						<Label>Size</Label>
+						<Input placeholder="Size" value={sizeInput || ""} onChange={setSizeInput} />
+					</Section>
+				</div>
+				<Bottom>
+					<Loader>
+						<ClipLoader color={"#000000"} loading={loading} size={16} />
+					</Loader>
+					<ConditionButton condition={!loading && !!isValidSize(sizeInput || "") && selectedOwner != null && selectedNode != null && !!name.trim()}>
+						<BgButton onClick={createDatastore}>Create datastore</BgButton>
+					</ConditionButton>
+				</Bottom>
 			</Container>
 		</Wrapper>
 
 	);
+}
+
+const isValidSize = (sizeInput: string): null | number => {
+	const lastChar = sizeInput
+		.toLowerCase()
+		.trim()
+		.charAt(sizeInput.trim().length - 1);
+
+	let m = 1;
+	if (lastChar == "g") m = 1000;
+	else if (lastChar != "m") return null;
+
+	const lastIdx = sizeInput.toLowerCase().indexOf(lastChar);
+	const num = Number(sizeInput.slice(0, lastIdx));
+
+	if (num)
+		return num * m >= 1 && num * m <= 200000
+			? num * m
+			: null;
+	else return null
 }

@@ -101,7 +101,7 @@ const DataStoresContainer: React.FC = () => {
   return (
     <DataStoresWrapper>
       {showNewDataStoreForm && (
-        <NewDatastoreForm />
+        <NewDatastoreForm hide={() => setShowNewDataStoreForm(false)} />
       )}
       {showShareDataStoreForm && (
         <ShareDataStoreWrapper
