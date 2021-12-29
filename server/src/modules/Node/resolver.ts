@@ -46,13 +46,14 @@ export class NodeResolver {
 			port: 4000,
 			ip: process.env.HOST_IP,
 			basePath: `/home/${osLoginName}`,
-			hostNode: true
+			hostNode: true,
 		}).save()
 
 		const { err } = await createUser(osLoginName, password, false);
 		if (err) {
 			console.log(err);
 			Node.delete({ id: node.id });
+			throw new ApolloError(err)
 		}
 
 		return node;

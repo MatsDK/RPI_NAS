@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { ClipLoader } from 'react-spinners';
 
 export const Button = styled.button`
   background: transparent;
@@ -81,3 +82,46 @@ export const LightBgButton = styled.button`
     background-color: ${(props) => props.theme.lightBgColors[1]};
   }
 `;
+
+interface LoadingProps {
+  loading: boolean
+}
+
+const LoadingOverlayWrapper = styled.div`
+  position: relative;
+
+`
+const Children = styled.div<LoadingProps>`
+  width: 100%;
+  height: 100%;
+  transition: opacity .15s ease-in-out;
+  opacity: ${props => props.loading ? .3 : 1};
+`
+
+const Loader = styled.div<LoadingProps>`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+
+  transition: opacity .15s ease-in-out;
+  opacity: ${props => props.loading ? 1 : 0};
+  pointer-events: ${props => props.loading ? "all" : "none"};
+`
+
+interface LoadingOverlayProps {
+  loading: boolean
+}
+
+
+export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ loading, children }) => (
+  <LoadingOverlayWrapper >
+    <Children loading={loading}>
+      {children}
+    </Children>
+    <Loader loading={loading}>
+      <ClipLoader color={"#000000"} loading={loading} size={16} />
+    </Loader>
+  </LoadingOverlayWrapper>
+);

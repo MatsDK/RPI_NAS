@@ -11,5 +11,5 @@ export const ArrowButton = styled.div<ArrowButtonProps>`
   display: grid;
   place-items: center;
 
-  transform: rotate(${(props) => (props.active ? 90 : 0)}deg);
+  transform: rotate(${(props) => props.active ? 90 : 0}deg);
 `;

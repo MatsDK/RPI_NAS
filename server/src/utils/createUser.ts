@@ -6,22 +6,17 @@ import fs from "fs-extra";
 export const createUser = async (
   osName: string,
   password: string,
-  check: boolean = true
+  checkNodes: boolean = true
 ): Promise<{ err: any }> => {
-  if (check)
-    if (
-      !!User.count({ where: { osUserName: osName } }) ||
-      !!(await Node.count({ where: { loginName: osName } }))
-    ) {
-      return { err: "Can't create a user with that name" };
-    }
+  if ((checkNodes && !!(await Node.count({ where: { loginName: osName } }))) || !!(await User.count({ where: { osUserName: osName } })))
+    return { err: "Can't create a user with that name" };
 
   const { stdout: hashOut, stderr: hashErr } = await exec(
     `perl -e 'print crypt("${password}", "salt")'`
   );
   if (!hashOut?.trim() || hashErr) return { err: hashErr };
 
-  const { stdout: addOut, stderr: addErr } = await exec(
+  const { stderr: addErr } = await exec(
     `useradd -p ${hashOut.trim()} ${osName}`
   );
   if (addErr) return { err: addErr };

@@ -74,7 +74,7 @@ export class UserResolver {
       osUserName,
     }).save();
 
-    const { err } = await createUser(osUserName, password);
+    const { err } = await createUser(osUserName, password, false);
     if (err) {
       await User.delete({ id: user.id });
       throw new Error("Invalid username");

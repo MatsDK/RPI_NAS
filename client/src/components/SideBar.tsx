@@ -82,7 +82,7 @@ const sideBar = () => {
         </SideBarItem>
       </Link>
       {me?.isAdmin && (
-        <Link href={"/hosts"}>
+        <Link href={"/nodes"}>
           <SideBarItem>
             <span style={{ marginRight: 5 }}>
               <Icon
