@@ -1,6 +1,8 @@
 import { useGetFriendsQueryQuery, useGetNodesQueryQuery } from 'generated/apolloComponents';
+import Link from "next/link"
 import { ClipLoader } from 'react-spinners';
 import React, { useState } from 'react';
+import { ConditionOverlay } from '../ConditionOverlay';
 import { useApolloClient } from 'react-apollo';
 import { useInput } from 'src/hooks/useInput';
 import { useMeState } from 'src/hooks/useMeState';
@@ -8,7 +10,7 @@ import { ProfilePicture } from "src/ui/ProfilePicture";
 import { Select } from 'src/ui/Select';
 import styled from 'styled-components';
 import { Input } from "../../ui/Input";
-import { BgButton, ConditionButton } from "../../ui/Button"
+import { BgButton, Button, ConditionButton } from "../../ui/Button"
 import { useApollo } from 'src/hooks/useApollo';
 import { CreateDataStoreMutation } from 'graphql/DataStores/CreateDataStore';
 import { getDataStoresQuery } from 'graphql/DataStores/getDataStores';
@@ -40,7 +42,6 @@ const Container = styled.div`
 	max-height: 500px;
 	min-height: 400px;
 	box-shadow:  0 0 30px 5px #00000012;
-	padding: 10px 20px;
 	pointer-events: all;
 	display: flex;
 	flex-direction: column;
@@ -125,6 +126,35 @@ const Loader = styled.div`
 	height: 16px;
 `
 
+const OverlayText = styled.div`
+	color: ${props => props.theme.textColors[1]};
+	font-size: 18px;
+
+	> a {
+		color: ${props => props.theme.textColors[0]};
+		font-size: 18px;
+		font-weight: 600;
+	}
+`
+
+const Overlay = styled.div`
+	display: flex;
+	flex-direction: column;
+`
+
+interface OverlayElementProps {
+	hide: () => void
+}
+
+const OverlayElement: React.FC<OverlayElementProps> = ({ hide }) => {
+	return (
+		<Overlay>
+			<OverlayText>Initialize a <Link href={"/nodes/createhost"}>host node</Link> before creating a datastore</OverlayText>
+			<Button onClick={hide}>Cancel</Button>
+		</Overlay>
+	)
+}
+
 export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 	const { me } = useMeState()
 	const [name, setName] = useState("")
@@ -140,7 +170,7 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 		client,
 	});
 
-	const { data: nodes, error: NodesError } = useGetNodesQueryQuery({
+	const { data: nodes, error: NodesError, loading: nodesLoading } = useGetNodesQueryQuery({
 		client,
 	});
 
@@ -148,6 +178,7 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 		console.log(friendsError, NodesError)
 		return null
 	}
+
 
 	const createDatastore = async () => {
 		if (!name.trim() || selectedNode == null || selectedOwner == null || !isValidSize(sizeInput || "")) return null
@@ -171,59 +202,69 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 
 	return (
 		<Wrapper>
-			<Container >
-				<Title>
-					New datastore
-					<span>Configure a new datastore</span>
-				</Title>
-				<div style={{ flex: 1 }}>
-					<Section>
-						<Label>Name</Label>
-						<Input placeholder="Name" value={name} onChange={(e) => setName(e.currentTarget.value.replace(/[^a-z0-9]/gi, "_"))} />
-					</Section>
-					<Section>
-						<Label>Datastore owner</Label>
-						<Select data={[me, ...(friends?.getFriends || [])]} label="Datastore owner" setValue={(owner) => setSelectedOwner(owner.id)} renderItem={
-							(item, idx, setSelected) => (<SelectOwnerItem
-								key={idx}
-								onClick={setSelected}
-							>
-								<ProfilePicture
-									src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${item.id}`}
-								/>
-								<span>{item.userName}</span>
-							</SelectOwnerItem>)
-						} uniqueKey="id" selectedLabelKey="userName" />
-					</Section>
-					<Section>
-						<Label>Datastore host</Label>
-						<Select data={nodes?.getNodes?.nodes || []} label="Datastore host" setValue={(node) => setSelectedNode(node.id)} renderItem={
-							(item, idx, setSelected) => (
-								<SelectCloudDropdownItem
-									key={idx}
-									onClick={setSelected}
-								>
-									{item.name}
-									<p>{item.ip}</p>
-								</SelectCloudDropdownItem>
-							)
-						} uniqueKey="id" selectedLabelKey="name" />
-					</Section>
-					<Section>
-						<Label>Size</Label>
-						<Input placeholder="Size" value={sizeInput || ""} onChange={setSizeInput} />
-					</Section>
-				</div>
-				<Bottom>
-					<Loader>
-						<ClipLoader color={"#000000"} loading={loading} size={16} />
-					</Loader>
-					<ConditionButton condition={!loading && !!isValidSize(sizeInput || "") && selectedOwner != null && selectedNode != null && !!name.trim()}>
-						<BgButton onClick={createDatastore}>Create datastore</BgButton>
-					</ConditionButton>
-				</Bottom>
+			<Container>
+				<ConditionOverlay
+					condition={!nodesLoading || !!nodes?.getNodes?.nodes.find(({ hostNode }) => hostNode)}
+					renderOverlay={() => <OverlayElement hide={hide} />}
+				>
+					<div style={{ "display": "flex", "flexDirection": "column", height: "100%", padding: "10px 20px" }}>
+						<Title>
+							New datastore
+							<span>Configure a new datastore</span>
+						</Title>
+						<div style={{ flex: 1 }}>
+							<Section>
+								<Label>Name</Label>
+								<Input placeholder="Name" value={name} onChange={(e) => setName(e.currentTarget.value.replace(/[^a-z0-9]/gi, "_"))} />
+							</Section>
+							<Section>
+								<Label>Datastore owner</Label>
+								<Select data={[me, ...(friends?.getFriends || [])]} label="Datastore owner" setValue={(owner) => setSelectedOwner(owner.id)} renderItem={
+									(item, idx, setSelected) => (<SelectOwnerItem
+										key={idx}
+										onClick={setSelected}
+									>
+										<ProfilePicture
+											src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${item.id}`}
+										/>
+										<span>{item.userName}</span>
+									</SelectOwnerItem>)
+								} uniqueKey="id" selectedLabelKey="userName" />
+							</Section>
+							<Section>
+								<Label>Datastore host</Label>
+								<Select data={nodes?.getNodes?.nodes || []} label="Datastore host" setValue={(node) => setSelectedNode(node.id)} renderItem={
+									(item, idx, setSelected) => (
+										<SelectCloudDropdownItem
+											key={idx}
+											onClick={setSelected}
+										>
+											{item.name}
+											<p>{item.ip}</p>
+										</SelectCloudDropdownItem>
+									)
+								} uniqueKey="id" selectedLabelKey="name" />
+							</Section>
+							<Section>
+								<Label>Size</Label>
+								<Input placeholder="Size" value={sizeInput || ""} onChange={setSizeInput} />
+							</Section>
+						</div>
+						<Bottom>
+							<ConditionButton condition={!loading} >
+								<Button onClick={hide} >Cancel</Button>
+							</ConditionButton>
+							<Loader>
+								<ClipLoader color={"#000000"} loading={loading} size={16} />
+							</Loader>
+							<ConditionButton condition={!loading && !!isValidSize(sizeInput || "") && selectedOwner != null && selectedNode != null && !!name.trim()}>
+								<BgButton onClick={createDatastore}>Create datastore</BgButton>
+							</ConditionButton>
+						</Bottom>
+					</div>
+				</ConditionOverlay>
 			</Container>
-		</Wrapper>
+		</Wrapper >
 
 	);
 }
