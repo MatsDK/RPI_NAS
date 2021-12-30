@@ -179,6 +179,7 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 		return null
 	}
 
+
 	const createDatastore = async () => {
 		if (!name.trim() || selectedNode == null || selectedOwner == null || !isValidSize(sizeInput || "")) return null
 
