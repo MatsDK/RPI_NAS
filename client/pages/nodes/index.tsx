@@ -4,7 +4,7 @@ import { Layout } from "src/components/Layout";
 import SideBar from "src/components/SideBar";
 import { withAuth } from "src/HOC/withAuth";
 import { useMeState } from "src/hooks/useMeState";
-import { HostsContainer } from "src/components/Nodes/HostsContainer";
+import { NodesView } from "src/components/Nodes/NodesView";
 
 import { ApolloContext, NextFunctionComponentWithAuth } from "types/types";
 import { getNodesQuery } from "graphql/Node/getNodes";
@@ -20,7 +20,7 @@ const Hosts: NextFunctionComponentWithAuth = ({ me }) => {
     return (
         <Layout title="Nodes">
             <SideBar />
-            <HostsContainer />
+            <NodesView />
         </Layout>
     );
 };

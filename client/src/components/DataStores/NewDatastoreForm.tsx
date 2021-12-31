@@ -1,6 +1,6 @@
 import { useGetFriendsQueryQuery, useGetNodesQueryQuery } from 'generated/apolloComponents';
 import Link from "next/link"
-import { ClipLoader } from 'react-spinners';
+import { Spinner } from 'src/ui/Spinner';
 import React, { useState } from 'react';
 import { ConditionOverlay } from '../ConditionOverlay';
 import { useApolloClient } from 'react-apollo';
@@ -255,7 +255,7 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 								<Button onClick={hide} >Cancel</Button>
 							</ConditionButton>
 							<Loader>
-								<ClipLoader color={"#000000"} loading={loading} size={16} />
+								<Spinner loading={loading} />
 							</Loader>
 							<ConditionButton condition={!loading && !!isValidSize(sizeInput || "") && selectedOwner != null && selectedNode != null && !!name.trim()}>
 								<BgButton onClick={createDatastore}>Create datastore</BgButton>

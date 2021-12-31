@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ClipLoader } from 'react-spinners';
+import { Spinner } from "./Spinner";
 
 export const Button = styled.button`
   background: transparent;
@@ -121,7 +121,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ loading, childre
       {children}
     </Children>
     <Loader loading={loading}>
-      <ClipLoader color={"#000000"} loading={loading} size={16} />
+      <Spinner loading={loading} />
     </Loader>
   </LoadingOverlayWrapper>
 );

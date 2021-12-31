@@ -1,6 +1,7 @@
 import axios from "axios";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { setDefaultDownloadPathMutation } from "graphql/User/setDefaultDownloadPath";
+import { Spinner } from "src/ui/Spinner";
 import router from "next/router";
 import React, { useContext, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
@@ -10,9 +11,6 @@ import { FolderContext, FolderContextType } from "src/providers/folderState";
 import { BgButton, Button, ConditionButton } from "src/ui/Button";
 import styled from "styled-components";
 import { Input, Label } from "../../ui/Input";
-import { ClipLoader } from "react-spinners";
-// import { css } from "@emotion/react"
-
 
 interface SSHDownloadDropdownProps {
   close: () => any;
@@ -130,7 +128,7 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
         />
       </PathInput>
       <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-        <ClipLoader color={"#000000"} loading={loading} size={16} />
+        <Spinner loading={loading} />
         <ConditionButton
           condition={
             !loading &&
