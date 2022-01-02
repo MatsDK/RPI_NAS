@@ -13,6 +13,7 @@ import { MyContext } from "../../types/Context"
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { gql } from "@apollo/client/core";
 import { GetNodesReturn } from "./GetNodesReturn";
+import { pingNodes } from "../../utils/nodes/pingNodes";
 
 const SETUPNODE_MUTATION = gql`
 mutation SetupNodeMutation($data: Node!) {
@@ -26,7 +27,7 @@ export class NodeResolver {
 	@Query(() => GetNodesReturn, { nullable: true })
 	async getNodes(): Promise<GetNodesReturn> {
 		const ret = new GetNodesReturn()
-		ret.nodes = await Node.find();
+		ret.nodes = await pingNodes(await Node.find());
 		ret.nodeRequests = await NodeRequest.find();
 		return ret
 	}
@@ -39,6 +40,7 @@ export class NodeResolver {
 		const osLoginName = loginName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
 		if ((await Node.count({ where: { hostNode: true } })) || (await User.count({ where: { osUserName: osLoginName } }))) return null
 
+		const users = await User.find({ select: ["id"] });
 		const node = await Node.create({
 			name: name.trim(),
 			loginName: osLoginName,
@@ -47,6 +49,7 @@ export class NodeResolver {
 			ip: process.env.HOST_IP,
 			basePath: `/home/${osLoginName}`,
 			hostNode: true,
+			initializedUsers: users.map(({ id }) => id)
 		}).save()
 
 		const { err } = await createUser(osLoginName, password, false);

@@ -289,6 +289,7 @@ export type Node = {
   loginName: Scalars['String'];
   name: Scalars['String'];
   password: Scalars['String'];
+  pingResult: Scalars['Boolean'];
   port: Scalars['Float'];
   sshPort: Scalars['Float'];
   token?: Maybe<Scalars['String']>;
@@ -547,7 +548,7 @@ export type DeleteNodeRequestMutationMutation = { __typename?: 'Mutation', delet
 export type GetNodesQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: { __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, name: string, loginName: string, basePath: string, hostNode: boolean }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> } | null | undefined };
+export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: { __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, port: number, name: string, loginName: string, basePath: string, hostNode: boolean, pingResult: boolean }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> } | null | undefined };
 
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadPathsInput> | DownloadPathsInput;
@@ -1270,10 +1271,12 @@ export const GetNodesQueryDocument = gql`
     nodes {
       id
       ip
+      port
       name
       loginName
       basePath
       hostNode
+      pingResult
     }
     nodeRequests {
       id

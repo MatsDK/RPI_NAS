@@ -6,9 +6,7 @@ import Icon from 'src/ui/Icon';
 
 const { Wrapper, PagePath, Container } = Components
 
-interface CreateHostNodeViewProps {
-
-}
+interface CreateHostNodeViewProps { }
 
 export const CreateHostNodeView: React.FC<CreateHostNodeViewProps> = ({ }) => {
 	return (

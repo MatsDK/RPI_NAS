@@ -24,6 +24,7 @@ import { createTokens } from "../../utils/createTokens";
 import { createUser } from "../../utils/createUser";
 import { FriendsQueryReturn } from "./FriendsQueryReturn";
 import { RegisterInput } from "./RegisterInput";
+import { Node } from "../../entity/CloudNode";
 
 @Resolver()
 export class UserResolver {
@@ -78,6 +79,11 @@ export class UserResolver {
     if (err) {
       await User.delete({ id: user.id });
       throw new Error("Invalid username");
+    }
+    const host = await Node.findOne({ where: { hostNode: true } })
+    if (host) {
+      host.initializedUsers.push(user.id)
+      await host.save()
     }
 
     return user;

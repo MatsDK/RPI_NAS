@@ -100,6 +100,7 @@ const Children = styled.div<LoadingProps>`
 
 const Loader = styled.div<LoadingProps>`
   position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: grid;

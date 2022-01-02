@@ -1,6 +1,5 @@
 import { useGetFriendsQueryQuery, useGetNodesQueryQuery } from 'generated/apolloComponents';
 import Link from "next/link"
-import { Spinner } from 'src/ui/Spinner';
 import React, { useState } from 'react';
 import { ConditionOverlay } from '../ConditionOverlay';
 import { useApolloClient } from 'react-apollo';
@@ -10,7 +9,7 @@ import { ProfilePicture } from "src/ui/ProfilePicture";
 import { Select } from 'src/ui/Select';
 import styled from 'styled-components';
 import { Input } from "../../ui/Input";
-import { BgButton, Button, ConditionButton } from "../../ui/Button"
+import { BgButton, Button, ConditionButton, LoadingOverlay } from "../../ui/Button"
 import { useApollo } from 'src/hooks/useApollo';
 import { CreateDataStoreMutation } from 'graphql/DataStores/CreateDataStore';
 import { getDataStoresQuery } from 'graphql/DataStores/getDataStores';
@@ -119,11 +118,6 @@ const Bottom = styled.div`
 	justify-content: flex-end;
 	align-items: center;
 	height: 40px;
-`
-
-const Loader = styled.div`
-	margin-right: 10px;
-	height: 16px;
 `
 
 const OverlayText = styled.div`
@@ -254,11 +248,10 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 							<ConditionButton condition={!loading} >
 								<Button onClick={hide} >Cancel</Button>
 							</ConditionButton>
-							<Loader>
-								<Spinner loading={loading} />
-							</Loader>
 							<ConditionButton condition={!loading && !!isValidSize(sizeInput || "") && selectedOwner != null && selectedNode != null && !!name.trim()}>
-								<BgButton onClick={createDatastore}>Create datastore</BgButton>
+								<LoadingOverlay loading={loading}>
+									<BgButton onClick={createDatastore}>Create datastore</BgButton>
+								</LoadingOverlay>
 							</ConditionButton>
 						</Bottom>
 					</div>

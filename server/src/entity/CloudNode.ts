@@ -47,4 +47,7 @@ export class Node extends BaseEntity {
   @Field(() => [Number])
   @Column("int", { array: true, default: [] })
   initializedUsers: number[]
+
+  @Field(() => Boolean)
+  pingResult?: boolean
 }

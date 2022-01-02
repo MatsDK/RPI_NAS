@@ -47,7 +47,7 @@ const NodesListItem = styled.div`
 
 const Headers = styled.div`
     margin: 50px 50px 0 50px;
-    padding: 10px 20px;
+    padding: 10px 20px 10px 40px;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -59,7 +59,19 @@ const Headers = styled.div`
         font-weight: 600;
         color: ${props => props.theme.textColors[0]};
     }
+`
 
+interface StatusProps {
+    status: boolean
+}
+
+const Status = styled.div<StatusProps>`
+    width: 10px;
+    height: 10px;
+    margin-right: 10px;
+    margin-top: 2px;
+    border-radius: 50%;
+    background-color: ${props => props.status ? props.theme.statusColors[1] : props.theme.statusColors[2]};
 `
 
 export const NodesView: React.FC = ({ }) => {
@@ -79,20 +91,20 @@ export const NodesView: React.FC = ({ }) => {
                 <NodesListWrapper>
                     <Headers>
                         <span>Name</span>
-                        <span>Ip address</span>
+                        <span>Ip address:Port</span>
                         <span>Token</span>
                     </Headers>
-                    <NodesList >
-                        {data?.getNodes?.nodes.map(({ name, ip, hostNode }, idx) => (
+                    <NodesList>
+                        {data?.getNodes?.nodes.map(({ name, ip, port, hostNode, pingResult }, idx) => (
                             <NodesListItem key={idx}>
+                                <Status status={pingResult} />
                                 <span>
                                     {name}{hostNode && <p>(Host)</p>}
                                 </span>
                                 <span>
-                                    {ip}
+                                    {ip}:{port}
                                 </span>
-                                <span>
-                                </span>
+                                <span>/</span>
                             </NodesListItem>
                         ))}
                     </NodesList>

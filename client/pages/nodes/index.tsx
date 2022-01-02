@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import React from "react";
 import { Layout } from "src/components/Layout";
 import SideBar from "src/components/SideBar";
@@ -11,11 +10,6 @@ import { getNodesQuery } from "graphql/Node/getNodes";
 
 const Hosts: NextFunctionComponentWithAuth = ({ me }) => {
     useMeState(me);
-    const router = useRouter();
-
-    if (me && !me.isAdmin) {
-        router.back();
-    }
 
     return (
         <Layout title="Nodes">
@@ -34,4 +28,4 @@ Hosts.getInitialProps = async ({ apolloClient }: ApolloContext) => {
     return { nodes: data.getNodes.nodes };
 };
 
-export default withAuth(Hosts);
+export default withAuth(Hosts, (me) => me.isAdmin);

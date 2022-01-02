@@ -1,5 +1,5 @@
 overwrite: true
-schema: "http://192.168.0.221:4000/graphql"
+schema: "http://192.168.0.164:4000/graphql"
 documents: "graphql/**/*.ts"
 generates:
   generated/apolloComponents.tsx:

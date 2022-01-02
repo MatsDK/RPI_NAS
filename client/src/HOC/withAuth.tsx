@@ -3,12 +3,13 @@ import Router from "next/router";
 import React from "react";
 import { redirectToLogin } from "src/utils/redirect";
 import { NextContextWithApollo, NextFunctionComponent } from "types/types";
-import { MeQuery } from "../../generated/apolloComponents";
+import { MeQuery, User } from "../../generated/apolloComponents";
 
 export const withAuth = <T extends object>(
-  Component: NextFunctionComponent<T>
+  Component: NextFunctionComponent<T>,
+  validateFn: (me: User) => boolean = () => true
 ) =>
-  class AuthComponent extends React.Component<T> {
+  class AuthComponent extends React.Component<T & { me?: User }> {
     static async getInitialProps({
       apolloClient,
       ...ctx
@@ -20,6 +21,9 @@ export const withAuth = <T extends object>(
 
         if (!response || !response.data || !response.data.me)
           return redirectToLogin(ctx);
+
+        if (!validateFn(response.data.me))
+          return Router.back()
 
         let appProps = {};
         if (Component.getInitialProps)
@@ -35,9 +39,14 @@ export const withAuth = <T extends object>(
     }
 
     render() {
-      if (!(this.props as any).me) {
-        Router.push("/logins");
+      if (!this.props.me || !validateFn(this.props.me)) {
+        Router.push("/login");
         return null;
+      }
+
+      if (!validateFn(this.props.me)) {
+        Router.back()
+        return null
       }
 
       return <Component {...this.props} />;

@@ -6,10 +6,12 @@ query GetNodesQuery {
     nodes {
       id
       ip
+      port
       name
       loginName
       basePath
       hostNode
+      pingResult
     }
     nodeRequests {
       id
