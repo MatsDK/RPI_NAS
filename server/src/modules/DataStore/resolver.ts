@@ -215,7 +215,7 @@ export class DataStoreResolver {
 
     let updateSMBRequired = false;
 
-    if (updateProps.sharedUsers) updateSMBRequired = await updateSharedUsers({ datastore, datastoreId, sharedUsers: updateProps.sharedUsers || [], updateSMBRequired })
+    if (updateProps.sharedUsers) updateSMBRequired = await updateSharedUsers({ host, datastore, datastoreId, sharedUsers: updateProps.sharedUsers || [], updateSMBRequired })
     updateSMBRequired = await updateDatastoreOwnerAndName({ host, datastore, updateProps, updateSMBRequired })
     if (updateProps?.allowedSMBUsers?.length) updateSMBRequired = await updateSharedUsersServices({ updateProps, updateSMBRequired, datastore })
 

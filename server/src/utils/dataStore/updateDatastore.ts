@@ -12,9 +12,10 @@ interface UpdateSharedUsersProps {
 	datastoreId: number
 	datastore: Datastore
 	updateSMBRequired: boolean
+	host: Node
 }
 
-export const updateSharedUsers = async ({ sharedUsers, datastoreId, datastore, updateSMBRequired }: UpdateSharedUsersProps): Promise<boolean> => {
+export const updateSharedUsers = async ({ sharedUsers, datastoreId, datastore, updateSMBRequired, host }: UpdateSharedUsersProps): Promise<boolean> => {
 	const sharedDatastoreUsers = await SharedDataStore.find({
 		where: { dataStoreId: datastoreId },
 	});
@@ -28,7 +29,7 @@ export const updateSharedUsers = async ({ sharedUsers, datastoreId, datastore, u
 
 	if (newSharedUsers.length) {
 		await SharedDataStore.insert(
-			newSharedUsers.map((id) => ({ userId: id, dataStoreId: datastoreId }))
+			newSharedUsers.map((id) => ({ userId: id, dataStoreId: datastoreId, initialized: host.initializedUsers.includes(id) }))
 		);
 		await groups.add(
 			newSharedUsers.map((id) => ({

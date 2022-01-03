@@ -15,4 +15,8 @@ export class SharedDataStore extends BaseEntity {
   @Field()
   @Column("int")
   dataStoreId: number;
+
+  @Field()
+  @Column()
+  initialized: boolean;
 }
