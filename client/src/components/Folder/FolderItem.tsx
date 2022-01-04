@@ -7,8 +7,10 @@ import Icon from "src/ui/Icon";
 import { useRouter } from "next/router";
 
 interface Props {
-  item: TreeItem;
+  item: TreeItem & { idx?: number };
   dataStoreId: number | null;
+  idx: number
+  items: TreeItem[]
 }
 
 export const FolderItemWrapper = styled.div`
@@ -52,12 +54,24 @@ const FolderButtonItem = styled.p`
   }
 `;
 
-const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
+const Name = styled.div`
+  p {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -o-user-select: none;
+    user-select: none;;
+  }
+`
+
+const FolderItem: React.FC<Props> = ({ item, dataStoreId, idx, items }) => {
   const folderCtx: FolderContextType = useContext(FolderContext);
 
   const router = useRouter();
 
   const [selected, setSelected] = useState(false);
+
+  item.idx = idx
 
   useEffect(() => {
     setSelected(!!folderCtx?.selected.selectedItems.has(item.path));
@@ -79,8 +93,23 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
 
           folderCtx && folderCtx.selected.setSelected?.(new Map(folderCtx.selected.selectedItems))
         } else if (shiftKey) {
-          console.log("c");
+          if (folderCtx?.selected.selectedItems.size == 0) {
+            folderCtx?.selected.selectedItems.set(item.path, item)
+            folderCtx.selected.setSelected?.(new Map(folderCtx.selected.selectedItems))
+          } else {
+            const lastItem = (Array.from(folderCtx?.selected.selectedItems || new Map()).pop())
+            if (!lastItem) return
 
+            if (lastItem[1].idx == idx) {
+              folderCtx?.selected.selectedItems.delete(item.path)
+              folderCtx?.selected.setSelected?.(new Map(folderCtx.selected.selectedItems))
+            }
+
+            for (let i = Math.min(lastItem[1].idx, idx) + 1; i < Math.max(lastItem[1].idx, idx); i++) {
+              folderCtx?.selected.setSelected?.(new Map(folderCtx.selected.selectedItems.set(items[i].path, items[i])))
+            }
+            folderCtx?.selected.setSelected?.(new Map(folderCtx.selected.selectedItems.set(item.path, item)))
+          }
         } else {
           if (folderCtx?.selected.selectedItems.has(item.path))
             folderCtx.selected.setSelected?.(new Map());
@@ -132,17 +161,17 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
           </div>
         )}
       </IconWrapper>
-      <div>
+      <Name>
         {item.isDirectory ? (
           <div onClick={(e) => e.stopPropagation()}>
             <Link href={`/path/${item.relativePath}?d=${dataStoreId}`}>
-              <FolderButtonItem>{item.name}</FolderButtonItem>
+              <FolderButtonItem >{item.name}</FolderButtonItem>
             </Link>
           </div>
         ) : (
           <p>{item.name}</p>
         )}
-      </div>
+      </Name>
     </FolderItemWrapper>
   );
 };

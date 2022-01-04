@@ -50,6 +50,10 @@ const NewFolderInput = styled.input`
   border-bottom: 1px solid ${(props) => props.theme.lightBgColors[2]};
 `;
 
+const sort = (data: any[]) =>
+  data.sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
+
+
 const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
   if (!dataStoreId) return null;
 
@@ -193,15 +197,15 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
               </form>
             </FolderItemWrapper>
           )}
-          {data.tree.tree
-            .sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
-            .map((item, idx) => (
-              <FolderItem
-                dataStoreId={dataStoreId}
-                item={item as TreeItem}
-                key={idx}
-              />
-            ))}
+          {sort(data.tree?.tree).map((item, idx) => (
+            <FolderItem
+              dataStoreId={dataStoreId}
+              item={item as TreeItem}
+              idx={idx}
+              items={sort(data.tree?.tree || [])}
+              key={idx}
+            />
+          ))}
         </FolderContent>
         <div
           style={{ minHeight: 300, flex: 1 }}

@@ -9,6 +9,7 @@ const defaultProfilePicture = fsPath.join(IMGS_FOLDER, `default.png`);
 
 const router = Router();
 
+
 router.route("/download").get(async (req, res) => {
   const { s: sessionId }: { s: string } = req.query as any;
 
@@ -17,16 +18,16 @@ router.route("/download").get(async (req, res) => {
 
   if (!thisSession) return res.json({ err: "session not found" });
 
-  const downloadPath = await getDownloadPath(thisSession, sessionId);
+  const { path: downloadPath, deleteTmpFolder, err } = await getDownloadPath(thisSession, sessionId);
 
-  if (typeof downloadPath !== "string")
-    return res.json({ err: downloadPath.err });
+  if (err)
+    return res.json({ err })
 
   if (downloadPath) {
     res.download(downloadPath, (err) => {
       if (err) throw err;
 
-      fs.unlinkSync(downloadPath);
+      if (deleteTmpFolder) fs.unlinkSync(downloadPath);
     });
 
     return;
@@ -43,7 +44,7 @@ router.get("/profile/:id", (req, res) => {
 
   if (fs.pathExistsSync(path)) res.sendFile(path);
   else res.sendFile(defaultProfilePicture);
-  
+
 });
 
 export { router };

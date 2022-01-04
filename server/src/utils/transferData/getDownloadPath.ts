@@ -7,9 +7,9 @@ import { DownloadPathsInput } from "../../modules/TransferData/DownloadSessionIn
 export const getDownloadPath = async (
   session: DownloadPathsInput[],
   sessionId: string
-): Promise<string | { err: any }> => {
+): Promise<{ path: string, deleteTmpFolder: boolean, err?: any }> => {
   if (session.length === 1 && session[0].type === "file")
-    return session[0].path;
+    return { path: session[0].path, deleteTmpFolder: false }
 
   const folderName = `${TMP_FOLDER}/${sessionId}`;
 
@@ -30,7 +30,6 @@ export const getDownloadPath = async (
     if (err.code === "ENOENT") console.log(err);
     else return { err };
   });
-
   archive.on("error", (err) => {
     return { err };
   });
@@ -51,5 +50,5 @@ export const getDownloadPath = async (
 
   fs.removeSync(folderName);
 
-  return `${folderName}.zip`;
+  return { path: `${folderName}.zip`, deleteTmpFolder: true }
 };
