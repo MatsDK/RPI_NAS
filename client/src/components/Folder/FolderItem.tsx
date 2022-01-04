@@ -70,12 +70,22 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId }) => {
         item.isDirectory &&
         router.push(`/path/${item.relativePath}?d=${dataStoreId}`)
       }
-      onClick={() => {
-        setSelected((s) => !s);
+      onClick={({ ctrlKey, shiftKey }) => {
+        if (ctrlKey) {
+          if (folderCtx?.selected.selectedItems.has(item.path))
+            folderCtx?.selected.selectedItems.delete(item.path)
+          else
+            folderCtx?.selected.selectedItems.set(item.path, item)
 
-        if (folderCtx?.selected.selectedItems.has(item.path))
-          folderCtx.selected.setSelected?.(new Map());
-        else folderCtx?.selected.setSelected?.(new Map([[item.path, item]]));
+          folderCtx && folderCtx.selected.setSelected?.(new Map(folderCtx.selected.selectedItems))
+        } else if (shiftKey) {
+          console.log("c");
+
+        } else {
+          if (folderCtx?.selected.selectedItems.has(item.path))
+            folderCtx.selected.setSelected?.(new Map());
+          else folderCtx?.selected.setSelected?.(new Map([[item.path, item]]));
+        }
       }}
     >
       <SelectButtonWrapper

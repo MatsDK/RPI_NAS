@@ -14,8 +14,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }, 4000)
   );
 
-  console.log(connectionData, uploadData, uploadPath)
-
   const getData = new Promise((res, rej) => {
     const client = new Client({
       host: connectionData.hostIp,
@@ -46,6 +44,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   const response = await Promise.race([getData, timeout]);
-  console.log(response)
   res.status(200).json(response);
 };

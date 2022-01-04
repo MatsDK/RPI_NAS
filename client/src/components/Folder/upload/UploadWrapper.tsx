@@ -1,400 +1,226 @@
-import axios from "axios";
-import { LightBgButton } from "src/ui/Button";
-import { getDataStoresQuery } from "graphql/DataStores/getDataStores";
-import { ConditionButton } from "src/ui/Button";
-import { createUploadSessionMutation } from "graphql/TransferData/createUploadSession";
-import { useRouter } from "next/dist/client/router";
-import fsPath from "path";
-import React, { useContext, useEffect, useState } from "react";
-import { useApollo } from "src/hooks/useApollo";
-import { useInput } from "src/hooks/useInput";
-import { FolderContext, FolderContextType } from "src/providers/folderState";
-import Icon from "src/ui/Icon";
-import { Scrollbar } from "src/ui/Scrollbar";
-import { Select } from "src/ui/Select";
-import styled from "styled-components";
-import { LabelInput } from "../../../ui/Input";
-import MenuOverlay from "../../MenuOverlay";
-import { FolderPath } from "./FolderPath";
+import axios from 'axios'
+import { ConditionButton, LoadingOverlay } from 'src/ui/Button'
+import { createUploadSessionMutation } from 'graphql/TransferData/createUploadSession'
+import React, { useContext, useEffect, useState } from 'react'
+import { useApollo } from 'src/hooks/useApollo'
+import { FolderContext, FolderContextType } from 'src/providers/folderState'
+import { BgButton, Button } from 'src/ui/Button'
+import { Scrollbar } from 'src/ui/Scrollbar'
+import styled from "styled-components"
+import { DriveSelect } from './DriveSelect'
+import { filterPaths } from './filterUploadPaths'
+import { FolderContent } from "./FolderContent"
+import { Path } from "./Path"
+import { SelectedContent } from "./SelectedContent"
+import { UpdateOwnershipMutation } from 'graphql/Folder/updateOwnership'
+import { getTreeQuery } from 'graphql/TreeObject/queryTree'
 
-interface Props {
-  hide: () => any;
+interface UploadWrapperProps {
+	hide: () => void
 }
+export type SelectedPath = { isDir: boolean, name: string }
+export type SelectedPaths = Map<string, SelectedPath>;
 
-type FolderData = Array<{ name: string; path: string; isDirectory: boolean }>;
-type SelectedPaths = Map<string, { isDir: boolean }>;
-
-type DataStoreType = { name: string; id: number };
+const Wrapper = styled.div`
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	display: grid;
+	place-items: center;
+	top: 0;
+	left: 0;
+`
 
 const Container = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 25px;
-`;
+	background-color: ${props => props.theme.lightBgColors[0]};
+	border: 1px solid ${props => props.theme.lightBgColors[1]};
+	border-radius: 5px;
+	width: 50vw;
+	max-width: 1200px;
+	min-width: 700px;
+	z-index: 100;
+	height: 60vh;
+	min-height: 500px;
+	box-shadow:  0 0 30px 5px #00000012;
+	pointer-events: all;
+	display: flex;
+	flex-direction: column;
+	padding: 10px 20px;
+`
 
-const Title = styled.h2`
-  font-weight: 600;
-  font-size: 27px;
-  color: ${(props) => props.theme.textColors[3]};
-  border-bottom: 1px solid ${(props) => props.theme.bgColors[1]};
-  padding-bottom: 10px;
-  margin-bottom: 5px;
-`;
+const Bottom = styled.div`
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	height: 40px;
+`
 
-const SelectedItems = styled.p`
-  color: ${(props) => props.theme.textColors[2]};
-  margin-left: 10px;
-  font-size: 14px;
-`;
+const Title = styled.h1`
+	color: ${props => props.theme.textColors[0]};
+	font-size: 25px;
+	font-weight: 600;
+	display: flex;
+	flex-direction: column;
 
-const DestinationInput = styled.div`
-  margin-top: 10px;
-  margin-bottom: 15px;
+	> span {
+		color: ${props => props.theme.textColors[1]};
+		font-size: 16px;
+		margin-top: -5px;
+		font-weight: normal;
+	}
 
-  > div {
-    display: flex;
-  }
-`;
+	margin-bottom: 20px;
+`
+
+const Section = styled.div`
+	flex: 1;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+`
+
+const BoxWrapper = styled.div`
+	display: flex;
+	width: 100%;
+	height: 100%;
+
+	> div {
+		width: 50%;
+	}
+`
+
+
+const Divider = styled.div`
+	width: 1px !important;
+	height: 100%;
+	background-color: ${props => props.theme.lightBgColors[2]};
+`
+
+const Headers = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	> span {
+		width: 50%;
+		padding:  0 0 5px 0;
+		font-weight: 600;
+
+		:first-child {
+			padding-left: 10px;
+		}
+	}
+`
 
 const PathWrapper = styled.div`
-  margin-top: 10px;
-  > div {
-    display: flex;
-  }
-`;
+	display: flex;
+	max-width: 50%;
+	/* overflow-x: auto; */
+	align-items: baseline;
+`
 
-const SmallTitle = styled.span`
-  color: ${(props) => props.theme.textColors[3]};
-  font-size: 18px;
-  font-weight: 500;
-`;
+const Box = styled.div`
+	${Scrollbar}
 
-const SelectedPathsContainer = styled.div`
-  border-top: 1px solid ${(props) => props.theme.bgColors[1]};
-  min-height: 150px;
-  display: flex;
-  flex-direction: column;
-  max-height: 250px;
-  margin-bottom: 10px;
-`;
+	height: 100%;
+	overflow-y: auto;
+`
 
-const SelectedPaths = styled.div`
-  flex: 1;
-  overflow: auto;
-  margin-top: 5px;
+export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
+	const folderCtx: FolderContextType = useContext(FolderContext);
+	const { mutate } = useApollo()
 
-  ${Scrollbar}
-`;
+	const isWin = navigator.platform.toLowerCase().includes("win")
 
-const FolderItem = styled.div`
-  display: flex;
-  padding: 2px 0;
+	const [selectedDrive, setSelectedDrive] = useState(isWin ? null : "")
+	const [loading, setLoading] = useState(false)
+	const [selected, setSelected] = useState<SelectedPaths>(new Map());
+	const [currPath, setCurrPath] = useState("/")
 
-  input[type="checkbox"] {
-    opacity: 0;
-    transition: 0.15s ease-in-out;
-  }
+	useEffect(() => {
+		setCurrPath("/")
+	}, [selectedDrive])
 
-  :hover input[type="checkbox"] {
-    opacity: 1;
-  }
 
-  input[type="checkbox"]:checked {
-    opacity: 1;
-  }
-`;
+	const upload = async () => {
+		const uploadData = filterPaths(selected)
+		if (!uploadData.length) return null
 
-const ContentContainer = styled.div`
-  ${Scrollbar}
+		try {
+			setLoading(true)
+			const {
+				data: {
+					createUploadSession: { uploadPath, ...connectionData },
+				},
+			} = await mutate(createUploadSessionMutation, {
+				uploadPath: folderCtx?.currentFolderPath?.folderPath.path,
+				dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+			});
 
-  flex: 1;
-  padding-top: 10px;
-  overflow: auto;
-`;
+			const { data } = await axios.get(`/api/upload`, {
+				params: {
+					data: {
+						connectionData,
+						uploadPath,
+						uploadData,
+					},
+				},
+			});
 
-const RemoveButton = styled.div`
-  margin-bottom: 2px;
-  margin-right: 5px;
-  cursor: pointer;
-  padding: 1px 5px;
-`;
+			const res = await mutate(UpdateOwnershipMutation,
+				{ datastoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId },
+				{
+					refetchQueries: [{
+						query: getTreeQuery, variables: {
+							depth: 1,
+							path: folderCtx?.currentFolderPath?.folderPath.path,
+							dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+						}
+					}]
+				})
+			console.log(res)
 
-const SelectedItem = styled.div`
-  display: flex;
-  align-items: center;
+			setLoading(false)
 
-  > div {
-    opacity: 0;
-    transition: 0.15s ease-in-out;
-  }
+			if (data.err) console.log(data.err)
+			else hide()
+		} catch (e) {
+			console.log(e);
+			setLoading(false)
+		}
+	};
 
-  :hover > div {
-    opacity: 1;
-  }
-`;
-
-const UploadWrapper: React.FC<Props> = ({ hide }) => {
-  const { query, mutate } = useApollo();
-  const router = useRouter();
-
-  const dataStoreId = router.query.d;
-
-  if (!dataStoreId) return null;
-
-  const folderCtx: FolderContextType = useContext(FolderContext);
-
-  const [folderPath, setFolderPath] = useInput<string>(
-    folderCtx?.currentFolderPath?.folderPath.path || ""
-  );
-  const [path, setPath] = useState<null | string>(null);
-  const [drives, setDrives] = useState<string[]>([]);
-  const [selectedDrive, setSelectedDrive] = useState<string | null>(null);
-  const [folderData, setFolderData] = useState<FolderData>([]);
-  const [selectedPaths, setSelectedPaths] = useState<SelectedPaths>(new Map());
-  const [dataStores, setDataStores] = useState<DataStoreType[]>([]);
-  const [selectedDataStore, setSelectedDataStore] = useState<null | {
-    id: any;
-    name: string;
-  }>(null);
-
-  useEffect(() => {
-    updateUploadFolderView();
-  }, [path, selectedDrive]);
-
-  useEffect(() => {
-    setPath("/");
-  }, [selectedDrive]);
-
-  useEffect(() => {
-    axios.get("/api/getdrives").then((res) => {
-      setDrives(res.data.drives.map((d: any) => d.mountpoints[0].path));
-      if (!selectedDrive)
-        setSelectedDrive(res.data.drives[0]?.mountpoints[0].path || null);
-    });
-
-    query(getDataStoresQuery, {}).then(({ data, errors }) => {
-      if (errors) return console.log(errors);
-
-      setDataStores(
-        data.getDataStores.map(({ id, name }) => ({ id: Number(id), name }))
-      );
-    });
-  }, []);
-
-  const updateUploadFolderView = async () => {
-    if (!selectedDrive) return;
-
-    const { data, status } = await axios.get(
-      `/api/path/${fsPath.join(selectedDrive.replace(/\\/g, "/"), path || "")}`
-    );
-
-    if (status === 200) setFolderData(data.data);
-  };
-
-  const upload = async () => {
-    const data = Array.from(selectedPaths),
-      newData: Array<{ path: string; isDir: boolean }> = [];
-
-    if (!data.length) return;
-
-    for (const path of data) {
-      let addValue = true;
-
-      data.forEach((p) => {
-        if (path.includes(p[0]) && path !== p) addValue = false;
-      });
-
-      if (addValue) newData.push({ path: path[0], isDir: path[1].isDir });
-    }
-
-    const {
-      data: {
-        createUploadSession: { uploadPath, ...connectionData },
-      },
-    } = await mutate(createUploadSessionMutation, {
-      uploadPath: folderPath,
-      dataStoreId: selectedDataStore!.id,
-    });
-
-    const res = await axios.get(`/api/upload`, {
-      params: {
-        data: {
-          connectionData,
-          uploadPath,
-          uploadData: newData,
-        },
-      },
-    });
-
-    console.log(res.data);
-  };
-
-  const selectItem = (item: {
-    name: string;
-    path: string;
-    isDirectory: boolean;
-  }) => {
-    if (!selectedPaths.has(item.path)) {
-      setSelectedPaths(
-        (selectedPaths) =>
-          new Map(
-            selectedPaths.set(item.path, {
-              isDir: item.isDirectory,
-            })
-          )
-      );
-    } else {
-      selectedPaths.delete(item.path);
-      setSelectedPaths((selectedPaths) => new Map(selectedPaths));
-    }
-  };
-
-  return (
-    <MenuOverlay hide={hide}>
-      <Container>
-        <Title>Upload</Title>
-        <DestinationInput>
-          <SmallTitle>Upload to</SmallTitle>
-          <div>
-            <Select
-              data={[
-                ...dataStores,
-                {
-                  name: folderCtx?.currentFolderPath?.folderPath.dataStoreName,
-                  id: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
-                },
-              ]}
-              label={"DataStore"}
-              setValue={setSelectedDataStore}
-            />
-            <div
-              style={{ marginLeft: 20, display: "flex", alignItems: "center" }}
-            >
-              <LabelInput
-                value={folderPath}
-                label={"Path"}
-                setValue={setFolderPath}
-              />
-            </div>
-          </div>
-        </DestinationInput>
-
-        <PathWrapper>
-          <SmallTitle>Path</SmallTitle>
-          <div>
-            <Select
-              data={drives}
-              label="Drive"
-              setValue={setSelectedDrive}
-            />
-            <FolderPath
-              setPath={setPath}
-              path={path}
-              selectedDrive={selectedDrive}
-            />
-          </div>
-        </PathWrapper>
-        <ContentContainer>
-          {folderData
-            .sort((a, b) => (b.isDirectory as any) - (a.isDirectory as any))
-            .map((item, idx) => (
-              <FolderItem
-                key={idx}
-                style={{
-                  cursor: item.isDirectory ? "pointer" : "default",
-                  width: "fit-content",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <input
-                  type={"checkbox"}
-                  style={{
-                    marginTop: 3,
-                    marginRight: 10,
-                    outline: 0,
-                  }}
-                  checked={selectedPaths.has(item.path)}
-                  onClick={() => selectItem(item)}
-                />
-                <div
-                  style={{ display: "flex" }}
-                  onClick={() =>
-                    item.isDirectory
-                      ? selectedDrive &&
-                      setPath(
-                        fsPath.relative(
-                          selectedDrive.replace(/\\/g, "/"),
-                          item.path.replace(/\\/g, "/")
-                        )
-                      )
-                      : selectItem(item)
-                  }
-                >
-                  <div style={{ marginRight: 7 }}>
-                    {item.isDirectory ? (
-                      <Icon
-                        name={"folderIcon"}
-                        color={{ idx: 2, propName: "lightBgColors" }}
-                        width={19}
-                        viewPort={22}
-                        height={19}
-                      />
-                    ) : (
-                      <Icon
-                        name={"fileIcon"}
-                        viewPort={23}
-                        color={{ idx: 2, propName: "lightBgColors" }}
-                        width={19}
-                        height={19}
-                      />
-                    )}
-                  </div>
-
-                  {item.name}
-                </div>
-              </FolderItem>
-            ))}
-        </ContentContainer>
-        <SelectedPathsContainer>
-          <div
-            style={{ display: "flex", alignItems: "baseline", marginTop: 4 }}
-          >
-            <SmallTitle>selected</SmallTitle>
-            <SelectedItems>{selectedPaths.size} selected</SelectedItems>
-          </div>
-          <SelectedPaths>
-            {Array.from(selectedPaths).map((path, idx) => (
-              <SelectedItem key={idx}>
-                <RemoveButton
-                  onClick={() => {
-                    selectedPaths.delete(path[0]);
-                    setSelectedPaths((selectedPaths) => new Map(selectedPaths));
-                  }}
-                >
-                  <Icon
-                    name={"removeIcon"}
-                    viewPort={20}
-                    color={{ idx: 2, propName: "lightBgColors" }}
-                    width={19}
-                    height={19}
-                  />
-                </RemoveButton>
-                <span>{path[0]}</span>
-              </SelectedItem>
-            ))}
-          </SelectedPaths>
-        </SelectedPathsContainer>
-        <ConditionButton
-          condition={!!selectedPaths.size && !!selectedDataStore}
-        >
-          <LightBgButton onClick={upload}>Upload</LightBgButton>
-        </ConditionButton>
-      </Container>
-    </MenuOverlay>
-  );
-};
-
-export default UploadWrapper;
-
+	return (
+		<Wrapper>
+			<Container>
+				<Title>Upload</Title>
+				<Section style={{ flex: 1 }}>
+					<Headers>
+						<PathWrapper>
+							{isWin && <DriveSelect setSelectedDrive={setSelectedDrive} />}
+							<Path path={currPath} setPath={setCurrPath} />
+						</PathWrapper>
+						<span>Selected</span>
+					</Headers>
+					<BoxWrapper>
+						<Box>
+							<FolderContent selected={selected} setSelected={setSelected} setPath={setCurrPath} drive={selectedDrive} path={currPath} />
+						</Box>
+						<Divider />
+						<Box>
+							<SelectedContent selected={selected} setSelected={setSelected} />
+						</Box>
+					</BoxWrapper>
+				</Section>
+				<Bottom>
+					<Button onClick={hide}>Cancel</Button>
+					<ConditionButton condition={!loading && !!selected.size}>
+						<LoadingOverlay loading={loading}>
+							<BgButton onClick={upload}>Upload</BgButton>
+						</LoadingOverlay>
+					</ConditionButton>
+				</Bottom>
+			</Container>
+		</Wrapper>
+	);
+}

@@ -11,16 +11,17 @@ interface SelectProps {
   renderItem: (item: any, idx: number, onClick: () => void) => JSX.Element;
   uniqueKey: string
   selectedLabelKey: string
+  width?: number
 }
 
 const Wrapper = styled.div`
   position: relative;
 `
 
-type ContainerProps = { showDropDown: boolean }
+type ContainerProps = { showDropDown: boolean, width: number }
 const Container = styled.div<ContainerProps>`
   position: relative;
-  width: 300px;
+  width: ${props => props.width}px;
   height: 40px;
   display: flex;
   cursor: pointer;
@@ -75,7 +76,8 @@ export const Select: React.FC<SelectProps> = ({
   setValue,
   renderItem,
   uniqueKey,
-  selectedLabelKey
+  selectedLabelKey,
+  width = 300
 }) => {
   const [showDropDown, setShowDropDown] = useState(false)
   const [selected, setSelected] = useState<any>(null)
@@ -92,7 +94,7 @@ export const Select: React.FC<SelectProps> = ({
   const selectedItem = selected && data.find((item) => item[uniqueKey] == selected)
 
   return <Wrapper>
-    <Container showDropDown={showDropDown} onClick={() => setShowDropDown(s => !s)}>
+    <Container showDropDown={showDropDown} onClick={() => setShowDropDown(s => !s)} width={width}>
       {selectedItem ? <SelectedValue>{selectedItem[selectedLabelKey]}</SelectedValue> :
         <Label>{label}</Label>
       }

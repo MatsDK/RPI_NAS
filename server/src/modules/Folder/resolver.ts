@@ -76,4 +76,26 @@ export class FolderResolver {
   move(@Arg("data") data: CopyMoveInput) {
     return MoveCopyData({ ...data, type: "move" });
   }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Boolean, { nullable: true })
+  async updateOwnership(@Arg("datastoreId") datastoreId: number) {
+    const datastore = await Datastore.findOne({ where: { id: datastoreId } })
+    if (!datastore) return null
+
+    const node = await Node.findOne({ where: { id: datastore.localHostNodeId } })
+    if (!node) return null
+
+    if (node.hostNode) {
+      const { stderr } =
+        await exec(`chown ${node.loginName}:${fsPath.basename(datastore.basePath)} ${datastore.basePath}/* -R`)
+      if (stderr) {
+        console.log(stderr)
+        return null
+      }
+
+      return true
+    }
+    return false
+  }
 }

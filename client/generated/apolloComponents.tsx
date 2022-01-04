@@ -166,6 +166,7 @@ export type Mutation = {
   setDefaultDownloadPath?: Maybe<Scalars['Boolean']>;
   toggleDatastoreService?: Maybe<Scalars['Boolean']>;
   updateDatastore?: Maybe<Scalars['Boolean']>;
+  updateOwnership?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -279,6 +280,11 @@ export type MutationUpdateDatastoreArgs = {
   updateProps: UpdateDatastoreInput;
 };
 
+
+export type MutationUpdateOwnershipArgs = {
+  datastoreId: Scalars['Float'];
+};
+
 export type Node = {
   __typename?: 'Node';
   basePath: Scalars['String'];
@@ -347,6 +353,7 @@ export type SharedDataStore = {
   __typename?: 'SharedDataStore';
   dataStoreId: Scalars['Float'];
   id: Scalars['ID'];
+  initialized: Scalars['Boolean'];
   userId: Scalars['Float'];
 };
 
@@ -494,6 +501,13 @@ export type MoveDataMutationMutationVariables = Exact<{
 
 
 export type MoveDataMutationMutation = { __typename?: 'Mutation', move?: boolean | null | undefined };
+
+export type UpdateOwnershipMutationVariables = Exact<{
+  datastoreId: Scalars['Float'];
+}>;
+
+
+export type UpdateOwnershipMutation = { __typename?: 'Mutation', updateOwnership?: boolean | null | undefined };
 
 export type AcceptFriendRequestMutationVariables = Exact<{
   userId: Scalars['Float'];
@@ -1023,6 +1037,37 @@ export function useMoveDataMutationMutation(baseOptions?: Apollo.MutationHookOpt
 export type MoveDataMutationMutationHookResult = ReturnType<typeof useMoveDataMutationMutation>;
 export type MoveDataMutationMutationResult = Apollo.MutationResult<MoveDataMutationMutation>;
 export type MoveDataMutationMutationOptions = Apollo.BaseMutationOptions<MoveDataMutationMutation, MoveDataMutationMutationVariables>;
+export const UpdateOwnershipDocument = gql`
+    mutation UpdateOwnership($datastoreId: Float!) {
+  updateOwnership(datastoreId: $datastoreId)
+}
+    `;
+export type UpdateOwnershipMutationFn = Apollo.MutationFunction<UpdateOwnershipMutation, UpdateOwnershipMutationVariables>;
+
+/**
+ * __useUpdateOwnershipMutation__
+ *
+ * To run a mutation, you first call `useUpdateOwnershipMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateOwnershipMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateOwnershipMutation, { data, loading, error }] = useUpdateOwnershipMutation({
+ *   variables: {
+ *      datastoreId: // value for 'datastoreId'
+ *   },
+ * });
+ */
+export function useUpdateOwnershipMutation(baseOptions?: Apollo.MutationHookOptions<UpdateOwnershipMutation, UpdateOwnershipMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateOwnershipMutation, UpdateOwnershipMutationVariables>(UpdateOwnershipDocument, options);
+      }
+export type UpdateOwnershipMutationHookResult = ReturnType<typeof useUpdateOwnershipMutation>;
+export type UpdateOwnershipMutationResult = Apollo.MutationResult<UpdateOwnershipMutation>;
+export type UpdateOwnershipMutationOptions = Apollo.BaseMutationOptions<UpdateOwnershipMutation, UpdateOwnershipMutationVariables>;
 export const AcceptFriendRequestDocument = gql`
     mutation AcceptFriendRequest($userId: Float!) {
   acceptFriendRequest(userId: $userId)

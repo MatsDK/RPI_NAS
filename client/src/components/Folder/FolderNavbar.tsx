@@ -16,7 +16,7 @@ import {
   SSHDownloadDropdown,
   SSHDownloadDropdownWrapper,
 } from "./SSHDownloadDropdown";
-import UploadWrapper from "./upload/UploadWrapper";
+import { UploadWrapper } from "./upload/UploadWrapper";
 
 const FolderNavbarWrapper = styled.div`
   height: 100%;
