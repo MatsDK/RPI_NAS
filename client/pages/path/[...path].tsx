@@ -34,7 +34,7 @@ const Folder: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
   }, [path, dataStoreId]);
 
   return (
-    <Layout title={`Datastore - ${path}`}>
+    <Layout title={`${dataStoreName || "Datastore"} - ${path}`}>
       <SideBar />
       <Wrapper>
         <Tree />

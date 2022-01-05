@@ -95,9 +95,7 @@ export const FolderContent: React.FC<FolderContentProps> = ({ drive, path, setPa
 	return <div>
 		{loading ? <div>Loading</div> : sort(folderData).map(({ isDirectory, name, path: itemPath }, idx) => {
 			return <FolderItem isDirectory={isDirectory} key={idx} selected={selected.has(itemPath)}>
-				{isDirectory ?
-					<Icon name="folderIcon" width={18} height={18} color={{ propName: "bgColors", idx: 2 }} viewPort={30} />
-					: <Icon name="fileIcon" width={18} height={18} color={{ propName: "bgColors", idx: 2 }} viewPort={26} />}
+				<FolderEntryIcon isDirectory={isDirectory} />
 				<div>
 					<span onClick={() => isDirectory && setPath(fsPath.join(path, name))}>{name}</span>
 				</div>
@@ -108,3 +106,11 @@ export const FolderContent: React.FC<FolderContentProps> = ({ drive, path, setPa
 	</div>
 
 }
+
+interface FolderEntryIconProps {
+	isDirectory: boolean
+}
+
+export const FolderEntryIcon: React.FC<FolderEntryIconProps> = ({ isDirectory }) => isDirectory ?
+	<Icon name="folderIcon" width={18} height={18} color={{ propName: "bgColors", idx: 2 }} viewPort={30} />
+	: <Icon name="fileIcon" width={18} height={18} color={{ propName: "bgColors", idx: 2 }} viewPort={26} />

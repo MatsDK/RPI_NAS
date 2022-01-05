@@ -19,7 +19,7 @@ const Layout: React.FC<Props> = ({ children, showHomeButton = false, title = "ex
     <div>
       <Head>
         <title>{title}</title>
-        <link rel="shortcut icon" href="/icon.png" />
+        <link rel="shortcut icon" href="/icon3.png" />
       </Head>
       <Navbar showHomeButton={showHomeButton} />
       <PageBody>{children}</PageBody>

@@ -69,6 +69,9 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
   useEffect(() => {
     if (folderCtx?.newFolderInput?.showNewFolderInput)
       inputRef.current?.focus();
+
+    if (folderCtx && !folderCtx.currentFolderPath?.folderPath.dataStoreName)
+      folderCtx.currentFolderPath?.setFolderPath({ path, dataStoreId, dataStoreName });
   }, [folderCtx]);
 
   const { data, error, loading } = useGetTreeQueryQuery({

@@ -50,9 +50,24 @@ const Container = styled.div`
 
 const Bottom = styled.div`
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between; 
 	align-items: center;
 	height: 40px;
+
+	> div {
+		display: flex;
+	}
+
+	> span {
+		display: flex;
+		color: ${props => props.theme.textColors[1]};
+
+		> p {
+			color: ${props => props.theme.textColors[0]};
+			margin-left: 3px;
+			font-weight: 600;
+		}
+	}
 `
 
 const Title = styled.h1`
@@ -105,9 +120,16 @@ const Headers = styled.div`
 		width: 50%;
 		padding:  0 0 5px 0;
 		font-weight: 600;
+		display: flex;
+		color: ${props => props.theme.textColors[0]};
 
 		:first-child {
 			padding-left: 10px;
+		}
+
+		p  {
+			color: ${props => props.theme.textColors[1]};
+			font-weight: normal;
 		}
 	}
 `
@@ -200,7 +222,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 							{isWin && <DriveSelect setSelectedDrive={setSelectedDrive} />}
 							<Path path={currPath} setPath={setCurrPath} />
 						</PathWrapper>
-						<span>Selected</span>
+						<span>Selected<p>({selected.size})</p></span>
 					</Headers>
 					<BoxWrapper>
 						<Box>
@@ -213,12 +235,18 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 					</BoxWrapper>
 				</Section>
 				<Bottom>
-					<Button onClick={hide}>Cancel</Button>
-					<ConditionButton condition={!loading && !!selected.size}>
-						<LoadingOverlay loading={loading}>
-							<BgButton onClick={upload}>Upload</BgButton>
-						</LoadingOverlay>
-					</ConditionButton>
+					<span>
+						Upload to:
+						<p>{folderCtx?.currentFolderPath?.folderPath.dataStoreName}/{folderCtx?.currentFolderPath?.folderPath.path}</p>
+					</span>
+					<div>
+						<Button onClick={hide}>Cancel</Button>
+						<ConditionButton condition={!loading && !!selected.size}>
+							<LoadingOverlay loading={loading}>
+								<BgButton onClick={upload}>Upload</BgButton>
+							</LoadingOverlay>
+						</ConditionButton>
+					</div>
 				</Bottom>
 			</Container>
 		</Wrapper>
