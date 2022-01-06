@@ -1,13 +1,10 @@
-const df = require("node-df");
 import { Any } from "typeorm";
-import { Datastore, SizeObject } from "../../entity/Datastore";
-import { User } from "../../entity/User";
-import { SharedDataStore } from "../../entity/SharedDataStore";
-import { dfOptions } from "../../constants";
+import { Node } from "../../entity/CloudNode";
+import { Datastore } from "../../entity/Datastore";
 import { DatastoreService, ServiceNames } from "../../entity/DatastoreService";
-import { Node } from "../../entity/CloudNode"
-import { getOrCreateNodeClient } from "../nodes/nodeClients";
-import gql from "graphql-tag";
+import { SharedDataStore } from "../../entity/SharedDataStore";
+import { User } from "../../entity/User";
+import { getDatastoreSizes } from "./getDatastoresSizes";
 
 export const getDatastoresWithSizesAndSharedUsers = async (
   datastores: Datastore[],
@@ -82,80 +79,26 @@ export const getDatastoresWithSizesAndSharedUsers = async (
     } as Datastore;
   })
 
-  return await getDatastoreSizes(
-    datastores,
-    await Node.find({ where: { id: Any(datastores.map(({ localNodeId }) => localNodeId)) } })
-  );
+  const nodes = await Node.find({ where: { id: Any(datastores.map(({ localNodeId }) => localNodeId)) } })
+
+  datastores = await getDatastoreSizes(datastores, nodes)
+  datastores = getDatastoreInitializedStatus(datastores, { nodes, userId })
+
+  return datastores;
 };
 
-const getLocalDatastoreSizes = (datastores: Datastore[]): Promise<Datastore[]> => new Promise((res, rej) => {
-  df(dfOptions, (err: any, r: any) => {
-    if (err) rej(err);
-
-    for (const ds of datastores) {
-      const fs = r.find((f: any) => f.mount === ds.basePath);
-
-      if (fs) {
-        const sizeObj = new SizeObject();
-
-        sizeObj.usedSize = Math.round(fs.used * 10) / 10;
-        sizeObj.usedPercent = Math.round(fs.capacity * 100);
-
-        ds.size = sizeObj;
-      }
-    }
-
-    res(datastores);
-  });
-})
-
-const GET_REMOTE_DATASTORE_SIZES_QUERY = gql`
-query GetDatastoreSizes($datastores: [GetDatastoreSizesInput!]!) {
-  getDatastoresSizes(datastores: $datastores) {
-    id
-    path
-    size {
-      usedSize
-      usedPercent
-    }
-  }
-}
-`
-
-type GetDatastoreSizesReturnObj = { id: number, path: string, size: SizeObject }
-
-const getRemoteDatastoreSizes = async (datastores: Datastore[], node: Node): Promise<Datastore[]> => {
-  try {
-    const client = await getOrCreateNodeClient({ node, ping: false })
-    if (!client) return []
-
-    const { data } = await client.conn.query({
-      query: GET_REMOTE_DATASTORE_SIZES_QUERY,
-      variables: { datastores: datastores.map(({ id, basePath }) => ({ id, path: basePath })) }
-    })
-
-    return datastores.map((ds) => ({
-      ...ds,
-      size: (data.getDatastoresSizes as GetDatastoreSizesReturnObj[]).find(({ id }) => id === ds.id)?.size
-    }) as Datastore)
-  } catch (e) {
-    console.log(e)
-    return []
-  }
+interface GetDatastoreInitializedStatusProps {
+  nodes: Node[]
+  userId: number
 }
 
-const getDatastoreSizes = async (datastores: Datastore[], nodes: Node[]): Promise<Datastore[]> => {
-  let ret: Datastore[] = []
+const getDatastoreInitializedStatus = (datastores: Datastore[], { nodes, userId }: GetDatastoreInitializedStatusProps) => {
+  for (const ds of datastores) {
+    const node = nodes.find(({ id }) => id === ds.localHostNodeId)
+    if (!node) continue
 
-  for (const node of nodes) {
-    const nodeDatastores = datastores.filter(({ localNodeId }) => node.id === localNodeId)
-
-    ret = [
-      ...ret,
-      ...(node.hostNode ? await getLocalDatastoreSizes(nodeDatastores) : await getRemoteDatastoreSizes(nodeDatastores, node))
-    ]
+    ds.userInitialized = node.initializedUsers.includes(userId)
   }
 
-  return ret
+  return datastores
 }
-

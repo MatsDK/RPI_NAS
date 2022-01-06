@@ -29,9 +29,20 @@ import { CreateDataStoreInput } from "./CreateDataStoreInput";
 import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { UpdateDatastoreInput } from "./UpdateDatastoreInput";
 import { createRemoteDatastore } from "../../utils/nodes/createDatastore"
+import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
 
 @Resolver()
 export class DataStoreResolver {
+  @UseMiddleware(isAuth, getUser)
+  @Query(() => [Datastore], { nullable: true })
+  async getDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
+    const dataStores = await ((req as any).user?.isAdmin
+      ? Datastore.find()
+      : getUserDataStores(req.userId));
+
+    return await getDatastoresWithSizesAndSharedUsers(dataStores, req.userId!);
+  }
+
   @UseMiddleware(isAuth, getUser, isAdmin)
   @Mutation(() => Datastore, { nullable: true })
   async createDataStore(
@@ -123,12 +134,6 @@ export class DataStoreResolver {
     }
 
     return true;
-  }
-
-  @UseMiddleware(isAuth, isAdmin)
-  @Query(() => [Node], { nullable: true })
-  getNodes() {
-    return Node.find();
   }
 
   @UseMiddleware(isAuth)

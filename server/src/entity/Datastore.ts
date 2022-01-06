@@ -68,4 +68,7 @@ export class Datastore extends BaseEntity {
 
   @Field(() => User, { nullable: true })
   owner: User;
+
+  @Field(() => Boolean, { nullable: true })
+  userInitialized: boolean;
 }

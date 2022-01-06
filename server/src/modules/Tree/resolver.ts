@@ -1,14 +1,10 @@
 import { Arg, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
-import { getUser } from "../../middleware/getUser";
-import { Datastore } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
 import { checkPermissions } from "../../middleware/checkPermissions";
 import { MyContext } from "../../types/Context";
-import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
 import { buildTreeObject } from "./buildTreeObject";
 import { GetTreeInput } from "./GetTreeInput";
 import { Tree } from "./TreeObject";
-import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
 
 @Resolver()
 export class TreeResolver {
@@ -48,15 +44,5 @@ export class TreeResolver {
     });
 
     return res;
-  }
-
-  @UseMiddleware(isAuth, getUser)
-  @Query(() => [Datastore], { nullable: true })
-  async getDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
-    const dataStores = await ((req as any).user?.isAdmin
-      ? Datastore.find()
-      : getUserDataStores(req.userId));
-
-    return await getDatastoresWithSizesAndSharedUsers(dataStores, req.userId!);
   }
 }
