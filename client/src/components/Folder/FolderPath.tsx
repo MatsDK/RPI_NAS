@@ -21,7 +21,10 @@ const PathContainer = styled.div`
   ${Scrollbar}
 
   width: 100%;
+  min-height: 40px;
   overflow-x: auto;
+  display: flex;
+  align-items: center;
 `
 
 const CurrentPath = styled.span`
@@ -49,7 +52,6 @@ export const FolderPath: React.FC<FolderPathProps> = ({
 }) => {
   return (
     <PathContainer>
-
       <PathWrapper>
         <span>
           {path.length && path[0] ? (

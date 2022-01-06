@@ -103,6 +103,7 @@ export class NodeResolver {
 		if ((await User.count({ where: { osUserName: osLoginName } }))) return null
 
 		const node = await Node.create({
+			initializedUsers: [],
 			name: name.trim(),
 			loginName: osLoginName,
 			password,

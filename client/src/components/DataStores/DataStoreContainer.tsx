@@ -1,5 +1,6 @@
-import { ProfilePicture } from "src/ui/ProfilePicture";
+import { DatastoreUsersWrapper } from "./DatastoreUsersWrapper";
 import { UpdateChanged } from "./UpdateChanged";
+import { DatastoreInfo } from "./DatastoreInfo";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useApolloClient } from "react-apollo";
@@ -12,12 +13,11 @@ import { useApollo } from "src/hooks/useApollo";
 import { UpdateDatastoreMutation } from "graphql/DataStores/updateDatastore";
 import { getDatastoreQuery } from "graphql/DataStores/getDatastore";
 import styled from "styled-components";
-import { DatastoreUsers } from "./DatastoreUsers";
 import { datastoreUpdated, getUpdateObj } from "./updateDatastore";
 import { ToggleDatastoreServiceMutation } from "graphql/DataStores/toggleDatastoreService";
 import { Scrollbar } from "src/ui/Scrollbar";
 
-interface DataStoreContainerProps {}
+interface DataStoreContainerProps { }
 
 const DatastoreContainerWrapper = styled.div`
   ${Scrollbar}
@@ -38,12 +38,6 @@ const DatastoreName = styled.h1`
     margin-left: 10px;
     color: ${(props) => props.theme.textColors[2]};
   }
-`;
-
-const SmallTitle = styled.h3`
-  font-size: 20px;
-  font-weight: 600;
-  color: ${(props) => props.theme.textColors[0]};
 `;
 
 export const UserWrapper = styled.div`
@@ -89,23 +83,8 @@ export const UserWrapperLeft = styled.div`
   }
 `;
 
-const Headers = styled.div`
-  display: flex;
-  align-items: baseline;
-  width: 100%;
-  margin: 10px 0;
 
-  h3 {
-    min-width: 60%;
-  }
-
-  span {
-    color: ${(props) => props.theme.textColors[1]};
-    font-size: 16px;
-  }
-`;
-
-export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
+export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({ }) => {
   const router = useRouter();
   const client: any = useApolloClient();
   const { me } = useMeState();
@@ -127,13 +106,13 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
   useEffect(() => {
     setHasChanged(datastoreUpdated(ds as Datastore | null, updatedDatastore));
 
-    return () => {};
+    return () => { };
   }, [updatedDatastore]);
 
   useEffect(() => {
     setUpdatedDatastore({ ...ds } as any);
 
-    return () => {};
+    return () => { };
   }, [ds]);
 
   useEffect(() => {
@@ -187,7 +166,10 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
       ?.smbEnabled;
 
   if (loading) return <div>loading</div>;
-  if (error) console.log(error);
+  if (error) {
+    console.log(error)
+    return null
+  }
 
   return (
     <DatastoreContainerWrapper>
@@ -195,72 +177,14 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({}) => {
         {ds.name}
         {ds.sharedUsers.length ? <span>Shared</span> : null}
       </DatastoreName>
-      <div>
-        <Headers>
-          <SmallTitle>Users</SmallTitle>
-          <span>SMB enabled</span>
-        </Headers>
-        <div>
-          {!isDatastoreOwner && ds.sharedUsers.find(({ id }) => me?.id == id) && (
-            <UserWrapper>
-              <UserWrapperLeft>
-                <div></div>
-                <ProfilePicture
-                  src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${me?.id}`}
-                />
-                <p>
-                  {me?.userName}
-                  <span>(You)</span>
-                </p>
-              </UserWrapperLeft>
-              {updatedDatastore?.allowedSMBUsers?.includes(Number(me?.id)) && (
-                <>
-                  <input
-                    type="checkbox"
-                    checked={smbEnabled}
-                    onChange={(e) => setSmbEnabled(e.target.checked)}
-                  />
-                </>
-              )}
-            </UserWrapper>
-          )}
-          <UserWrapper>
-            <UserWrapperLeft>
-              <div></div>
-              <ProfilePicture
-                src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${ds.owner?.id}`}
-              />
-              <p>
-                {ds.owner?.userName}
-                <span>
-                  (Owner)
-                  {me?.id == ds.owner?.id && "(You)"}
-                </span>
-              </p>
-            </UserWrapperLeft>
-            {isDatastoreOwner && (
-              <input
-                type="checkbox"
-                onChange={() =>
-                  setUpdatedDatastore((uds) => {
-                    const newObj = { ...uds, owner: { ...uds?.owner } };
-                    newObj?.owner?.smbEnabled != null &&
-                      (newObj.owner.smbEnabled = !newObj?.owner?.smbEnabled);
-
-                    return { ...newObj } as any;
-                  })
-                }
-                checked={!!updatedDatastore?.owner?.smbEnabled}
-              />
-            )}
-          </UserWrapper>
-        </div>
-        <DatastoreUsers
-          setUpdatedDatastore={setUpdatedDatastore}
-          updatedDatastore={updatedDatastore}
-          isDatastoreOwner={isDatastoreOwner}
-        />
-      </div>
+      <DatastoreInfo datastore={ds as any} />
+      <DatastoreUsersWrapper
+        datastore={ds as any}
+        updatedDatastore={updatedDatastore}
+        setUpdatedDatastore={setUpdatedDatastore}
+        smbEnabled={smbEnabled}
+        setSmbEnabled={setSmbEnabled}
+      />
       <div>
         {hasChanged && (
           <UpdateChanged

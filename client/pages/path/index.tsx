@@ -38,7 +38,7 @@ const Page: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
   }, [dataStoreId]);
 
   return (
-    <Layout title="Datastore">
+    <Layout title={dataStoreName || "Datatstore"}>
       <SideBar />
       <Wrapper>
         <Tree />

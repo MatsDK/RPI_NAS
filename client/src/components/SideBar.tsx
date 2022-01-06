@@ -51,7 +51,7 @@ const sideBar = () => {
     <SideBar>
       <Link href={"/"}>
         <SideBarItem>
-          <span style={{ marginRight: 5 }}>
+          <span style={{ marginRight: 0 }}>
             <Icon
               name="folderIcon"
               color={{ propName: "lightBgColors", idx: 1 }}
@@ -67,7 +67,7 @@ const sideBar = () => {
       </Link>
       <Link href={"/datastore"}>
         <SideBarItem>
-          <span style={{ marginRight: 5 }}>
+          <span style={{ marginRight: 0 }}>
             <Icon
               name="dataStoreIcon"
               color={{ propName: "lightBgColors", idx: 1 }}
@@ -84,7 +84,7 @@ const sideBar = () => {
       {me?.isAdmin && (
         <Link href={"/nodes"}>
           <SideBarItem>
-            <span style={{ marginRight: 5 }}>
+            <span style={{ marginRight: 0 }}>
               <Icon
                 name="hostIcon"
                 color={{ propName: "lightBgColors", idx: 1 }}
@@ -101,7 +101,7 @@ const sideBar = () => {
       )}
       <Link href={"/friends"}>
         <SideBarItem>
-          <span style={{ marginRight: 5 }}>
+          <span style={{ marginRight: 0 }}>
             <Icon
               name="people"
               color={{ propName: "lightBgColors", idx: 1 }}

@@ -9,8 +9,6 @@ import { useRouter } from "next/router";
 
 interface DataStoreListItemProps {
   dataStore: Datastore;
-  setDataStoreId: React.Dispatch<React.SetStateAction<number>>;
-  setShowShareDataStoreForm: React.Dispatch<React.SetStateAction<boolean>>;
   showGoToBtn?: boolean;
 }
 
@@ -190,8 +188,6 @@ const status = ["init", "online", "offline"];
 
 export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
   dataStore,
-  setDataStoreId,
-  setShowShareDataStoreForm,
   showGoToBtn = true,
 }) => {
   const { me } = useMeState();
@@ -254,7 +250,7 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
             {dataStore.status === "init"
               ? "Initializing"
               : dataStore.status.charAt(0).toUpperCase() +
-                dataStore.status.slice(1)}
+              dataStore.status.slice(1)}
           </p>
         </StatusSection>
         <DataStoreShared>

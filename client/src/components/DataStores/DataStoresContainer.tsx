@@ -3,7 +3,6 @@ import Link from "next/link";
 import { BgButton } from "src/ui/Button";
 import React, { useEffect, useState } from "react";
 import { NewDatastoreForm } from "./NewDatastoreForm";
-import ShareDataStoreWrapper from "./ShareDataStoreWrapper";
 import { useApolloClient } from "react-apollo";
 import { useMeState } from "src/hooks/useMeState";
 import styled from "styled-components";
@@ -68,12 +67,8 @@ const DataStoresContainer: React.FC = () => {
   const { loading, data, error } = useGetDataStoresQuery({ client });
 
   const [showNewDataStoreForm, setShowNewDataStoreForm] = useState(false);
-  const [showShareDataStoreForm, setShowShareDataStoreForm] = useState(false);
-
   const [myDatastores, setMyDatastores] = useState<Datastore[]>([]);
   const [otherDatastores, setOthersDatastores] = useState<Datastore[]>([]);
-
-  const [dataStoreId, setDataStoreId] = useState(0);
 
   useEffect(() => {
     setOthersDatastores(
@@ -94,7 +89,6 @@ const DataStoresContainer: React.FC = () => {
 
   if (error) {
     console.log(error);
-
     return null;
   }
 
@@ -102,17 +96,6 @@ const DataStoresContainer: React.FC = () => {
     <DataStoresWrapper>
       {showNewDataStoreForm && (
         <NewDatastoreForm hide={() => setShowNewDataStoreForm(false)} />
-      )}
-      {showShareDataStoreForm && (
-        <ShareDataStoreWrapper
-          dataStoreId={dataStoreId}
-          dataStores={
-            (data?.getDataStores as Datastore[]).filter(
-              (d) => d.userId == me.id
-            ) || null
-          }
-          hide={() => setShowShareDataStoreForm(false)}
-        />
       )}
       <DataStoresHeader>
         <DataStoresTitle>
@@ -134,30 +117,24 @@ const DataStoresContainer: React.FC = () => {
       </DataStoresHeader>
       {!loading && (
         <DataStoresList>
-          {myDatastores.map((dataStore, idx) => {
-            return (
-              <DataStoreListItem
-                dataStore={dataStore as any}
-                setDataStoreId={setDataStoreId}
-                setShowShareDataStoreForm={setShowShareDataStoreForm}
-                key={idx}
-              />
-            );
-          })}
+          {myDatastores.map((dataStore, idx) => (
+            <DataStoreListItem
+              dataStore={dataStore as any}
+              key={idx}
+            />
+          )
+          )}
           {me?.isAdmin && !!otherDatastores.length && (
             <>
               <SmallTitle>Other datastores</SmallTitle>
-              {otherDatastores.map((dataStore, idx) => {
-                return (
-                  <DataStoreListItem
-                    showGoToBtn={false}
-                    dataStore={dataStore as any}
-                    setDataStoreId={setDataStoreId}
-                    setShowShareDataStoreForm={setShowShareDataStoreForm}
-                    key={idx}
-                  />
-                );
-              })}
+              {otherDatastores.map((dataStore, idx) => (
+                <DataStoreListItem
+                  showGoToBtn={false}
+                  dataStore={dataStore as any}
+                  key={idx}
+                />
+              )
+              )}
             </>
           )}
         </DataStoresList>

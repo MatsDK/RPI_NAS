@@ -269,7 +269,7 @@ const isValidSize = (sizeInput: string): null | number => {
 		.charAt(sizeInput.trim().length - 1);
 
 	let m = 1;
-	if (lastChar == "g") m = 1000;
+	if (lastChar == "g") m = 1024;
 	else if (lastChar != "m") return null;
 
 	const lastIdx = sizeInput.toLowerCase().indexOf(lastChar);

@@ -67,7 +67,15 @@ export class DataStoreResolver {
     const setStatusToOnline = async () => newDatastore && await Datastore.update({ id: newDatastore.id }, { status: DataStoreStatus.ONLINE })
 
     if (hostNode.id != thisNode.id) {
-      const { err } = await createRemoteDatastore({ node: thisNode, path: basePath, groupName, sizeInMB, ownerUserName: owner.osUserName, ownerPassword, initOwner: !isUserInitialized })
+      const { err } = await createRemoteDatastore({
+        node: thisNode,
+        path: basePath,
+        groupName,
+        sizeInMB,
+        ownerUserName: owner.osUserName,
+        ownerPassword,
+        initOwner: !isUserInitialized
+      })
       await setStatusToOnline()
 
       if (err) throw new Error(err)

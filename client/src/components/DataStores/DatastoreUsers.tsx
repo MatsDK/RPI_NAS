@@ -46,10 +46,12 @@ export const DatastoreUsers: React.FC<DatastoreUsersProps> = ({
   isDatastoreOwner,
 }) => {
   const client: any = useApolloClient();
-  const [showAddSharedUserForm, setShowAddSharedUserForm] = useState(false);
+  const { me } = useMeState();
+
   const { data: friendsData } = useGetFriendsQueryQuery({ client });
   const friends = friendsData?.getFriends || [];
-  const { me } = useMeState();
+
+  const [showAddSharedUserForm, setShowAddSharedUserForm] = useState(false);
 
   const sharedUsers = isDatastoreOwner
     ? updatedDatastore?.sharedUsers

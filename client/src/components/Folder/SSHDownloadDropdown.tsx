@@ -122,7 +122,7 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
         <Label>Path</Label>
         <Input
           type="text"
-          placeholder="Path"
+          placeholder="Download to"
           value={pathInput}
           onChange={setPathInput}
         />

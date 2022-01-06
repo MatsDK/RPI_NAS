@@ -6,9 +6,9 @@ import fs from "fs-extra";
 export const createUser = async (
   osName: string,
   password: string,
-  checkNodes: boolean = true
+  checkUsers: boolean = true
 ): Promise<{ err: any }> => {
-  if ((checkNodes && !!(await Node.count({ where: { loginName: osName } }))) || !!(await User.count({ where: { osUserName: osName } })))
+  if (!!(await Node.count({ where: { loginName: osName } })) || (checkUsers && !!(await User.count({ where: { osUserName: osName } }))))
     return { err: "Can't create a user with that name" };
 
   const { stdout: hashOut, stderr: hashErr } = await exec(
