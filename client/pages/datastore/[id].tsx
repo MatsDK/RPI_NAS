@@ -6,15 +6,28 @@ import { ApolloContext, NextFunctionComponentWithAuth } from "types/types";
 import { useMeState } from "src/hooks/useMeState";
 import { DataStoreContainer } from "src/components/DataStores/DataStoreContainer";
 import { getDatastoreQuery } from "graphql/DataStores/getDatastore";
+import { Datastore, useGetDatastoreQuery } from "generated/apolloComponents";
+import { useRouter } from "next/router";
+import { useApolloClient } from "react-apollo";
 
 const Datastores: NextFunctionComponentWithAuth = ({ me }) => {
+  const router = useRouter();
+  const client = useApolloClient() as any
   useMeState(me);
 
+  const datastoreId = Number(router.query.id);
+  const { data } = useGetDatastoreQuery({
+    variables: { datastoreId },
+    client,
+  });
+
+  const ds = data?.getDatastore;
+
   return (
-    <Layout title="Datastore">
+    <Layout title={`${ds ? `${ds.name} | ` : ""}Datastores`}>
       <SideBar />
       <DataStoresContainer />
-      <DataStoreContainer />
+      <DataStoreContainer ds={ds as Datastore} datastoreId={datastoreId} />
     </Layout>
   );
 };

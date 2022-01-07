@@ -1,23 +1,25 @@
+import { getDatastoreQuery } from "graphql/DataStores/getDatastore";
+import { InitializeUserForm } from "./InitializeUserForm";
+import { ToggleDatastoreServiceMutation } from "graphql/DataStores/toggleDatastoreService";
+import { UpdateDatastoreMutation } from "graphql/DataStores/updateDatastore";
+import React, { useEffect, useState } from "react";
+import { useApollo } from "src/hooks/useApollo";
+import { useMeState } from "src/hooks/useMeState";
+import { ConditionOverlay } from "../ConditionOverlay";
+import { Scrollbar } from "src/ui/Scrollbar";
+import styled from "styled-components";
+import {
+  Datastore
+} from "../../../generated/apolloComponents";
+import { DatastoreInfo } from "./DatastoreInfo";
 import { DatastoreUsersWrapper } from "./DatastoreUsersWrapper";
 import { UpdateChanged } from "./UpdateChanged";
-import { DatastoreInfo } from "./DatastoreInfo";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { useApolloClient } from "react-apollo";
-import { useMeState } from "src/hooks/useMeState";
-import {
-  Datastore,
-  useGetDatastoreQuery,
-} from "../../../generated/apolloComponents";
-import { useApollo } from "src/hooks/useApollo";
-import { UpdateDatastoreMutation } from "graphql/DataStores/updateDatastore";
-import { getDatastoreQuery } from "graphql/DataStores/getDatastore";
-import styled from "styled-components";
 import { datastoreUpdated, getUpdateObj } from "./updateDatastore";
-import { ToggleDatastoreServiceMutation } from "graphql/DataStores/toggleDatastoreService";
-import { Scrollbar } from "src/ui/Scrollbar";
 
-interface DataStoreContainerProps { }
+interface DataStoreContainerProps {
+  ds: Datastore | undefined
+  datastoreId: number
+}
 
 const DatastoreContainerWrapper = styled.div`
   ${Scrollbar}
@@ -83,25 +85,16 @@ export const UserWrapperLeft = styled.div`
   }
 `;
 
-
-export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({ }) => {
-  const router = useRouter();
-  const client: any = useApolloClient();
+export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({ ds, datastoreId }) => {
   const { me } = useMeState();
   const { mutate } = useApollo();
-
-  const datastoreId = Number(router.query.id);
-  const { data, loading, error } = useGetDatastoreQuery({
-    variables: { datastoreId },
-    client,
-  });
-  const ds = data?.getDatastore;
 
   const [hasChanged, setHasChanged] = useState(false);
   const [smbEnabled, setSmbEnabled] = useState(false);
   const [updatedDatastore, setUpdatedDatastore] = useState<Datastore | null>({
     ...ds,
   } as any);
+
 
   useEffect(() => {
     setHasChanged(datastoreUpdated(ds as Datastore | null, updatedDatastore));
@@ -165,43 +158,48 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({ }) => {
     defaultSMBEnabled = !!ds?.sharedUsers.find(({ id }) => id == me?.id)
       ?.smbEnabled;
 
-  if (loading) return <div>loading</div>;
-  if (error) {
-    console.log(error)
-    return null
-  }
+  // if (loading) return <div>loading</div>;
+  // if (error) {
+  //   console.log(error)
+  //   return null
+  // }
 
   return (
     <DatastoreContainerWrapper>
-      <DatastoreName>
-        {ds.name}
-        {ds.sharedUsers.length ? <span>Shared</span> : null}
-      </DatastoreName>
-      <DatastoreInfo datastore={ds as any} />
-      <DatastoreUsersWrapper
-        datastore={ds as any}
-        updatedDatastore={updatedDatastore}
-        setUpdatedDatastore={setUpdatedDatastore}
-        smbEnabled={smbEnabled}
-        setSmbEnabled={setSmbEnabled}
-      />
-      <div>
-        {hasChanged && (
-          <UpdateChanged
-            updated={[
-              {
-                title: ds.name,
-                onUpdate: update,
-                onCancel: () => {
-                  setUpdatedDatastore(() => ({ ...ds } as any));
-                  setHasChanged(false);
-                  setSmbEnabled(defaultSMBEnabled);
+      <ConditionOverlay condition={!!ds.userInitialized} renderOverlay={
+        () => <InitializeUserForm datastoreId={Number(ds.id)} datastoreName={ds.name} />}
+      >
+        <DatastoreName>
+          {ds.name}
+          {ds.sharedUsers.length ? <span>Shared</span> : null}
+        </DatastoreName>
+        <DatastoreInfo datastore={ds as any} />
+        <DatastoreUsersWrapper
+          datastore={ds as any}
+          updatedDatastore={updatedDatastore}
+          setUpdatedDatastore={setUpdatedDatastore}
+          smbEnabled={smbEnabled}
+          setSmbEnabled={setSmbEnabled}
+        />
+        <div>
+          {hasChanged && (
+            <UpdateChanged
+              updated={[
+                {
+                  title: ds.name,
+                  onUpdate: update,
+                  onCancel: () => {
+                    setUpdatedDatastore(() => ({ ...ds } as any));
+                    setHasChanged(false);
+                    setSmbEnabled(defaultSMBEnabled);
+                  },
                 },
-              },
-            ]}
-          />
-        )}
-      </div>
+              ]}
+            />
+          )}
+        </div>
+      </ConditionOverlay>
+
     </DatastoreContainerWrapper>
   );
 };

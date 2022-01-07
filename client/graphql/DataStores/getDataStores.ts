@@ -10,6 +10,7 @@ export const getDataStoresQuery = gql`
       localNodeId
       basePath
       sizeInMB
+      userInitialized
       size {
         usedSize
         usedPercent

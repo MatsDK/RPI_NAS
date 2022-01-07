@@ -1,14 +1,13 @@
 import { Datastore } from "generated/apolloComponents";
-import { PlaceHolder } from "pages/friends";
 import Link from "next/link";
+import { PlaceHolder } from "pages/friends";
 import React from "react";
 import { useMeState } from "src/hooks/useMeState";
 import { ProfilePicturesStack } from "src/ui/ProfilePicturesStack";
 import styled from "styled-components";
-import { useRouter } from "next/router";
 
 interface DataStoreListItemProps {
-  dataStore: Datastore;
+  datastore: Datastore;
   showGoToBtn?: boolean;
 }
 
@@ -173,25 +172,37 @@ interface StatusSectionProps {
 }
 
 const StatusSection = styled.div<StatusSectionProps>`
-  color: ${(props) => props.theme.textColors[2]};
   display: flex;
+  justify-content: space-between;
 
-  p {
-    margin-left: 4px;
-    font-weight: 600;
+  > div {
+    color: ${(props) => props.theme.textColors[2]};
+    display: flex;
 
-    color: ${(props) => props.theme.statusColors[props.status]};
+    p {
+      margin-left: 4px;
+      font-weight: 600;
+
+      color: ${(props) => props.theme.statusColors[props.status]};
+    }
   }
 `;
+
+const InitUserSection = styled.span`
+  color: ${props => props.theme.textColors[0]};
+  background-color: ${props => props.theme.lightBgColors[1]};
+  padding: 1px 5px;
+  border-radius: 3px;
+  cursor: pointer;
+`
 
 const status = ["init", "online", "offline"];
 
 export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
-  dataStore,
+  datastore,
   showGoToBtn = true,
 }) => {
   const { me } = useMeState();
-  const router = useRouter();
 
   return (
     <DataStoreItem>
@@ -208,12 +219,12 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
         </svg>
         <div>
           <p>
-            <span>{`${Math.round(dataStore.size?.usedSize || 0)}/${Math.round(
-              dataStore.sizeInMB || 0
+            <span>{`${Math.round(datastore?.size?.usedSize || 0)}/${Math.round(
+              datastore.sizeInMB || 0
             )}`}</span>{" "}
             Mb
           </p>
-          <p>{Math.round(dataStore.size?.usedPercent || 0)}%</p>
+          <p>{Math.round(datastore.size?.usedPercent || 0)}%</p>
         </div>
         <svg viewBox="0 0 36 36">
           <path
@@ -222,45 +233,54 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
       a 15.9155 15.9155 0 0 1 0 -31.831"
             fill="none"
             strokeWidth="3"
-            strokeDasharray={`${dataStore.size?.usedPercent || 100}, 100`}
+            strokeDasharray={`${datastore.size?.usedPercent || 100}, 100`}
           />
         </svg>
       </DataStoreSize>
       <DataStoreInfo>
         <DataStoreItemHeader>
           <DataStoreItemTitle>
-            <span onClick={() => router.push(`/datastore/${dataStore.id}`)}>
-              {dataStore.name}
-            </span>
+            <Link href={`/datastore/${datastore.id}`}>
+              <span>
+                {datastore.name}
+              </span>
+            </Link>
             {showGoToBtn && (
-              <Link href={`/path?d=${dataStore.id}`}>
+              <Link href={`/path?d=${datastore.id}`}>
                 <button>Go to</button>
               </Link>
             )}
           </DataStoreItemTitle>
           <DataStoreOwner>
             <label>Owner: </label>
-            <span>{dataStore.owner?.userName}</span>
-            <p>{dataStore.owner?.id === me?.id && " (You)"}</p>
+            <span>{datastore.owner?.userName}</span>
+            <p>{datastore.owner?.id === me?.id && " (You)"}</p>
           </DataStoreOwner>
         </DataStoreItemHeader>
-        <StatusSection status={status.indexOf(dataStore.status)}>
-          status:
-          <p>
-            {dataStore.status === "init"
-              ? "Initializing"
-              : dataStore.status.charAt(0).toUpperCase() +
-              dataStore.status.slice(1)}
-          </p>
+        <StatusSection status={status.indexOf(datastore.status)}>
+          <div>
+            status:
+            <p>
+              {datastore.status === "init"
+                ? "Initializing"
+                : datastore.status.charAt(0).toUpperCase() +
+                datastore.status.slice(1)}
+            </p>
+          </div>
+          {!!datastore.userInitialized &&
+            <Link href={`/datastore/${datastore.id}`}>
+              <InitUserSection>User not initialized</InitUserSection>
+            </Link>
+          }
         </StatusSection>
         <DataStoreShared>
           <DataStoreSharedHeader>
             <div>Shared: </div>
           </DataStoreSharedHeader>
           <DataStoreSharedUsers>
-            {dataStore.sharedUsers.length ? (
+            {datastore.sharedUsers.length ? (
               <ProfilePicturesStack
-                users={dataStore.sharedUsers.map(({ id, userName }) => ({
+                users={datastore.sharedUsers.map(({ id, userName }) => ({
                   id: Number(id),
                   userName,
                 }))}

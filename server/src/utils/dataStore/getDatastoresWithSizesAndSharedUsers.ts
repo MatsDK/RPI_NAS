@@ -53,34 +53,10 @@ export const getDatastoresWithSizesAndSharedUsers = async (
     }
   });
 
-  const ownerDatastoreServicesSMB = await DatastoreService.find({
-    where: {
-      serviceName: ServiceNames.SMB,
-      datastoreId: Any(datastores.map(({ id }) => id)),
-      userId: Any(users.map(({ id }) => id)),
-    },
-  });
-
-  datastores = datastores.map((datastore) => {
-    const owner = users.find(({ id }) => id === datastore.userId)!;
-
-    return {
-      ...datastore,
-      sharedUsers: sharedUsersMap.get(datastore.id) || [],
-      owner: {
-        ...owner,
-        smbEnabled: !!ownerDatastoreServicesSMB.find(
-          (s) =>
-            s.datastoreId === datastore.id &&
-            s.userId === owner.id &&
-            s.serviceName === ServiceNames.SMB
-        ),
-      },
-    } as Datastore;
-  })
 
   const nodes = await Node.find({ where: { id: Any(datastores.map(({ localNodeId }) => localNodeId)) } })
 
+  datastores = await getDatastoresSharedUsersAndOwner(datastores, { users, sharedUsersMap })
   datastores = await getDatastoreSizes(datastores, nodes)
   datastores = getDatastoreInitializedStatus(datastores, { nodes, userId })
 
@@ -101,4 +77,37 @@ const getDatastoreInitializedStatus = (datastores: Datastore[], { nodes, userId 
   }
 
   return datastores
+}
+
+interface GetDatastoreSharedUsersAndOwnerProps {
+  users: User[]
+  sharedUsersMap: Map<number, User[]>
+}
+
+const getDatastoresSharedUsersAndOwner = async (datastores: Datastore[], { users, sharedUsersMap, }: GetDatastoreSharedUsersAndOwnerProps) => {
+  const ownerDatastoreServicesSMB = await DatastoreService.find({
+    where: {
+      serviceName: ServiceNames.SMB,
+      datastoreId: Any(datastores.map(({ id }) => id)),
+      userId: Any(users.map(({ id }) => id)),
+    },
+  });
+
+  return datastores.map((datastore) => {
+    const owner = users.find(({ id }) => id === datastore.userId)!;
+
+    return {
+      ...datastore,
+      sharedUsers: sharedUsersMap.get(datastore.id) || [],
+      owner: {
+        ...owner,
+        smbEnabled: !!ownerDatastoreServicesSMB.find(
+          (s) =>
+            s.datastoreId === datastore.id &&
+            s.userId === owner.id &&
+            s.serviceName === ServiceNames.SMB
+        ),
+      },
+    } as Datastore;
+  })
 }

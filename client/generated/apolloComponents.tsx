@@ -76,6 +76,7 @@ export type Datastore = {
   sizeInMB?: Maybe<Scalars['Float']>;
   status: Scalars['String'];
   userId: Scalars['Float'];
+  userInitialized?: Maybe<Scalars['Boolean']>;
 };
 
 export type DatastoreService = {
@@ -440,14 +441,14 @@ export type CreateSharedDataStoresMutaionMutation = { __typename?: 'Mutation', c
 export type GetDataStoresQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: number | null | undefined, status: string, size?: { __typename?: 'SizeObject', usedSize: number, usedPercent: number } | null | undefined, owner?: { __typename?: 'User', id: string, userName: string, isAdmin: boolean } | null | undefined, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }> | null | undefined };
+export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: number | null | undefined, userInitialized?: boolean | null | undefined, status: string, size?: { __typename?: 'SizeObject', usedSize: number, usedPercent: number } | null | undefined, owner?: { __typename?: 'User', id: string, userName: string, isAdmin: boolean } | null | undefined, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }> | null | undefined };
 
 export type GetDatastoreQueryVariables = Exact<{
   datastoreId: Scalars['Float'];
 }>;
 
 
-export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: { __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: number | null | undefined, allowedSMBUsers: Array<number>, status: string, size?: { __typename?: 'SizeObject', usedSize: number, usedPercent: number } | null | undefined, owner?: { __typename?: 'User', id: string, userName: string, smbEnabled?: boolean | null | undefined, isAdmin: boolean } | null | undefined, sharedUsers: Array<{ __typename?: 'User', id: string, userName: string, smbEnabled?: boolean | null | undefined, isAdmin: boolean }> } | null | undefined };
+export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: { __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: number | null | undefined, allowedSMBUsers: Array<number>, userInitialized?: boolean | null | undefined, status: string, size?: { __typename?: 'SizeObject', usedSize: number, usedPercent: number } | null | undefined, owner?: { __typename?: 'User', id: string, userName: string, smbEnabled?: boolean | null | undefined, isAdmin: boolean } | null | undefined, sharedUsers: Array<{ __typename?: 'User', id: string, userName: string, smbEnabled?: boolean | null | undefined, isAdmin: boolean }> } | null | undefined };
 
 export type ToggleDatastoreServiceMutationMutationVariables = Exact<{
   serviceName: Scalars['String'];
@@ -733,6 +734,7 @@ export const GetDataStoresDocument = gql`
     localNodeId
     basePath
     sizeInMB
+    userInitialized
     size {
       usedSize
       usedPercent
@@ -789,6 +791,7 @@ export const GetDatastoreDocument = gql`
     basePath
     sizeInMB
     allowedSMBUsers
+    userInitialized
     size {
       usedSize
       usedPercent

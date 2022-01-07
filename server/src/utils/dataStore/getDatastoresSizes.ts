@@ -3,7 +3,7 @@ import { dfOptions } from "../../constants";
 import { Datastore, SizeObject } from "../../entity/Datastore";
 import { getOrCreateNodeClient } from "../nodes/nodeClients";
 import { Node } from "../../entity/CloudNode"
-const df = require("df")
+const df = require("node-df")
 
 const getLocalDatastoreSizes = (datastores: Datastore[]): Promise<Datastore[]> => new Promise((res, rej) => {
 	df(dfOptions, (err: any, r: any) => {

@@ -11,6 +11,7 @@ export const getDatastoreQuery = gql`
       basePath
       sizeInMB
       allowedSMBUsers
+      userInitialized
       size {
         usedSize
         usedPercent

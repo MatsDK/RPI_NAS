@@ -119,7 +119,7 @@ const DataStoresContainer: React.FC = () => {
         <DataStoresList>
           {myDatastores.map((dataStore, idx) => (
             <DataStoreListItem
-              dataStore={dataStore as any}
+              datastore={dataStore as any}
               key={idx}
             />
           )
@@ -130,7 +130,7 @@ const DataStoresContainer: React.FC = () => {
               {otherDatastores.map((dataStore, idx) => (
                 <DataStoreListItem
                   showGoToBtn={false}
-                  dataStore={dataStore as any}
+                  datastore={dataStore as any}
                   key={idx}
                 />
               )
