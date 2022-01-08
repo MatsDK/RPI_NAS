@@ -174,6 +174,16 @@ export class DataStoreResolver {
 
   @UseMiddleware(isAuth, getUser)
   @Mutation(() => Boolean, { nullable: true })
+  async initUser(
+    @Ctx() { req }: MyContext,
+    @Arg("datastoreId") datastoreId: number,
+    @Arg("password") password: string
+  ): Promise<boolean | null> {
+    return true
+  }
+
+  @UseMiddleware(isAuth, getUser)
+  @Mutation(() => Boolean, { nullable: true })
   async toggleDatastoreService(
     @Ctx() { req }: MyContext,
     @Arg("dataStoreId") datastoreId: number,

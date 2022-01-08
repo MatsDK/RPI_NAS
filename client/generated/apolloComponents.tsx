@@ -159,6 +159,7 @@ export type Mutation = {
   createUploadSession?: Maybe<UploadSessionReturn>;
   delete?: Maybe<Scalars['Boolean']>;
   deleteNodeRequest: Scalars['Boolean'];
+  initUser?: Maybe<Scalars['Boolean']>;
   login?: Maybe<User>;
   logout?: Maybe<Scalars['Boolean']>;
   move?: Maybe<Scalars['Boolean']>;
@@ -241,6 +242,12 @@ export type MutationDeleteArgs = {
 
 export type MutationDeleteNodeRequestArgs = {
   id: Scalars['Float'];
+};
+
+
+export type MutationInitUserArgs = {
+  datastoreId: Scalars['Float'];
+  password: Scalars['String'];
 };
 
 
@@ -430,6 +437,14 @@ export type CreateDataStoreMutionMutationVariables = Exact<{
 
 
 export type CreateDataStoreMutionMutation = { __typename?: 'Mutation', createDataStore?: { __typename?: 'Datastore', id: string } | null | undefined };
+
+export type InitializeUserMutationVariables = Exact<{
+  datastoreId: Scalars['Float'];
+  password: Scalars['String'];
+}>;
+
+
+export type InitializeUserMutation = { __typename?: 'Mutation', initUser?: boolean | null | undefined };
 
 export type CreateSharedDataStoresMutaionMutationVariables = Exact<{
   ids: Array<SharedDataStoresIdsInput> | SharedDataStoresIdsInput;
@@ -693,6 +708,38 @@ export function useCreateDataStoreMutionMutation(baseOptions?: Apollo.MutationHo
 export type CreateDataStoreMutionMutationHookResult = ReturnType<typeof useCreateDataStoreMutionMutation>;
 export type CreateDataStoreMutionMutationResult = Apollo.MutationResult<CreateDataStoreMutionMutation>;
 export type CreateDataStoreMutionMutationOptions = Apollo.BaseMutationOptions<CreateDataStoreMutionMutation, CreateDataStoreMutionMutationVariables>;
+export const InitializeUserDocument = gql`
+    mutation InitializeUser($datastoreId: Float!, $password: String!) {
+  initUser(password: $password, datastoreId: $datastoreId)
+}
+    `;
+export type InitializeUserMutationFn = Apollo.MutationFunction<InitializeUserMutation, InitializeUserMutationVariables>;
+
+/**
+ * __useInitializeUserMutation__
+ *
+ * To run a mutation, you first call `useInitializeUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useInitializeUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [initializeUserMutation, { data, loading, error }] = useInitializeUserMutation({
+ *   variables: {
+ *      datastoreId: // value for 'datastoreId'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useInitializeUserMutation(baseOptions?: Apollo.MutationHookOptions<InitializeUserMutation, InitializeUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<InitializeUserMutation, InitializeUserMutationVariables>(InitializeUserDocument, options);
+      }
+export type InitializeUserMutationHookResult = ReturnType<typeof useInitializeUserMutation>;
+export type InitializeUserMutationResult = Apollo.MutationResult<InitializeUserMutation>;
+export type InitializeUserMutationOptions = Apollo.BaseMutationOptions<InitializeUserMutation, InitializeUserMutationVariables>;
 export const CreateSharedDataStoresMutaionDocument = gql`
     mutation CreateSharedDataStoresMutaion($ids: [SharedDataStoresIdsInput!]!) {
   createSharedDataStore(data: {ids: $ids})
