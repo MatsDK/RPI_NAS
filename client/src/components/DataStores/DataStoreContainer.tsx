@@ -160,7 +160,7 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({ ds, data
 
   return (
     <DatastoreContainerWrapper>
-      <ConditionOverlay condition={!!ds.userInitialized} renderOverlay={
+      <ConditionOverlay condition={!ds.userInitialized} renderOverlay={
         () => <InitializeUserForm datastoreId={Number(ds.id)} datastoreName={ds.name} />}
       >
         <DatastoreName>

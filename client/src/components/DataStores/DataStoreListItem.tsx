@@ -267,7 +267,7 @@ export const DataStoreListItem: React.FC<DataStoreListItemProps> = ({
                 datastore.status.slice(1)}
             </p>
           </div>
-          {!!datastore.userInitialized &&
+          {!datastore.userInitialized &&
             <Link href={`/datastore/${datastore.id}`}>
               <InitUserSection>User not initialized</InitUserSection>
             </Link>

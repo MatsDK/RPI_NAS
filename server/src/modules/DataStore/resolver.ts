@@ -30,6 +30,8 @@ import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { UpdateDatastoreInput } from "./UpdateDatastoreInput";
 import { createRemoteDatastore } from "../../utils/nodes/createDatastore"
 import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
+import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
+import { InitializeUserMutation } from "./InitUserMutation";
 
 @Resolver()
 export class DataStoreResolver {
@@ -179,6 +181,33 @@ export class DataStoreResolver {
     @Arg("datastoreId") datastoreId: number,
     @Arg("password") password: string
   ): Promise<boolean | null> {
+    if (!password.trim() || !req.user) return null
+
+    const datastore = await Datastore.findOne({ where: { id: datastoreId } });
+    if (!datastore) return null
+
+    const node = await Node.findOne({ where: { id: datastore.localHostNodeId } });
+    if (!node || node.hostNode) return null
+
+    const client = await getOrCreateNodeClient({ node, ping: false })
+    if (!client) return null
+
+    try {
+      const res = await client.conn.mutate({
+        mutation: InitializeUserMutation,
+        variables: {
+          groupName: fsPath.basename(datastore.basePath),
+          userName: req.user.osUserName,
+          password: password.trim()
+        }
+      })
+
+      console.log(res)
+    } catch (e) {
+      console.log(e)
+      return null
+    }
+
     return true
   }
 

@@ -5,7 +5,7 @@ import { createUser } from "../utils/createUser";
 import { getOrCreateConnection } from "../utils/client";
 import { ApolloError } from "apollo-server-express";
 import { createDatastoreFolder } from "../utils/datastore/createDatastoreFolder"
-import { createGroup } from "../utils/datastore/handleGroups";
+import { createGroup, addToGroup } from "../utils/datastore/handleGroups";
 import { GetDatastoreSizes, GetDatastoreSizesInput } from "./GetDatastoreSizes";
 import { getDatastoreSizes } from "../utils/datastore/getDatastoreSizes";
 
@@ -41,7 +41,8 @@ export class resolver {
 	async createDatastore(@Arg("data", () => CreateDatastoreInput) { path, groupName, ownerUserName, sizeInMB, ownerPassword, initOwner, hostLoginName }: CreateDatastoreInput): Promise<boolean> {
 		if (initOwner) {
 			try {
-				await createUser(ownerUserName, ownerPassword)
+				const { err } = await createUser(ownerUserName, ownerPassword)
+				if (err) throw new ApolloError(err)
 			} catch { }
 		}
 
@@ -57,5 +58,18 @@ export class resolver {
 	@Query(() => [GetDatastoreSizes])
 	getDatastoresSizes(@Arg("datastores", () => [GetDatastoreSizesInput]) datastores: [GetDatastoreSizesInput]) {
 		return datastores.length ? getDatastoreSizes(datastores) : []
+	}
+
+	@Mutation(() => Boolean, { nullable: true })
+	async initUser(@Arg("userName") userName: string, @Arg("password") password: string, @Arg("groupName") groupName: string): Promise<boolean | null> {
+		try {
+			await createUser(userName, password)
+			await addToGroup(userName, groupName)
+		} catch (e) {
+			console.log(e)
+			return null
+		}
+
+		return true
 	}
 }
