@@ -49,7 +49,6 @@ export const CreateHostNodeForm: React.FC<CreateHostNodeFormProps> = ({ }) => {
     if (data?.getNodes?.nodes.find(({ hostNode }) => hostNode))
         router.push("/nodes")
 
-
     const createNode = async (e: FormEvent) => {
         e.preventDefault();
 

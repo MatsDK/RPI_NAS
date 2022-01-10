@@ -38,7 +38,7 @@ export class DataStoreResolver {
   @UseMiddleware(isAuth, getUser)
   @Query(() => [Datastore], { nullable: true })
   async getDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
-    const dataStores = await ((req as any).user?.isAdmin
+    const dataStores = await (req.user?.isAdmin
       ? Datastore.find()
       : getUserDataStores(req.userId));
 
@@ -172,43 +172,6 @@ export class DataStoreResolver {
     }
 
     return ret;
-  }
-
-  @UseMiddleware(isAuth, getUser)
-  @Mutation(() => Boolean, { nullable: true })
-  async initUser(
-    @Ctx() { req }: MyContext,
-    @Arg("datastoreId") datastoreId: number,
-    @Arg("password") password: string
-  ): Promise<boolean | null> {
-    if (!password.trim() || !req.user) return null
-
-    const datastore = await Datastore.findOne({ where: { id: datastoreId } });
-    if (!datastore) return null
-
-    const node = await Node.findOne({ where: { id: datastore.localHostNodeId } });
-    if (!node || node.hostNode) return null
-
-    const client = await getOrCreateNodeClient({ node, ping: false })
-    if (!client) return null
-
-    try {
-      const res = await client.conn.mutate({
-        mutation: InitializeUserMutation,
-        variables: {
-          groupName: fsPath.basename(datastore.basePath),
-          userName: req.user.osUserName,
-          password: password.trim()
-        }
-      })
-
-      console.log(res)
-    } catch (e) {
-      console.log(e)
-      return null
-    }
-
-    return true
   }
 
   @UseMiddleware(isAuth, getUser)

@@ -36,7 +36,7 @@ export const isAuth: MiddlewareFn<MyContext> = async (
 
     req.userId = decoded.userId;
     return next();
-  } catch {}
+  } catch { }
 
   let decodedRefreshToken: any;
 
@@ -54,7 +54,7 @@ export const isAuth: MiddlewareFn<MyContext> = async (
   const user = await User.findOne(decodedRefreshToken.userId);
   if (!user) return null;
 
-  (req as any).user = user;
+  req.user = user;
 
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
     createTokens(user);

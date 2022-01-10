@@ -1,63 +1,60 @@
 import { Node, useGetNodesQueryQuery } from "generated/apolloComponents";
-import { Spinner } from "src/ui/Spinner";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/router";
+import React, { useEffect } from "react";
 import { useApolloClient } from "react-apollo";
+import { Scrollbar } from "src/ui/Scrollbar";
+import { Spinner } from "src/ui/Spinner";
 import styled from "styled-components";
 import { NodeRequestsList } from "./NodeRequestsList";
 
 const Wrapper = styled.div`
-    width: 100%;
+    padding: 25px 0 0 30px;
     height: 100%;
-`
-
-const NodesListWrapper = styled.div`
-    max-width: 1440px;
-    margin: 0 auto;
+    min-width: 620px;
 `
 
 const NodesList = styled.div`
-    padding: 0 50px 20px 50px;
+    overflow: auto;
+    height: calc(100% - 115px);
+
+    ${Scrollbar}
     display: flex;
     flex-direction: column;
 `
 
 const NodesListItem = styled.div`
-    width: 100%;
-    border-bottom: 1px solid ${props => props.theme.lightBgColors[1]};
-    padding: 5px 20px;
-    min-height: 45px;
-
+    padding: 15px;
     display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-
-    > span {
-        flex: 1;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: ${props => props.theme.textColors[0]};
-        display: flex;
-        
-        > p {
-            color: ${props => props.theme.textColors[1]};
-        }
-    }
+    flex-direction: column;
+    border-bottom: 1px solid ${(props) => props.theme.textColors[3]};
 `
 
-const Headers = styled.div`
-    margin: 50px 50px 0 50px;
-    padding: 10px 20px 10px 40px;
+const NameSection = styled.div`
     display: flex;
-    justify-content: space-evenly;
     align-items: center;
-    border-bottom: 1px solid ${props => props.theme.lightBgColors[2]};
+    justify-content: space-between;
 
     > span {
-        flex: 1;
-        font-size: 18px;
-        font-weight: 600;
+        display: flex;
+        align-items: baseline;
         color: ${props => props.theme.textColors[0]};
+        font-size: 18px;
+
+        :first-child {
+            font-size: 22px;
+            font-weight: 700;
+
+            > p {
+                font-size: 18px;
+                font-weight: normal;
+            }
+        }
+
+        > p {
+            color: ${props => props.theme.textColors[1]};
+            margin: 0 4px;
+        }
     }
 `
 
@@ -65,16 +62,68 @@ interface StatusProps {
     status: boolean
 }
 
-const Status = styled.div<StatusProps>`
-    width: 10px;
-    height: 10px;
-    margin-right: 10px;
-    margin-top: 2px;
-    border-radius: 50%;
-    background-color: ${props => props.status ? props.theme.statusColors[1] : props.theme.statusColors[2]};
+const Status = styled.span<StatusProps>`
+    color: ${props => props.theme.statusColors[props.status ? 1 : 2]} !important;
+    font-weight: 600;
+
+    > p {
+        font-weight: normal;
+    }
+`
+
+const IpSection = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 5px;
+
+    > span {
+        color: ${props => props.theme.textColors[1]};
+        font-size: 17px;
+        display: flex;
+        
+        :first-child {
+            margin-right: 30px;
+        }
+
+        > p {
+            margin-left: 4px;
+            color: ${props => props.theme.textColors[0]};
+            font-weight: 600;
+        }
+    }
+`
+
+const Header = styled.div`
+    border-bottom: 1px solid ${(props) => props.theme.textColors[3]};
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 15px;
+`
+
+const Title = styled.h1`
+    font-weight: 500;
+    margin-right: 3px;
+    color: ${props => props.theme.textColors[0]};
+    font-size: 25px;
+    display: flex;
+    align-items: baseline;
+    
+    > span {
+        margin-left: 5px;
+        display: flex;
+        font-size: 14px;
+        color: ${(props) => props.theme.textColors[2]};
+        font-weight: normal;
+
+        > p {
+            font-weight: 500;
+            margin-right: 3px;
+        }
+    }
 `
 
 export const NodesView: React.FC = ({ }) => {
+    const router = useRouter()
     const client: any = useApolloClient();
     const { data, loading, error } = useGetNodesQueryQuery({ client });
 
@@ -85,37 +134,45 @@ export const NodesView: React.FC = ({ }) => {
 
     const host = data?.getNodes?.nodes.filter(({ hostNode }) => !!hostNode)[0] as Node
 
+    useEffect(() => {
+        if (!loading && !host) router.push("/nodes/createhost")
+
+        return () => { }
+    }, [host, loading])
+
     return (
         <Wrapper>
             {loading ? <Spinner loading={true} /> :
-                <NodesListWrapper>
-                    <Headers>
-                        <span>Name</span>
-                        <span>Ip address:Port</span>
-                        <span>Token</span>
-                    </Headers>
-                    <NodesList>
+                <>
+                    <Header>
+                        <Title>Nodes <span><p>{data?.getNodes?.nodes.length}</p> Node{data?.getNodes?.nodes.length != 1 && "s"}</span></Title>
+                    </Header>
+                    <NodesList >
                         {data?.getNodes?.nodes.map(({ name, ip, port, hostNode, pingResult }, idx) => (
                             <NodesListItem key={idx}>
-                                <Status status={pingResult} />
-                                <span>
-                                    {name}{hostNode && <p>(Host)</p>}
-                                </span>
-                                <span>
-                                    {ip}:{port}
-                                </span>
-                                <span>/</span>
+                                <NameSection>
+                                    <span>
+                                        {name}{hostNode && <p>(Host)</p>}
+                                    </span>
+                                    <Status status={pingResult}><p>Status: </p>{pingResult ? "Online" : "Offline"}</Status>
+                                </NameSection>
+                                <IpSection>
+                                    <span>Ip: <p>{ip}</p></span>
+                                    <span>Port: <p>{port}</p></span>
+                                </IpSection>
                             </NodesListItem>
                         ))}
                     </NodesList>
-                </NodesListWrapper>
+                </>
             }
-            {!host && (
-                <div>
-                    <Link href={"/nodes/createhost"}>Create host node</Link>
-                </div>
-            )}
+            {
+                !host && (
+                    <div>
+                        <Link href={"/nodes/createhost"}>Create host node</Link>
+                    </div>
+                )
+            }
             <NodeRequestsList host={host} nodeRequests={data?.getNodes?.nodeRequests || []} />
-        </Wrapper>
+        </Wrapper >
     );
 };

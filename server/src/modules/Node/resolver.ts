@@ -1,19 +1,23 @@
-import { Query, Resolver, UseMiddleware, Mutation, Arg, Ctx } from "type-graphql";
+import { gql } from "@apollo/client/core";
 import { ApolloError } from "apollo-server-express";
-import { AcceptNodeRequestInput } from "./AcceptNodeRequestInput"
+import fsPath from "path";
+import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
+import { v4 } from "uuid";
 import { Node } from "../../entity/CloudNode";
+import { Datastore } from "../../entity/Datastore";
 import { NodeRequest } from "../../entity/NodeRequest";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
+import { getUser } from "../../middleware/getUser";
 import { isAdmin } from "../../middleware/isAdmin";
-import { CreateNodeInput } from "./CreateNodeInput";
+import { MyContext } from "../../types/Context";
 import { createUser } from "../../utils/createUser";
-import { v4 } from "uuid";
-import { MyContext } from "../../types/Context"
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
-import { gql } from "@apollo/client/core";
-import { GetNodesReturn } from "./GetNodesReturn";
 import { pingNodes } from "../../utils/nodes/pingNodes";
+import { InitializeUserMutation } from "../DataStore/InitUserMutation";
+import { AcceptNodeRequestInput } from "./AcceptNodeRequestInput";
+import { CreateNodeInput } from "./CreateNodeInput";
+import { GetNodesReturn } from "./GetNodesReturn";
 
 const SETUPNODE_MUTATION = gql`
 mutation SetupNodeMutation($data: Node!) {
@@ -144,4 +148,50 @@ export class NodeResolver {
 		const client = await getOrCreateNodeClient({ uri, ping: true })
 		return true
 	}
+
+
+	@UseMiddleware(isAuth, getUser)
+	@Mutation(() => Boolean, { nullable: true })
+	async initUser(
+		@Ctx() { req }: MyContext,
+		@Arg("datastoreId") datastoreId: number,
+		@Arg("password") password: string
+	): Promise<boolean | null> {
+		if (!password.trim() || !req.user) return null
+
+		const datastore = await Datastore.findOne({ where: { id: datastoreId } });
+		if (!datastore) return null
+
+		const node = await Node.findOne({ where: { id: datastore.localHostNodeId } });
+		if (!node || node.hostNode || node.initializedUsers.includes(req.userId)) return null
+
+		const client = await getOrCreateNodeClient({ node, ping: false })
+		if (!client) return null
+
+		try {
+			const res = await client.conn.mutate({
+				mutation: InitializeUserMutation,
+				variables: {
+					groupName: fsPath.basename(datastore.basePath),
+					userName: req.user.osUserName,
+					password: password.trim()
+				}
+			})
+
+			if (res.errors) {
+				console.log(res.errors)
+				return null
+			}
+
+			node.initializedUsers.push(req.userId)
+			await node.save()
+		} catch (e) {
+			console.log(e)
+			return null
+		}
+
+		return true
+	}
+
+
 }

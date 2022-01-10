@@ -6,10 +6,10 @@ export const isAdmin: MiddlewareFn<MyContext> = async (
   { context: { req } },
   next
 ) => {
-  if ((req as any).user) return (req as any).user.isAdmin ? next() : null;
+  if (req.user) return req.user.isAdmin ? next() : null;
   if (req.userId == null) return null;
 
-  (req as any).user = await User.findOne({ where: { id: req.userId } });
+  req.user = await User.findOne({ where: { id: req.userId } });
 
-  return (req as any).user.isAdmin ? next() : null;
+  return req.user?.isAdmin ? next() : null;
 };
