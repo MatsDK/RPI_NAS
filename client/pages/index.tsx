@@ -31,7 +31,7 @@ Page.getInitialProps = async (ctx: ApolloContext) => {
     variables: {
       depth: 1,
       path: "/",
-      dataStoreId: null,
+      datastoreId: null,
     },
   });
 

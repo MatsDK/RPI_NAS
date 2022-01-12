@@ -53,7 +53,7 @@ const Page: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
 };
 
 Page.getInitialProps = async (ctx: ApolloContext) => {
-  const datastore = ctx.req
+  const datastoreId = ctx.req
     ? ctx.req?.query?.d
       ? Number(ctx.req.query.d)
       : null
@@ -75,7 +75,7 @@ Page.getInitialProps = async (ctx: ApolloContext) => {
     variables: {
       depth: 1,
       path: "",
-      datastoreId: datastore
+      datastoreId
     },
   });
 

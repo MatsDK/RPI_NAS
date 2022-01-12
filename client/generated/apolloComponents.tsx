@@ -138,7 +138,7 @@ export type GetNodesReturn = {
 };
 
 export type GetTreeInput = {
-  dataStoreId?: Maybe<Scalars['Float']>;
+  datastoreId?: Maybe<Scalars['Float']>;
   depth?: Maybe<Scalars['Float']>;
   path: Scalars['String'];
 };
@@ -380,6 +380,7 @@ export type Tree = {
   __typename?: 'Tree';
   path: Scalars['String'];
   tree?: Maybe<Array<TreeItem>>;
+  userInitialized: Scalars['Boolean'];
 };
 
 export type TreeItem = {
@@ -613,7 +614,7 @@ export type GetTreeQueryQueryVariables = Exact<{
 }>;
 
 
-export type GetTreeQueryQuery = { __typename?: 'Query', tree?: { __typename: 'Tree', path: string, tree?: Array<{ __typename: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string }> | null | undefined } | null | undefined };
+export type GetTreeQueryQuery = { __typename?: 'Query', tree?: { __typename?: 'Tree', path: string, userInitialized: boolean, tree?: Array<{ __typename?: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string }> | null | undefined } | null | undefined };
 
 export type UploadMutationVariables = Exact<{
   file: Scalars['Upload'];
@@ -1493,7 +1494,7 @@ export type CreateUploadSessionMutationMutationResult = Apollo.MutationResult<Cr
 export type CreateUploadSessionMutationMutationOptions = Apollo.BaseMutationOptions<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>;
 export const GetDirectoryTreeQueryDocument = gql`
     query getDirectoryTreeQuery($path: String!, $depth: Float!, $datastoreId: Float) {
-  directoryTree(data: {path: $path, depth: $depth, dataStoreId: $datastoreId}) {
+  directoryTree(data: {path: $path, depth: $depth, datastoreId: $datastoreId}) {
     path
     __typename
     tree {
@@ -1540,15 +1541,14 @@ export type GetDirectoryTreeQueryLazyQueryHookResult = ReturnType<typeof useGetD
 export type GetDirectoryTreeQueryQueryResult = Apollo.QueryResult<GetDirectoryTreeQueryQuery, GetDirectoryTreeQueryQueryVariables>;
 export const GetTreeQueryDocument = gql`
     query getTreeQuery($path: String!, $depth: Float!, $datastoreId: Float) {
-  tree(data: {path: $path, dataStoreId: $datastoreId, depth: $depth}) {
+  tree(data: {path: $path, datastoreId: $datastoreId, depth: $depth}) {
     path
-    __typename
+    userInitialized
     tree {
       relativePath
       isDirectory
       name
       path
-      __typename
     }
   }
 }

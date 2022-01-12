@@ -7,7 +7,7 @@ export const getDirectoryTreeQuery = gql`
     $datastoreId: Float
   ) {
     directoryTree(
-      data: { path: $path, depth: $depth, dataStoreId: $datastoreId }
+      data: { path: $path, depth: $depth, datastoreId: $datastoreId }
     ) {
       path
       __typename

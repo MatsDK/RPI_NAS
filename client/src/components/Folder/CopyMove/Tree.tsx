@@ -100,7 +100,7 @@ const TreeItem: React.FC<TreeItemProps> = ({
       query(getDirectoryTreeQuery, {
         depth: 1,
         path: item.relativePath,
-        dataStoreId: item.dataStoreId,
+        datastoreId: item.dataStoreId,
       }).then((res) => setNestedItems(res));
 
     return () => { };

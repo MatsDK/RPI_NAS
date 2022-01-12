@@ -18,30 +18,30 @@ interface Props {
 const Folder: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
   useMeState(me);
 
-  const [dataStoreName, setDataStoreName] = useState<string>("");
+  const [datastoreName, setDatastoreName] = useState<string>("");
 
   const router = useRouter(),
     path = ((router.query.path || []) as string[]).join("/"),
-    dataStoreId = router?.query?.d ? Number(router.query.d) : null;
+    datastoreId = router?.query?.d ? Number(router.query.d) : null;
 
-  if (dataStoreId == null) return null;
+  if (datastoreId == null) return null;
 
   useEffect(() => {
-    setDataStoreName(
-      tree?.directoryTree?.tree?.find((d) => d.dataStoreId == dataStoreId)
+    setDatastoreName(
+      tree?.directoryTree?.tree?.find((d) => d.dataStoreId == datastoreId)
         ?.name || ""
     );
-  }, [path, dataStoreId]);
+  }, [path, datastoreId]);
 
   return (
-    <Layout title={`${dataStoreName || "Datastore"} - ${path}`}>
+    <Layout title={`${datastoreName || "Datastore"} - ${path}`}>
       <SideBar />
       <Wrapper>
         <Tree />
         <FolderItems
           path={path}
-          datastoreId={dataStoreId}
-          datastoreName={dataStoreName}
+          datastoreId={datastoreId}
+          datastoreName={datastoreName}
         />
       </Wrapper>
     </Layout>
@@ -50,7 +50,7 @@ const Folder: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
 
 Folder.getInitialProps = async (ctx: ApolloContext) => {
   const path = ctx.query.path.join("/"),
-    dataStore = ctx.req
+    datastoreId = ctx.req
       ? ctx.req?.query?.d
         ? Number(ctx.req.query.d)
         : null
@@ -72,7 +72,7 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
     variables: {
       depth: 1,
       path,
-      datastoreId: dataStore,
+      datastoreId,
     },
   });
 
