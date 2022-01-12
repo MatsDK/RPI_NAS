@@ -101,7 +101,7 @@ export class UserResolver {
     const ret = new FriendsQueryReturn();
 
     ret.friends = await User.find({
-      where: { id: In(req.user.friendsIds) },
+      where: { id: In(req.user?.friendsIds || []) },
     });
 
     ret.friendsRequest = await getConnection()
@@ -118,7 +118,7 @@ export class UserResolver {
   @Query(() => [User], { nullable: true })
   getFriends(@Ctx() { req }: MyContext): Promise<User[]> {
     return User.find({
-      where: { id: In(req.user.friendsIds) },
+      where: { id: In(req.user?.friendsIds || []) },
     });
   }
 

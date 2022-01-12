@@ -8,7 +8,7 @@ import Icon from "src/ui/Icon";
 import { Scrollbar } from "src/ui/Scrollbar";
 import styled from "styled-components";
 
-export type MoveCopyPath = { dataStoreId: number; path: string };
+export type MoveCopyPath = { datastoreId: number; path: string };
 
 interface TreeProps {
   setSelectedPath: React.Dispatch<React.SetStateAction<MoveCopyPath | null>>;
@@ -103,7 +103,7 @@ const TreeItem: React.FC<TreeItemProps> = ({
         dataStoreId: item.dataStoreId,
       }).then((res) => setNestedItems(res));
 
-    return () => {};
+    return () => { };
   }, [item, showNestedItems]);
 
   return (
@@ -123,12 +123,12 @@ const TreeItem: React.FC<TreeItemProps> = ({
         </ArrowButton>
         <FolderName
           selected={
-            selectedPath?.dataStoreId == item.dataStoreId &&
+            selectedPath?.datastoreId == item.dataStoreId &&
             selectedPath?.path === item.relativePath
           }
           onClick={() =>
             setSelectedPath({
-              dataStoreId: item.dataStoreId || 0,
+              datastoreId: item.dataStoreId || 0,
               path: item.relativePath,
             })
           }

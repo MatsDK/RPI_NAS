@@ -81,7 +81,7 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
       MoveDataMutation,
       {
         data: selectedData,
-        dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+        dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
         destination: movePath,
       },
       {
@@ -90,7 +90,7 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
             query: getTreeQuery,
             variables: {
               depth: 1,
-              dataStoreId: movePath?.dataStoreId,
+              datastoreId: movePath?.datastoreId,
               path: movePath?.path,
             },
           },
@@ -98,7 +98,7 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
             query: getTreeQuery,
             variables: {
               depth: 1,
-              dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+              datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
               path: folderCtx?.currentFolderPath?.folderPath.path,
             },
           },
@@ -129,7 +129,7 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
             <span>
               {
                 data?.directoryTree?.tree?.find(
-                  (v) => v.dataStoreId == movePath?.dataStoreId
+                  (v) => v.dataStoreId == movePath?.datastoreId
                 )?.name
               }
               /{movePath?.path.replace(/\\/g, "/")}

@@ -13,7 +13,7 @@ import styled from "styled-components";
 
 interface Props {
   item: TreeItem;
-  dataStoreId?: number | null;
+  datastoreId?: number | null;
   showNested?: boolean;
 }
 
@@ -53,7 +53,7 @@ const TreeFolder = styled.div`
   cursor: pointer;
 `;
 
-const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
+const Item: React.FC<Props> = ({ item, datastoreId, showNested = false }) => {
   const router = useRouter();
 
   const [nestedItems, setNestedItems] = useState<TreeItem[] | null>(null);
@@ -73,7 +73,7 @@ const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
     variables: {
       depth: 1,
       path: item.relativePath,
-      dataStoreId,
+      datastoreId,
     },
   });
 
@@ -128,7 +128,7 @@ const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
         </ArrowButton>
         <div
           onClick={() => {
-            router.push(`/path/${item.relativePath}?d=${dataStoreId}`);
+            router.push(`/path/${item.relativePath}?d=${datastoreId}`);
           }}
         >
           {item.dataStoreId != null ? (
@@ -168,7 +168,7 @@ const Item: React.FC<Props> = ({ item, dataStoreId, showNested = false }) => {
 
             return (
               <Item
-                dataStoreId={dataStoreId}
+                datastoreId={datastoreId}
                 showNested={show}
                 item={i}
                 key={idx}

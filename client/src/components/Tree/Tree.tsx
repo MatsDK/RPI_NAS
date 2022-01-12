@@ -66,7 +66,7 @@ const Tree: React.FC<Props> = ({ path = "/" }) => {
     variables: {
       depth: 1,
       path,
-      dataStoreId: null,
+      datastoreId: null,
     },
   });
 
@@ -90,10 +90,10 @@ const Tree: React.FC<Props> = ({ path = "/" }) => {
           {data.directoryTree.tree.map((item, idx) => (
             <TreeObjectItem
               showNested={
-                FolderCtx?.currentFolderPath?.folderPath.dataStoreId ===
+                FolderCtx?.currentFolderPath?.folderPath.datastoreId ===
                 item.dataStoreId
               }
-              dataStoreId={item.dataStoreId}
+              datastoreId={item.dataStoreId}
               item={item as TreeItem}
               key={idx}
             />

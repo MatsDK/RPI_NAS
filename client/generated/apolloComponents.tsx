@@ -600,7 +600,7 @@ export type CreateUploadSessionMutationMutation = { __typename?: 'Mutation', cre
 export type GetDirectoryTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
   depth: Scalars['Float'];
-  dataStoreId?: Maybe<Scalars['Float']>;
+  datastoreId?: Maybe<Scalars['Float']>;
 }>;
 
 
@@ -609,7 +609,7 @@ export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree?:
 export type GetTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
   depth: Scalars['Float'];
-  dataStoreId?: Maybe<Scalars['Float']>;
+  datastoreId?: Maybe<Scalars['Float']>;
 }>;
 
 
@@ -1492,8 +1492,8 @@ export type CreateUploadSessionMutationMutationHookResult = ReturnType<typeof us
 export type CreateUploadSessionMutationMutationResult = Apollo.MutationResult<CreateUploadSessionMutationMutation>;
 export type CreateUploadSessionMutationMutationOptions = Apollo.BaseMutationOptions<CreateUploadSessionMutationMutation, CreateUploadSessionMutationMutationVariables>;
 export const GetDirectoryTreeQueryDocument = gql`
-    query getDirectoryTreeQuery($path: String!, $depth: Float!, $dataStoreId: Float) {
-  directoryTree(data: {path: $path, depth: $depth, dataStoreId: $dataStoreId}) {
+    query getDirectoryTreeQuery($path: String!, $depth: Float!, $datastoreId: Float) {
+  directoryTree(data: {path: $path, depth: $depth, dataStoreId: $datastoreId}) {
     path
     __typename
     tree {
@@ -1523,7 +1523,7 @@ export const GetDirectoryTreeQueryDocument = gql`
  *   variables: {
  *      path: // value for 'path'
  *      depth: // value for 'depth'
- *      dataStoreId: // value for 'dataStoreId'
+ *      datastoreId: // value for 'datastoreId'
  *   },
  * });
  */
@@ -1539,8 +1539,8 @@ export type GetDirectoryTreeQueryQueryHookResult = ReturnType<typeof useGetDirec
 export type GetDirectoryTreeQueryLazyQueryHookResult = ReturnType<typeof useGetDirectoryTreeQueryLazyQuery>;
 export type GetDirectoryTreeQueryQueryResult = Apollo.QueryResult<GetDirectoryTreeQueryQuery, GetDirectoryTreeQueryQueryVariables>;
 export const GetTreeQueryDocument = gql`
-    query getTreeQuery($path: String!, $depth: Float!, $dataStoreId: Float) {
-  tree(data: {path: $path, dataStoreId: $dataStoreId, depth: $depth}) {
+    query getTreeQuery($path: String!, $depth: Float!, $datastoreId: Float) {
+  tree(data: {path: $path, dataStoreId: $datastoreId, depth: $depth}) {
     path
     __typename
     tree {
@@ -1568,7 +1568,7 @@ export const GetTreeQueryDocument = gql`
  *   variables: {
  *      path: // value for 'path'
  *      depth: // value for 'depth'
- *      dataStoreId: // value for 'dataStoreId'
+ *      datastoreId: // value for 'datastoreId'
  *   },
  * });
  */

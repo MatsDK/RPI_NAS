@@ -6,7 +6,7 @@ import { getTreeQuery } from "../graphql/Folder/getTree";
 import { Button } from "react-native";
 import { createSessionMutation } from "../graphql/ShareData/CreateDownloadSession";
 
-interface DataStoreProps {}
+interface DataStoreProps { }
 
 const SERVER_URL = "http://192.168.0.209:4000";
 
@@ -48,7 +48,7 @@ export const DataStore: RouteProps<"DataStore", DataStoreProps> = ({
       query={getTreeQuery}
       variables={{
         path: params.path,
-        dataStoreId: Number(params.id),
+        datastoreId: Number(params.id),
         depth: 1,
       }}
     >

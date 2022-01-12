@@ -6,7 +6,7 @@ export class GetTreeInput {
   path: string;
 
   @Field(() => Number, { nullable: true })
-  dataStoreId: number;
+  datastoreId: number;
 
   @Field(() => Number, { nullable: true })
   depth: number;

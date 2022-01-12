@@ -40,8 +40,8 @@ const Folder: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
         <Tree />
         <FolderItems
           path={path}
-          dataStoreId={dataStoreId}
-          dataStoreName={dataStoreName}
+          datastoreId={dataStoreId}
+          datastoreName={dataStoreName}
         />
       </Wrapper>
     </Layout>
@@ -63,7 +63,7 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
     variables: {
       depth: 1,
       path: "/",
-      dataStoreId: null,
+      datastoreId: null,
     },
   });
 
@@ -72,7 +72,7 @@ Folder.getInitialProps = async (ctx: ApolloContext) => {
     variables: {
       depth: 1,
       path,
-      dataStoreId: dataStore,
+      datastoreId: dataStore,
     },
   });
 

@@ -1,8 +1,10 @@
+import { ApolloError } from "apollo-server-core";
 import { Datastore } from "../../entity/Datastore";
+import { Node } from "../../entity/CloudNode";
 import { Tree } from "./TreeObject";
 
 interface Params {
-  dataStoreId: number | null;
+  datastoreId: number | null;
   path: string;
   depth: number;
   userId: number;
@@ -10,17 +12,20 @@ interface Params {
 }
 
 export const buildTreeObject = async ({
-  dataStoreId,
+  datastoreId,
   path,
   depth = 1,
   userId,
   directoryTree,
 }: Params): Promise<Tree> => {
-  if (dataStoreId == null)
-    return await new Tree().init(path, depth, null, directoryTree, { userId });
+  if (datastoreId == null)
+    return await new Tree(true).init(path, depth, null, directoryTree, { userId });
 
-  const dataStore = await Datastore.findOne({ where: { id: dataStoreId } });
-  if (!dataStore) throw new Error("datastore not found");
+  const datastore = await Datastore.findOne({ where: { id: datastoreId } });
+  if (!datastore) throw new ApolloError("datastore not found");
 
-  return await new Tree().init(path, depth, dataStore.basePath, directoryTree);
+  const node = await Node.findOne({ where: { id: datastore.localHostNodeId } })
+  if (!node) throw new ApolloError("Node not found")
+
+  return await new Tree(node.initializedUsers.includes(userId)).init(path, depth, datastore.basePath, directoryTree);
 };

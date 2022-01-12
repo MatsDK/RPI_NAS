@@ -12,13 +12,13 @@ export class TreeResolver {
   @Query(() => Tree, { nullable: true })
   async tree(
     @Arg("data", () => GetTreeInput)
-    { dataStoreId, path, depth }: GetTreeInput,
+    { datastoreId, path, depth }: GetTreeInput,
     @Ctx() { req }: MyContext
   ): Promise<Tree> {
     const userId = (req as any).userId;
 
     return await buildTreeObject({
-      dataStoreId,
+      datastoreId,
       path,
       depth,
       userId,
@@ -30,13 +30,13 @@ export class TreeResolver {
   @Query(() => Tree, { nullable: true })
   async directoryTree(
     @Arg("data", () => GetTreeInput)
-    { dataStoreId, path, depth }: GetTreeInput,
+    { datastoreId, path, depth }: GetTreeInput,
     @Ctx() { req }: MyContext
   ): Promise<Tree> {
     const userId = (req as any).userId;
 
     const res = await buildTreeObject({
-      dataStoreId,
+      datastoreId,
       path,
       depth,
       userId,

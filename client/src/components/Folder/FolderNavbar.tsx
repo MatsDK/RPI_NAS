@@ -126,7 +126,7 @@ const FolderNavbar = () => {
             query: getTreeQuery,
             variables: {
               depth: 1,
-              dataStoreId: folderCtx.currentFolderPath?.folderPath.dataStoreId,
+              datastoreId: folderCtx.currentFolderPath?.folderPath.datastoreId,
               path: folderCtx.currentFolderPath?.folderPath.path,
             },
           },

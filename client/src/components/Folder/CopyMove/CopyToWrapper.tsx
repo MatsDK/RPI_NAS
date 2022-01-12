@@ -82,7 +82,7 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
       CopyDataMutation,
       {
         data: selectedData,
-        dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+        dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
         destination: copyToPath,
       },
       {
@@ -91,7 +91,7 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
             query: getTreeQuery,
             variables: {
               depth: 1,
-              dataStoreId: copyToPath?.dataStoreId,
+              datastoreId: copyToPath?.datastoreId,
               path: copyToPath?.path,
             },
           },
@@ -122,7 +122,7 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
             <span>
               {
                 data?.directoryTree?.tree?.find(
-                  (v) => v.dataStoreId == copyToPath?.dataStoreId
+                  (v) => v.dataStoreId == copyToPath?.datastoreId
                 )?.name
               }
               /{copyToPath?.path.replace(/\\/g, "/")}

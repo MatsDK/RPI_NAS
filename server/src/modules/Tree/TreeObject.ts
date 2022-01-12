@@ -11,6 +11,13 @@ export class Tree {
   @Field(() => [TreeItem], { nullable: true })
   tree: TreeItem[] | null;
 
+  @Field(() => Boolean)
+  userInitialized: boolean
+
+  constructor(userInitialized: boolean) {
+    this.userInitialized = userInitialized
+  }
+
   async init(
     path: string,
     depth: number,

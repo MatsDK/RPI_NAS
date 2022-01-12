@@ -5,8 +5,8 @@ export type FolderContextType = FolderContext | null;
 
 export type CurrentFolderType = {
   path: string | null;
-  dataStoreId: number | null;
-  dataStoreName: string | null;
+  datastoreId: number | null;
+  datastoreName: string | null;
 };
 
 interface FolderContext {

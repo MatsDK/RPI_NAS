@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 
 interface Props {
   item: TreeItem & { idx?: number };
-  dataStoreId: number | null;
+  datastoreId: number | null;
   idx: number
   items: TreeItem[]
 }
@@ -64,7 +64,7 @@ const Name = styled.div`
   }
 `
 
-const FolderItem: React.FC<Props> = ({ item, dataStoreId, idx, items }) => {
+const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
   const folderCtx: FolderContextType = useContext(FolderContext);
 
   const router = useRouter();
@@ -82,7 +82,7 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId, idx, items }) => {
       style={{ backgroundColor: selected ? "#ededed" : "#fff" }}
       onDoubleClick={() =>
         item.isDirectory &&
-        router.push(`/path/${item.relativePath}?d=${dataStoreId}`)
+        router.push(`/path/${item.relativePath}?d=${datastoreId}`)
       }
       onClick={({ ctrlKey, shiftKey }) => {
         if (ctrlKey) {
@@ -164,7 +164,7 @@ const FolderItem: React.FC<Props> = ({ item, dataStoreId, idx, items }) => {
       <Name>
         {item.isDirectory ? (
           <div onClick={(e) => e.stopPropagation()}>
-            <Link href={`/path/${item.relativePath}?d=${dataStoreId}`}>
+            <Link href={`/path/${item.relativePath}?d=${datastoreId}`}>
               <FolderButtonItem >{item.name}</FolderButtonItem>
             </Link>
           </div>

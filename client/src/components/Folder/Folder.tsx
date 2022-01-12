@@ -23,8 +23,8 @@ import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 
 interface Props {
   path: string;
-  dataStoreId: number | null;
-  dataStoreName: string;
+  datastoreId: number | null;
+  datastoreName: string;
 }
 
 const FolderContent = styled.div`
@@ -50,12 +50,17 @@ const NewFolderInput = styled.input`
   border-bottom: 1px solid ${(props) => props.theme.lightBgColors[2]};
 `;
 
+const Wrapper = styled.div`
+  flex: 1;
+  overflow: hidden;
+`
+
 const sort = (data: any[]) =>
   data.sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
 
 
-const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
-  if (!dataStoreId) return null;
+const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
+  if (!datastoreId) return null;
 
   const { mutate } = useApollo();
   const client: any = useApolloClient();
@@ -70,15 +75,15 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
     if (folderCtx?.newFolderInput?.showNewFolderInput)
       inputRef.current?.focus();
 
-    if (folderCtx && !folderCtx.currentFolderPath?.folderPath.dataStoreName)
-      folderCtx.currentFolderPath?.setFolderPath({ path, dataStoreId, dataStoreName });
+    if (folderCtx && !folderCtx.currentFolderPath?.folderPath.datastoreName)
+      folderCtx.currentFolderPath?.setFolderPath({ path, datastoreId, datastoreName });
   }, [folderCtx]);
 
   const { data, error, loading } = useGetTreeQueryQuery({
     variables: {
       depth: 1,
       path,
-      dataStoreId,
+      datastoreId,
     },
     client,
   });
@@ -90,7 +95,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
       folderCtx.selected?.setSelected?.(new Map());
 
       selected.selectedItems = new Map();
-      currentFolderPath?.setFolderPath({ path, dataStoreId, dataStoreName });
+      currentFolderPath?.setFolderPath({ path, datastoreId, datastoreName });
     }
   }, [path]);
 
@@ -99,6 +104,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
   if (error) return <div>error</div>;
 
   if (!data?.tree?.tree) return <div>folder not found</div>;
+  console.log(data?.tree)
 
   const createNewFolder = async (e: FormEvent) => {
     e.preventDefault();
@@ -113,7 +119,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
       CreateFolderMutation,
       {
         path: newPath,
-        dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+        dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
       },
       {
         refetchQueries: [
@@ -122,7 +128,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
             variables: {
               depth: 1,
               path: folderCtx?.currentFolderPath?.folderPath.path,
-              dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+              dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
             },
           },
         ],
@@ -130,7 +136,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
           try {
             const cacheData: any = cache.readQuery({
               query: getTreeQuery,
-              variables: { depth: 1, path, dataStoreId },
+              variables: { depth: 1, path, datastoreId },
             });
 
             if (!data.createFolder || !cacheData?.tree) return;
@@ -147,7 +153,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
 
             cache.writeQuery({
               query: getTreeQuery,
-              variables: { depth: 1, path, dataStoreId },
+              variables: { depth: 1, path, datastoreId },
               data: cacheData,
             });
           } catch (error) {
@@ -161,20 +167,16 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
     setFolderNameInput("");
   };
 
+
   return (
-    <div
-      style={{
-        flex: 1,
-        overflow: "hidden",
-      }}
-    >
+    <Wrapper>
       <FolderNavbar />
       <FolderContainer>
         <FolderPath
           path={path.split("/")}
           dataStore={{
-            id: dataStoreId,
-            name: dataStoreName,
+            id: datastoreId,
+            name: datastoreName,
           }}
         />
         <FolderContent>
@@ -202,7 +204,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
           )}
           {sort(data.tree?.tree).map((item, idx) => (
             <FolderItem
-              dataStoreId={dataStoreId}
+              datastoreId={datastoreId}
               item={item as TreeItem}
               idx={idx}
               items={sort(data.tree?.tree || [])}
@@ -215,7 +217,7 @@ const Folder: React.FC<Props> = ({ path, dataStoreId, dataStoreName }) => {
           onClick={() => folderCtx?.selected?.setSelected?.(new Map())}
         ></div>
       </FolderContainer>
-    </div>
+    </Wrapper>
   );
 };
 

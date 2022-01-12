@@ -43,9 +43,9 @@ const Page: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
       <Wrapper>
         <Tree />
         <Folder
-          path={""}
-          dataStoreId={Number(router.query.d)}
-          dataStoreName={dataStoreName}
+          path=""
+          datastoreId={Number(router.query.d)}
+          datastoreName={dataStoreName}
         />
       </Wrapper>
     </Layout>
@@ -53,7 +53,7 @@ const Page: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
 };
 
 Page.getInitialProps = async (ctx: ApolloContext) => {
-  const dataStore = ctx.req
+  const datastore = ctx.req
     ? ctx.req?.query?.d
       ? Number(ctx.req.query.d)
       : null
@@ -66,7 +66,7 @@ Page.getInitialProps = async (ctx: ApolloContext) => {
     variables: {
       depth: 1,
       path: "/",
-      dataStoreId: null,
+      datastoreId: null,
     },
   });
 
@@ -75,7 +75,7 @@ Page.getInitialProps = async (ctx: ApolloContext) => {
     variables: {
       depth: 1,
       path: "",
-      dataStoreId: dataStore,
+      datastoreId: datastore
     },
   });
 
