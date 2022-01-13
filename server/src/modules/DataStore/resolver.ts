@@ -32,6 +32,7 @@ import { createRemoteDatastore } from "../../utils/nodes/createDatastore"
 import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { InitializeUserMutation } from "./InitUserMutation";
+import { ApolloError } from "apollo-server-core";
 
 @Resolver()
 export class DataStoreResolver {
@@ -150,6 +151,8 @@ export class DataStoreResolver {
     if (!datastore) return null;
 
     const isDatastoreOwner = datastore?.userId === req.userId;
+
+    if (!(await SharedDataStore.findOne({ where: { dataStoreId: datastore.id, userId: req.userId } })) && !isDatastoreOwner) throw new ApolloError("No access allowed")
 
     const ret = (
       await getDatastoresWithSizesAndSharedUsers(

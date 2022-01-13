@@ -1,24 +1,27 @@
 import { Node, useGetNodesQueryQuery } from "generated/apolloComponents";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useApolloClient } from "react-apollo";
 import { Scrollbar } from "src/ui/Scrollbar";
 import { Spinner } from "src/ui/Spinner";
 import styled from "styled-components";
-import { NodeRequestsList } from "./NodeRequestsList";
+import { NodeRequestsListItem } from "./NodeRequestsListItem";
 
 const Wrapper = styled.div`
-    padding: 25px 0 0 30px;
-    height: 100%;
+    ${Scrollbar}
+    overflow: auto;
+
+    padding: 15px 0 0 30px;
     min-width: 620px;
 `
 
 const NodesList = styled.div`
-    overflow: auto;
-    height: calc(100% - 115px);
+    display: flex;
+    flex-direction: column;
+`
 
-    ${Scrollbar}
+const NodeRequestsList = styled.div`
     display: flex;
     flex-direction: column;
 `
@@ -103,6 +106,7 @@ const Header = styled.div`
 const Title = styled.h1`
     font-weight: 500;
     margin-right: 3px;
+    margin-top: 10px;
     color: ${props => props.theme.textColors[0]};
     font-size: 25px;
     display: flex;
@@ -127,6 +131,8 @@ export const NodesView: React.FC = ({ }) => {
     const client: any = useApolloClient();
     const { data, loading, error } = useGetNodesQueryQuery({ client });
 
+    const [selectedNodeRequest, setSelectedNodeRequest] = useState<null | number>(null)
+
     if (error) {
         console.log(error);
         return null;
@@ -147,7 +153,7 @@ export const NodesView: React.FC = ({ }) => {
                     <Header>
                         <Title>Nodes <span><p>{data?.getNodes?.nodes.length}</p> Node{data?.getNodes?.nodes.length != 1 && "s"}</span></Title>
                     </Header>
-                    <NodesList >
+                    <NodesList>
                         {data?.getNodes?.nodes.map(({ name, ip, port, hostNode, pingResult }, idx) => (
                             <NodesListItem key={idx}>
                                 <NameSection>
@@ -163,6 +169,20 @@ export const NodesView: React.FC = ({ }) => {
                             </NodesListItem>
                         ))}
                     </NodesList>
+                    <Header>
+                        <Title>Node requests <span><p>{data?.getNodes?.nodeRequests.length}</p> Node request{data?.getNodes?.nodeRequests.length != 1 && "s"}</span></Title>
+                    </Header>
+                    <NodeRequestsList>
+                        {
+                            // data?.getNodes?.nodeRequests.map((request, idx) => (
+                            //     <NodeRequestsListItem key={idx} request={request} host={host} setSelectedNodeRequest={setSelectedNodeRequest} selectedNodeRequest={selectedNodeRequest} />
+                            // ))
+                            [{ id: 1, ip: "192", port: 3000 }].map((request, idx) => (
+                                <NodeRequestsListItem key={idx} request={request} host={host} setSelectedNodeRequest={setSelectedNodeRequest} selectedNodeRequest={selectedNodeRequest} />
+                            ))
+                        }
+                    </NodeRequestsList>
+                    <div style={{ minHeight: 100 }} />
                 </>
             }
             {
@@ -172,7 +192,6 @@ export const NodesView: React.FC = ({ }) => {
                     </div>
                 )
             }
-            <NodeRequestsList host={host} nodeRequests={data?.getNodes?.nodeRequests || []} />
         </Wrapper >
     );
 };
