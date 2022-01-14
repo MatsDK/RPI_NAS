@@ -1,10 +1,11 @@
 import React from 'react'
 import { AcceptNodeRequestForm } from './AcceptNodeRequestForm';
-import { ConditionButton } from "../../ui/Button"
+import { Button, BgButton, ConditionButton } from "../../ui/Button"
 import { Node, NodeRequest } from 'generated/apolloComponents';
 import { useApollo } from 'src/hooks/useApollo';
 import { DeleteNodeRequestMutation } from 'graphql/Node/deleteNodeRequest';
 import { getNodesQuery } from 'graphql/Node/getNodes';
+import styled from 'styled-components';
 
 interface NodeRequestsListItemProps {
 	selectedNodeRequest: number | null
@@ -12,6 +13,39 @@ interface NodeRequestsListItemProps {
 	request: NodeRequest,
 	host: Node
 }
+
+const NodeRequestListItemWrapper = styled.div`
+	padding: 15px;
+	display: flex;
+	flex-direction: column;
+	border-bottom: 1px solid ${(props) => props.theme.textColors[3]};
+`
+
+const NodeRequestInfo = styled.div`
+	display: flex;
+	justify-content: space-between;
+
+	> div {
+		display: flex;
+
+		> span {
+			display: flex;
+			font-size: 17px;
+			color: ${props => props.theme.textColors[0]};
+			font-weight: 600;
+			
+			:first-child {
+				margin-right: 15px;
+			}
+
+			> p {
+				margin-right: 4px;
+				font-weight: normal;
+				color: ${props => props.theme.textColors[1]};
+			}
+		}
+	}
+`
 
 export const NodeRequestsListItem: React.FC<NodeRequestsListItemProps> = ({ host, request, selectedNodeRequest, setSelectedNodeRequest }) => {
 	const { mutate } = useApollo()
@@ -24,19 +58,30 @@ export const NodeRequestsListItem: React.FC<NodeRequestsListItemProps> = ({ host
 	const showAcceptForm = selectedNodeRequest === request.id
 
 	return (
-		<div>
-			<div style={{ display: "flex" }}>
-				{request.ip}:{request.port}
-				<ConditionButton condition={!!host}>
-					<button onClick={() => setSelectedNodeRequest(() => showAcceptForm ? null : request.id)}>Accept</button>
-				</ConditionButton>
-				<ConditionButton condition={!!host}>
-					<button onClick={() => deleteNodeRequest(request.id)}>Delete</button>
-				</ConditionButton>
-			</div>
+		<NodeRequestListItemWrapper>
+			<NodeRequestInfo>
+				<div>
+					<span>
+						<p>Node ip: </p>
+						{request.ip}
+					</span>
+					<span>
+						<p>Port: </p>
+						{request.port}
+					</span>
+				</div>
+				<div>
+					<ConditionButton condition={!!host}>
+						<Button onClick={() => deleteNodeRequest(request.id)}>Delete</Button>
+					</ConditionButton>
+					<ConditionButton condition={!!host}>
+						<BgButton onClick={() => setSelectedNodeRequest(() => showAcceptForm ? null : request.id)}>Accept</BgButton>
+					</ConditionButton>
+				</div>
+			</NodeRequestInfo>
 			{showAcceptForm &&
 				<AcceptNodeRequestForm id={request.id} hostLoginName={host!.loginName} />
 			}
-		</div>
+		</NodeRequestListItemWrapper>
 	)
 }
