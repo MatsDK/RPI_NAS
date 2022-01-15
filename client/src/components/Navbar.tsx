@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
 import { useDropdown } from "src/hooks/useDropdown";
 import { useMeState } from "src/hooks/useMeState";
@@ -127,7 +126,6 @@ const Names = styled.div`
 `;
 
 const UserDropDown: React.FC = () => {
-  const router = useRouter();
   const { me } = useMeState();
 
   return (
@@ -150,7 +148,9 @@ const UserDropDown: React.FC = () => {
           <Link href="/profile">
             <Btn style={{ textDecoration: "underline" }}>My Profile</Btn>
           </Link>
-          <Btn onClick={() => router.push("/logout ")}>Sign out</Btn>
+          <Link href="/logout">
+            <Btn>Sign out</Btn>
+          </Link>
         </div>
       </div>
     </>

@@ -12,6 +12,7 @@ query GetNodesQuery {
       basePath
       hostNode
       pingResult
+      token
     }
     nodeRequests {
       id

@@ -579,7 +579,7 @@ export type DeleteNodeRequestMutationMutation = { __typename?: 'Mutation', delet
 export type GetNodesQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: { __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, port: number, name: string, loginName: string, basePath: string, hostNode: boolean, pingResult: boolean }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> } | null | undefined };
+export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: { __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, port: number, name: string, loginName: string, basePath: string, hostNode: boolean, pingResult: boolean, token?: string | null | undefined }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> } | null | undefined };
 
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadPathsInput> | DownloadPathsInput;
@@ -1373,6 +1373,7 @@ export const GetNodesQueryDocument = gql`
       basePath
       hostNode
       pingResult
+      token
     }
     nodeRequests {
       id

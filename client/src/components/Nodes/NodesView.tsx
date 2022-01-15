@@ -1,11 +1,13 @@
 import { Node, useGetNodesQueryQuery } from "generated/apolloComponents";
 import Link from "next/link";
+import { CopyTokenContainer } from "src/ui/CopyTokenContainer";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useApolloClient } from "react-apollo";
 import { Scrollbar } from "src/ui/Scrollbar";
 import { Spinner } from "src/ui/Spinner";
 import styled from "styled-components";
+import { ConditionOverlay } from "../ConditionOverlay";
 import { NodeRequestsListItem } from "./NodeRequestsListItem";
 
 const Wrapper = styled.div`
@@ -126,6 +128,18 @@ const Title = styled.h1`
     }
 `
 
+const TokenSection = styled.div`
+    display: flex;
+    align-items: baseline;
+
+    > span {
+        margin-left: 5px;
+        font-size: 17px;
+        color: ${(props) => props.theme.textColors[1]};
+        font-weight: normal;
+    }
+`
+
 export const NodesView: React.FC = ({ }) => {
     const router = useRouter()
     const client: any = useApolloClient();
@@ -148,50 +162,51 @@ export const NodesView: React.FC = ({ }) => {
 
     return (
         <Wrapper>
-            {loading ? <Spinner loading={true} /> :
-                <>
-                    <Header>
-                        <Title>Nodes <span><p>{data?.getNodes?.nodes.length}</p> Node{data?.getNodes?.nodes.length != 1 && "s"}</span></Title>
-                    </Header>
-                    <NodesList>
-                        {data?.getNodes?.nodes.map(({ name, ip, port, hostNode, pingResult }, idx) => (
-                            <NodesListItem key={idx}>
-                                <NameSection>
-                                    <span>
-                                        {name}{hostNode && <p>(Host)</p>}
-                                    </span>
-                                    <Status status={pingResult}><p>Status: </p>{pingResult ? "Online" : "Offline"}</Status>
-                                </NameSection>
-                                <IpSection>
-                                    <span>Ip: <p>{ip}</p></span>
-                                    <span>Port: <p>{port}</p></span>
-                                </IpSection>
-                            </NodesListItem>
-                        ))}
-                    </NodesList>
-                    <Header>
-                        <Title>Node requests <span><p>{data?.getNodes?.nodeRequests.length}</p> Node request{data?.getNodes?.nodeRequests.length != 1 && "s"}</span></Title>
-                    </Header>
-                    <NodeRequestsList>
-                        {
-                            // data?.getNodes?.nodeRequests.map((request, idx) => (
-                            //     <NodeRequestsListItem key={idx} request={request} host={host} setSelectedNodeRequest={setSelectedNodeRequest} selectedNodeRequest={selectedNodeRequest} />
-                            // ))
-                            [{ id: 1, ip: "192", port: 3000 }].map((request, idx) => (
-                                <NodeRequestsListItem key={idx} request={request} host={host} setSelectedNodeRequest={setSelectedNodeRequest} selectedNodeRequest={selectedNodeRequest} />
-                            ))
-                        }
-                    </NodeRequestsList>
-                    <div style={{ minHeight: 100 }} />
-                </>
-            }
-            {
-                !host && (
-                    <div>
-                        <Link href={"/nodes/createhost"}>Create host node</Link>
-                    </div>
-                )
-            }
+            <ConditionOverlay condition={!host} renderOverlay={() =>
+                <div>
+                    <Link href={"/nodes/createhost"}>Create host node</Link>
+                </div>
+            } >
+
+                {loading ? <Spinner loading={true} /> :
+                    <>
+                        <Header>
+                            <Title>Nodes <span><p>{data?.getNodes?.nodes.length}</p> Node{data?.getNodes?.nodes.length != 1 && "s"}</span></Title>
+                        </Header>
+                        <NodesList>
+                            {data?.getNodes?.nodes.map(({ name, ip, port, hostNode, pingResult, token }, idx) => (
+                                <NodesListItem key={idx}>
+                                    <NameSection>
+                                        <span>
+                                            {name}{hostNode && <p>(Host)</p>}
+                                        </span>
+                                        <Status status={pingResult}><p>Status: </p>{pingResult ? "Online" : "Offline"}</Status>
+                                    </NameSection>
+                                    <IpSection>
+                                        <span>Ip: <p>{ip}</p></span>
+                                        <span>Port: <p>{port}</p></span>
+                                    </IpSection>
+                                    {!hostNode && !!token && <TokenSection>
+                                        <span>Token: </span>
+                                        <CopyTokenContainer token={token} />
+                                    </TokenSection>}
+                                </NodesListItem>
+                            ))}
+                        </NodesList>
+                        <Header>
+                            <Title>Node requests <span><p>{data?.getNodes?.nodeRequests.length}</p> Node request{data?.getNodes?.nodeRequests.length != 1 && "s"}</span></Title>
+                        </Header>
+                        <NodeRequestsList>
+                            {
+                                data?.getNodes?.nodeRequests.map((request, idx) => (
+                                    <NodeRequestsListItem key={idx} request={request} host={host} setSelectedNodeRequest={setSelectedNodeRequest} selectedNodeRequest={selectedNodeRequest} />
+                                ))
+                            }
+                        </NodeRequestsList>
+                        <div style={{ minHeight: 100 }} />
+                    </>
+                }
+            </ConditionOverlay>
         </Wrapper >
     );
 };
