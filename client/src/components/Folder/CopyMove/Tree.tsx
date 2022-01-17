@@ -58,7 +58,7 @@ interface TreeItemProps {
 const NestedItems = styled.div`
   margin-left: 7px;
   padding-left: 7px;
-  border-left: 1px solid ${(props) => props.theme.bgColors[1]};
+  border-left: 1px solid ${(props) => props.theme.lightBgColors[2]};
 `;
 
 const TreeItemWrapper = styled.div``;
@@ -70,13 +70,15 @@ const FolderItem = styled.div`
 
 interface FolderNameProps {
   selected: boolean;
+  isDatastore: boolean
 }
 
 const FolderName = styled.div<FolderNameProps>`
   background-color: ${(props) =>
-    props.selected ? props.theme.bgColors[2] : "transparent"};
+    props.selected ? props.theme.lightBgColors[1] : "transparent"};
+  font-weight: ${props => props.selected || props.isDatastore ? "500" : "normal"};
   color: ${(props) =>
-    props.selected ? props.theme.textColors[2] : props.theme.textColors[3]};
+    props.selected || props.isDatastore ? props.theme.textColors[0] : props.theme.textColors[1]};
   padding: 2px 5px;
   margin-left: 5px;
   border-radius: 3px;
@@ -115,7 +117,7 @@ const TreeItem: React.FC<TreeItemProps> = ({
         >
           <Icon
             name={"folderArrow"}
-            color={{ propName: "textColors", idx: 2 }}
+            color={{ propName: "lightBgColors", idx: 2 }}
             width={13}
             height={13}
             viewPort={15}
@@ -126,6 +128,7 @@ const TreeItem: React.FC<TreeItemProps> = ({
             selectedPath?.datastoreId == item.dataStoreId &&
             selectedPath?.path === item.relativePath
           }
+          isDatastore={!item.relativePath}
           onClick={() =>
             setSelectedPath({
               datastoreId: item.dataStoreId || 0,
@@ -136,7 +139,6 @@ const TreeItem: React.FC<TreeItemProps> = ({
           {item.name}
         </FolderName>
       </FolderItem>
-
       {showNestedItems && (
         <NestedItems>
           {nestedItems?.data.directoryTree?.tree?.map((v, idx) => (

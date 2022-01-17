@@ -69,7 +69,9 @@ export const FolderPath: React.FC<FolderPathProps> = ({
               </div>
             </Link>
           ) : (
-            <CurrentPath>{name}</CurrentPath>
+            <Link href={`/datastore/${id}`}>
+              <CurrentPath style={{ cursor: "pointer" }}>{name}</CurrentPath>
+            </Link>
           )}
         </span>
         {path.map((p, idx) => {

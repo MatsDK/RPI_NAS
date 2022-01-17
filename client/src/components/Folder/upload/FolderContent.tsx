@@ -1,4 +1,5 @@
 import axios from "axios";
+import { LoadingOverlay } from "src/ui/Button";
 import { useState, useEffect } from "react";
 import fsPath from "path"
 import styled from "styled-components";
@@ -92,8 +93,8 @@ export const FolderContent: React.FC<FolderContentProps> = ({ drive, path, setPa
 		}
 	};
 
-	return <div>
-		{loading ? <div>Loading</div> : sort(folderData).map(({ isDirectory, name, path: itemPath }, idx) => {
+	return <LoadingOverlay loading={loading}>
+		{sort(folderData).map(({ isDirectory, name, path: itemPath }, idx) => {
 			return <FolderItem isDirectory={isDirectory} key={idx} selected={selected.has(itemPath)}>
 				<FolderEntryIcon isDirectory={isDirectory} />
 				<div>
@@ -103,7 +104,7 @@ export const FolderContent: React.FC<FolderContentProps> = ({ drive, path, setPa
 			</FolderItem>
 		})}
 		<div style={{ minHeight: 100 }} />
-	</div>
+	</LoadingOverlay>
 
 }
 

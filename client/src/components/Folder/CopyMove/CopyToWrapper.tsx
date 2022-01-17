@@ -1,58 +1,18 @@
+import { useGetDirectoryTreeQueryQuery } from "generated/apolloComponents";
+import { LoadingOverlay } from "src/ui/Button";
+import { Title, Wrapper, Container, BottomContainer } from "../../../ui/CopyAndMove"
 import { CopyDataMutation } from "graphql/Folder/copyData";
-import { Tree } from "./Tree";
+import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import React, { useContext, useState } from "react";
+import { useApolloClient } from "react-apollo";
 import { useApollo } from "src/hooks/useApollo";
 import { FolderContext } from "src/providers/folderState";
-import { ConditionButton, LightBgButton } from "src/ui/Button";
-import styled from "styled-components";
-import MenuOverlay from "../../MenuOverlay";
-import { MoveCopyPath } from "./Tree";
-import { getTreeQuery } from "graphql/TreeObject/queryTree";
-import { useApolloClient } from "react-apollo";
-import { useGetDirectoryTreeQueryQuery } from "generated/apolloComponents";
-import { Scrollbar } from "src/ui/Scrollbar";
+import { BgButton, Button, ConditionButton } from "src/ui/Button";
+import { MoveCopyPath, Tree } from "./Tree";
 
 interface CopyToWrapperProps {
   hide: () => any;
 }
-
-const CopyToContainer = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 25px;
-`;
-
-const CopyToBottomContainer = styled.div`
-  padding: 10px 0 0 0;
-  display: flex;
-  color: ${(props) => props.theme.textColors[2]};
-  border-top: 1px solid ${(props) => props.theme.bgColors[1]};
-
-  p {
-    margin-left: 8px;
-    display: flex;
-    overflow: hidden;
-  }
-
-  span {
-    flex: 1;
-    color: ${(props) => props.theme.textColors[3]};
-    overflow: auto;
-    white-space: nowrap;
-    ${Scrollbar}
-  }
-`;
-
-const Title = styled.h2`
-  font-weight: 600;
-  font-size: 27px;
-  color: ${(props) => props.theme.textColors[3]};
-  border-bottom: 1px solid ${(props) => props.theme.bgColors[1]};
-  padding-bottom: 10px;
-  margin-bottom: 5px;
-`;
-
 export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
   const { mutate } = useApollo();
   const client: any = useApolloClient();
@@ -105,20 +65,17 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
   };
 
   return (
-    <MenuOverlay maxWidth={"25vw"} hide={hide}>
-      <CopyToContainer>
+    <Wrapper>
+      <Container>
         <Title>Copy To</Title>
         <Tree
           data={data}
           setSelectedPath={setCopyToPath}
           selectedPath={copyToPath}
         />
-        <CopyToBottomContainer>
-          <ConditionButton condition={!!copyToPath}>
-            <LightBgButton onClick={copy}>Copy</LightBgButton>
-          </ConditionButton>
+        <BottomContainer>
           <p>
-            To:{" "}
+            To:
             <span>
               {
                 data?.directoryTree?.tree?.find(
@@ -128,8 +85,16 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
               /{copyToPath?.path.replace(/\\/g, "/")}
             </span>
           </p>
-        </CopyToBottomContainer>
-      </CopyToContainer>
-    </MenuOverlay>
+          <div>
+            <Button onClick={hide}>Cancel</Button>
+            <LoadingOverlay loading={true}>
+              <ConditionButton condition={!!copyToPath}>
+                <BgButton onClick={copy}>Copy</BgButton>
+              </ConditionButton>
+            </LoadingOverlay>
+          </div>
+        </BottomContainer>
+      </Container>
+    </Wrapper>
   );
 };

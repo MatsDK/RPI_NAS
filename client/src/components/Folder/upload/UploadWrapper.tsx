@@ -23,8 +23,8 @@ export type SelectedPaths = Map<string, SelectedPath>;
 
 const Wrapper = styled.div`
 	position: absolute;
-	width: 100vw;
-	height: 100vh;
+	width: 100%;
+	height: 100%;
 	display: grid;
 	place-items: center;
 	top: 0;
@@ -176,7 +176,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 				},
 			} = await mutate(createUploadSessionMutation, {
 				uploadPath: folderCtx?.currentFolderPath?.folderPath.path,
-				dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+				dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
 			});
 
 			const { data } = await axios.get(`/api/upload`, {
@@ -190,13 +190,13 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 			});
 
 			const res = await mutate(UpdateOwnershipMutation,
-				{ datastoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId },
+				{ datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId },
 				{
 					refetchQueries: [{
 						query: getTreeQuery, variables: {
 							depth: 1,
 							path: folderCtx?.currentFolderPath?.folderPath.path,
-							dataStoreId: folderCtx?.currentFolderPath?.folderPath.dataStoreId,
+							dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
 						}
 					}]
 				})
@@ -237,7 +237,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 				<Bottom>
 					<span>
 						Upload to:
-						<p>{folderCtx?.currentFolderPath?.folderPath.dataStoreName}/{folderCtx?.currentFolderPath?.folderPath.path}</p>
+						<p>{folderCtx?.currentFolderPath?.folderPath.datastoreName}/{folderCtx?.currentFolderPath?.folderPath.path}</p>
 					</span>
 					<div>
 						<Button onClick={hide}>Cancel</Button>

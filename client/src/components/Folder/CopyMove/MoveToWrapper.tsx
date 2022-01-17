@@ -1,56 +1,18 @@
 import { useGetDirectoryTreeQueryQuery } from "generated/apolloComponents";
+import { LoadingOverlay } from "src/ui/Button";
 import { MoveDataMutation } from "graphql/Folder/moveData";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import React, { useContext, useState } from "react";
 import { useApolloClient } from "react-apollo";
 import { useApollo } from "src/hooks/useApollo";
 import { FolderContext } from "src/providers/folderState";
-import { ConditionButton, LightBgButton } from "src/ui/Button";
-import { Scrollbar } from "src/ui/Scrollbar";
-import styled from "styled-components";
-import MenuOverlay from "../../MenuOverlay";
+import { Button, ConditionButton, BgButton } from "src/ui/Button";
 import { MoveCopyPath, Tree } from "./Tree";
+import { Container, Title, Wrapper, BottomContainer } from "../../../ui/CopyAndMove"
 
 interface MoveToWrapperProps {
   hide: () => any;
 }
-
-const MoveToContainer = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 25px;
-`;
-
-const MoveToBottomContainer = styled.div`
-  padding: 10px 0 0 0;
-  border-top: 1px solid ${(props) => props.theme.bgColors[1]};
-  display: flex;
-  color: ${(props) => props.theme.textColors[2]};
-
-  p {
-    margin-left: 8px;
-    display: flex;
-    overflow: hidden;
-  }
-
-  span {
-    flex: 1;
-    color: ${(props) => props.theme.textColors[3]};
-    overflow: auto;
-    white-space: nowrap;
-    ${Scrollbar}
-  }
-`;
-
-const Title = styled.h2`
-  font-weight: 600;
-  font-size: 27px;
-  color: ${(props) => props.theme.textColors[3]};
-  border-bottom: 1px solid ${(props) => props.theme.bgColors[1]};
-  padding-bottom: 10px;
-  margin-bottom: 5px;
-`;
 
 export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
   const { mutate } = useApollo();
@@ -112,18 +74,15 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
   };
 
   return (
-    <MenuOverlay maxWidth={"25vw"} hide={hide}>
-      <MoveToContainer>
+    <Wrapper>
+      <Container>
         <Title>Move To</Title>
         <Tree
           data={data}
           setSelectedPath={setMovePath}
           selectedPath={movePath}
         />
-        <MoveToBottomContainer>
-          <ConditionButton condition={!!movePath}>
-            <LightBgButton onClick={move}>Move</LightBgButton>
-          </ConditionButton>
+        <BottomContainer>
           <p>
             To:{" "}
             <span>
@@ -135,8 +94,16 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
               /{movePath?.path.replace(/\\/g, "/")}
             </span>
           </p>
-        </MoveToBottomContainer>
-      </MoveToContainer>
-    </MenuOverlay>
+          <div>
+            <Button onClick={hide}>Cancel</Button>
+            <LoadingOverlay loading={true}>
+              <ConditionButton condition={!!movePath}>
+                <BgButton onClick={move}>Move</BgButton>
+              </ConditionButton>
+            </LoadingOverlay>
+          </div>
+        </BottomContainer>
+      </Container>
+    </Wrapper>
   );
 };
