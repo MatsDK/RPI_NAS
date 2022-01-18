@@ -1,4 +1,4 @@
-import { Arg, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { Datastore } from "../../entity/Datastore";
 import fs from "fs-extra";
 import { isAuth } from "../../middleware/auth";
@@ -9,6 +9,7 @@ import { CopyMoveInput } from "./copyMoveMutationInput";
 import { MoveCopyData } from "./moveCopyData";
 import { exec } from "../../utils/exec";
 import { Node } from "../../entity/CloudNode";
+import { MyContext } from "../../types/Context";
 
 @Resolver()
 export class FolderResolver {
@@ -67,14 +68,14 @@ export class FolderResolver {
 
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
-  copy(@Arg("data") data: CopyMoveInput) {
-    return MoveCopyData({ ...data, type: "copy" });
+  copy(@Ctx() { req }: MyContext, @Arg("data") data: CopyMoveInput) {
+    return MoveCopyData({ ...data, type: "copy" }, req.userId);
   }
 
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
-  move(@Arg("data") data: CopyMoveInput) {
-    return MoveCopyData({ ...data, type: "move" });
+  move(@Ctx() { req }: MyContext, @Arg("data") data: CopyMoveInput) {
+    return MoveCopyData({ ...data, type: "move" }, req.userId);
   }
 
   @UseMiddleware(isAuth)

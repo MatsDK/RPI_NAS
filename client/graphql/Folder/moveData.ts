@@ -8,7 +8,7 @@ export const MoveDataMutation = gql`
   ) {
     move(
       data: {
-        dataStoreId: $dataStoreId
+        datastoreId: $dataStoreId
         destination: $destination
         data: $data
       }

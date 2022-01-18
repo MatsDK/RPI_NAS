@@ -3,6 +3,7 @@ import { Datastore } from "../../entity/Datastore";
 import { Node } from "../../entity/CloudNode";
 import { Tree } from "./TreeObject";
 import { SharedDataStore } from "../../entity/SharedDataStore";
+import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
 
 interface Params {
   datastoreId: number | null;
@@ -25,7 +26,7 @@ export const buildTreeObject = async ({
   const datastore = await Datastore.findOne({ where: { id: datastoreId } });
   if (!datastore) throw new ApolloError("datastore not found");
 
-  if (!(await SharedDataStore.findOne({ where: { dataStoreId: datastore.id, userId } })) && datastore.userId != userId) throw new ApolloError("No access allowed")
+  if (!(await hasAccessToDatastore(datastore.id, userId, datastore.userId))) throw new ApolloError("No access allowed")
 
   const node = await Node.findOne({ where: { id: datastore.localHostNodeId } })
   if (!node) throw new ApolloError("Node not found")

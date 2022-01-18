@@ -4,7 +4,7 @@ import { Type } from "../../types/Context";
 @InputType()
 export class CopyMoveDestinationObject {
   @Field(() => Number)
-  dataStoreId: number;
+  datastoreId: number;
 
   @Field(() => String)
   path: string;
@@ -22,7 +22,7 @@ export class CopyMoveDataObject {
 @InputType()
 export class CopyMoveInput {
   @Field(() => Number)
-  dataStoreId: number;
+  datastoreId: number;
 
   @Field(() => CopyMoveDestinationObject)
   destination: CopyMoveDestinationObject;

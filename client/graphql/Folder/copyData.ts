@@ -8,7 +8,7 @@ export const CopyDataMutation = gql`
   ) {
     copy(
       data: {
-        dataStoreId: $dataStoreId
+        datastoreId: $dataStoreId
         destination: $destination
         data: $data
       }
