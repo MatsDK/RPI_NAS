@@ -26,7 +26,6 @@ export const MoveCopyData = async ({
           fsPath.basename(path)
         );
 
-
       try {
         switch (type) {
           case "move": {
@@ -86,16 +85,16 @@ const getDsAndNodes = async (srcDatastoreId: number, destDatastoreId: number, us
   }
 
   const nodes = await Node.find({
-    where: [{ id: srcDatastore.id }, { id: destDatastore.id }],
+    where: [{ id: srcDatastore.localHostNodeId }, { id: destDatastore.localHostNodeId }],
   });
 
   nodes.forEach((v) => nodesMap.set(v.id, v));
 
-  const srcNode = nodesMap.get(srcDatastore.id),
-    destNode = nodesMap.get(destDatastore.id);
+  const srcNode = nodesMap.get(srcDatastore.localHostNodeId),
+    destNode = nodesMap.get(destDatastore.localHostNodeId);
 
   if (!srcNode || !destNode) return {
-    err: "nodes nt found"
+    err: "nodes not found"
   }
 
   if (!(await hasAccessToDatastore(srcDatastoreId, userId, srcDatastore.userId)) ||

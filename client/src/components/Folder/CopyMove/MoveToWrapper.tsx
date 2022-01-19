@@ -19,6 +19,7 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
   const client: any = useApolloClient();
 
   const [movePath, setMovePath] = useState<null | MoveCopyPath>(null);
+  const [loading, setLoading] = useState(false)
 
   const folderCtx = useContext(FolderContext);
 
@@ -39,38 +40,47 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
 
     if (!selectedData) return;
 
-    const { errors, data } = await mutate(
-      MoveDataMutation,
-      {
-        data: selectedData,
-        dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
-        destination: movePath,
-      },
-      {
-        refetchQueries: [
-          {
-            query: getTreeQuery,
-            variables: {
-              depth: 1,
-              datastoreId: movePath?.datastoreId,
-              path: movePath?.path,
-            },
-          },
-          {
-            query: getTreeQuery,
-            variables: {
-              depth: 1,
-              datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
-              path: folderCtx?.currentFolderPath?.folderPath.path,
-            },
-          },
-        ],
-      }
-    );
+    try {
+      setLoading(true)
 
-    if (errors) return console.log(errors);
+      const { errors, data } = await mutate(
+        MoveDataMutation,
+        {
+          data: selectedData,
+          datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
+          destination: movePath,
+        },
+        {
+          refetchQueries: [
+            {
+              query: getTreeQuery,
+              variables: {
+                depth: 1,
+                datastoreId: movePath?.datastoreId,
+                path: movePath?.path,
+              },
+            },
+            {
+              query: getTreeQuery,
+              variables: {
+                depth: 1,
+                datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
+                path: folderCtx?.currentFolderPath?.folderPath.path,
+              },
+            },
+          ],
+        }
+      );
+      setLoading(false)
 
-    console.log(data);
+      if (errors) return console.log(errors);
+
+      console.log(data);
+      hide()
+    } catch (e) {
+      setLoading(false)
+      console.log(e)
+    }
   };
 
   return (
@@ -96,7 +106,7 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
           </p>
           <div>
             <Button onClick={hide}>Cancel</Button>
-            <LoadingOverlay loading={true}>
+            <LoadingOverlay loading={loading}>
               <ConditionButton condition={!!movePath}>
                 <BgButton onClick={move}>Move</BgButton>
               </ConditionButton>

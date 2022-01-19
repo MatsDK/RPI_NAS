@@ -2,13 +2,13 @@ import gql from "graphql-tag";
 
 export const CopyDataMutation = gql`
   mutation CopyDataMutation(
-    $dataStoreId: Float!
+    $datastoreId: Float!
     $destination: CopyMoveDestinationObject!
     $data: [CopyMoveDataObject!]!
   ) {
     copy(
       data: {
-        datastoreId: $dataStoreId
+        datastoreId: $datastoreId
         destination: $destination
         data: $data
       }

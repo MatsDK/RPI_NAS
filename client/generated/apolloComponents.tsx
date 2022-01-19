@@ -34,13 +34,13 @@ export type CopyMoveDataObject = {
 };
 
 export type CopyMoveDestinationObject = {
-  dataStoreId: Scalars['Float'];
+  datastoreId: Scalars['Float'];
   path: Scalars['String'];
 };
 
 export type CopyMoveInput = {
   data: Array<CopyMoveDataObject>;
-  dataStoreId: Scalars['Float'];
+  datastoreId: Scalars['Float'];
   destination: CopyMoveDestinationObject;
 };
 
@@ -486,7 +486,7 @@ export type UpdateDatastoreMutationMutationVariables = Exact<{
 export type UpdateDatastoreMutationMutation = { __typename?: 'Mutation', updateDatastore?: boolean | null | undefined };
 
 export type CopyDataMutationMutationVariables = Exact<{
-  dataStoreId: Scalars['Float'];
+  datastoreId: Scalars['Float'];
   destination: CopyMoveDestinationObject;
   data: Array<CopyMoveDataObject> | CopyMoveDataObject;
 }>;
@@ -511,7 +511,7 @@ export type DeleteDataMutationMutationVariables = Exact<{
 export type DeleteDataMutationMutation = { __typename?: 'Mutation', delete?: boolean | null | undefined };
 
 export type MoveDataMutationMutationVariables = Exact<{
-  dataStoreId: Scalars['Float'];
+  datastoreId: Scalars['Float'];
   destination: CopyMoveDestinationObject;
   data: Array<CopyMoveDataObject> | CopyMoveDataObject;
 }>;
@@ -959,8 +959,8 @@ export type UpdateDatastoreMutationMutationHookResult = ReturnType<typeof useUpd
 export type UpdateDatastoreMutationMutationResult = Apollo.MutationResult<UpdateDatastoreMutationMutation>;
 export type UpdateDatastoreMutationMutationOptions = Apollo.BaseMutationOptions<UpdateDatastoreMutationMutation, UpdateDatastoreMutationMutationVariables>;
 export const CopyDataMutationDocument = gql`
-    mutation CopyDataMutation($dataStoreId: Float!, $destination: CopyMoveDestinationObject!, $data: [CopyMoveDataObject!]!) {
-  copy(data: {dataStoreId: $dataStoreId, destination: $destination, data: $data})
+    mutation CopyDataMutation($datastoreId: Float!, $destination: CopyMoveDestinationObject!, $data: [CopyMoveDataObject!]!) {
+  copy(data: {datastoreId: $datastoreId, destination: $destination, data: $data})
 }
     `;
 export type CopyDataMutationMutationFn = Apollo.MutationFunction<CopyDataMutationMutation, CopyDataMutationMutationVariables>;
@@ -978,7 +978,7 @@ export type CopyDataMutationMutationFn = Apollo.MutationFunction<CopyDataMutatio
  * @example
  * const [copyDataMutationMutation, { data, loading, error }] = useCopyDataMutationMutation({
  *   variables: {
- *      dataStoreId: // value for 'dataStoreId'
+ *      datastoreId: // value for 'datastoreId'
  *      destination: // value for 'destination'
  *      data: // value for 'data'
  *   },
@@ -1056,8 +1056,8 @@ export type DeleteDataMutationMutationHookResult = ReturnType<typeof useDeleteDa
 export type DeleteDataMutationMutationResult = Apollo.MutationResult<DeleteDataMutationMutation>;
 export type DeleteDataMutationMutationOptions = Apollo.BaseMutationOptions<DeleteDataMutationMutation, DeleteDataMutationMutationVariables>;
 export const MoveDataMutationDocument = gql`
-    mutation MoveDataMutation($dataStoreId: Float!, $destination: CopyMoveDestinationObject!, $data: [CopyMoveDataObject!]!) {
-  move(data: {dataStoreId: $dataStoreId, destination: $destination, data: $data})
+    mutation MoveDataMutation($datastoreId: Float!, $destination: CopyMoveDestinationObject!, $data: [CopyMoveDataObject!]!) {
+  move(data: {datastoreId: $datastoreId, destination: $destination, data: $data})
 }
     `;
 export type MoveDataMutationMutationFn = Apollo.MutationFunction<MoveDataMutationMutation, MoveDataMutationMutationVariables>;
@@ -1075,7 +1075,7 @@ export type MoveDataMutationMutationFn = Apollo.MutationFunction<MoveDataMutatio
  * @example
  * const [moveDataMutationMutation, { data, loading, error }] = useMoveDataMutationMutation({
  *   variables: {
- *      dataStoreId: // value for 'dataStoreId'
+ *      datastoreId: // value for 'datastoreId'
  *      destination: // value for 'destination'
  *      data: // value for 'data'
  *   },

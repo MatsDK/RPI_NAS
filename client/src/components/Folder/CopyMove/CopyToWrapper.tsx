@@ -18,6 +18,7 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
   const client: any = useApolloClient();
 
   const [copyToPath, setCopyToPath] = useState<null | MoveCopyPath>(null);
+  const [loading, setLoading] = useState(false)
 
   const folderCtx = useContext(FolderContext);
 
@@ -38,30 +39,37 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
 
     if (!selectedData) return;
 
-    const { errors, data } = await mutate(
-      CopyDataMutation,
-      {
-        data: selectedData,
-        dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
-        destination: copyToPath,
-      },
-      {
-        refetchQueries: [
-          {
-            query: getTreeQuery,
-            variables: {
-              depth: 1,
-              datastoreId: copyToPath?.datastoreId,
-              path: copyToPath?.path,
+    try {
+      setLoading(true)
+      const { errors, data } = await mutate(
+        CopyDataMutation,
+        {
+          data: selectedData,
+          datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
+          destination: copyToPath,
+        },
+        {
+          refetchQueries: [
+            {
+              query: getTreeQuery,
+              variables: {
+                depth: 1,
+                datastoreId: copyToPath?.datastoreId,
+                path: copyToPath?.path,
+              },
             },
-          },
-        ],
-      }
-    );
+          ],
+        }
+      );
+      setLoading(false)
 
-    if (errors) return console.log(errors);
+      if (errors) return console.log(errors);
 
-    if (data.copy) hide();
+      if (data.copy) hide();
+    } catch (e) {
+      setLoading(false)
+      console.log(e);
+    }
   };
 
   return (
@@ -87,7 +95,7 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
           </p>
           <div>
             <Button onClick={hide}>Cancel</Button>
-            <LoadingOverlay loading={true}>
+            <LoadingOverlay loading={loading}>
               <ConditionButton condition={!!copyToPath}>
                 <BgButton onClick={copy}>Copy</BgButton>
               </ConditionButton>
