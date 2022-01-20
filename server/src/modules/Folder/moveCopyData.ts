@@ -5,6 +5,7 @@ import { CopyMoveInput } from "./copyMoveMutationInput";
 import { Node } from "../../entity/CloudNode";
 import { ApolloError } from "apollo-server-core";
 import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
+import { moveAndCopyRemote } from "./moveAndCopyRemote";
 
 export const MoveCopyData = async ({
   data,
@@ -48,7 +49,7 @@ export const MoveCopyData = async ({
       }
     }
   else {
-    console.log("copy remote")
+    await moveAndCopyRemote(rest as GetDsAndNodeReturn, { type, data, destination })
   }
 
   return true;
@@ -59,7 +60,7 @@ const isSubDir = (srcPath: string, destPath: string): boolean => {
   return !!relative && !relative.startsWith('..') && !fsPath.isAbsolute(relative);
 }
 
-interface GetDsAndNodeReturn {
+export interface GetDsAndNodeReturn {
   srcDatastore: Datastore,
   srcNode: Node
   destDatastore: Datastore,
