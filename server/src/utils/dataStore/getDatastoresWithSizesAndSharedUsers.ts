@@ -70,7 +70,7 @@ interface GetDatastoreInitializedStatusProps {
 
 const getDatastoreInitializedStatus = (datastores: Datastore[], { nodes, userId }: GetDatastoreInitializedStatusProps) => {
   for (const ds of datastores) {
-    const node = nodes.find(({ id }) => id === ds.localHostNodeId)
+    const node = nodes.find(({ id }) => id === ds.localNodeId)
     if (!node) continue
 
     ds.userInitialized = node.initializedUsers.includes(userId)

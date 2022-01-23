@@ -4,6 +4,7 @@ import { Client } from "ssh-package"
 import { CopyMoveDataObject, CopyMoveDestinationObject } from "./copyMoveMutationInput";
 import { GetDsAndNodeReturn } from "./moveCopyData";
 import { Datastore } from "../../entity/Datastore";
+import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 
 interface moveAndCopyProps {
 	type: "copy" | "move"
@@ -11,7 +12,7 @@ interface moveAndCopyProps {
 	destination: CopyMoveDestinationObject
 }
 
-export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcDatastore }: GetDsAndNodeReturn, { type, data, destination }: moveAndCopyProps) => {
+export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcDatastore }: GetDsAndNodeReturn, { type, data, destination }: moveAndCopyProps): Promise<{ err: any }> => {
 	if (destNode.hostNode) {
 		try {
 			const client = await createSSHClientForNode(srcNode)
@@ -27,8 +28,12 @@ export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcD
 			console.log(e)
 			return { err: e }
 		}
+	} else {
+		const client = await getOrCreateNodeClient({ node: destNode, ping: false })
+		if (!client) return { err: "Could not connect to client" }
 	}
 
+	return { err: false }
 }
 
 const createSSHClientForNode = async (node: Node): Promise<Client> => new Promise((res, rej) => {

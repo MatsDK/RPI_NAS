@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server-core";
 import { nanoid } from "nanoid";
 import fsPath from "path";
 import {
@@ -19,21 +20,18 @@ import { isAdmin } from "../../middleware/isAdmin";
 import { MyContext } from "../../types/Context";
 import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder";
 import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
+import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
 import {
   addUsersToGroup, createGroup
 } from "../../utils/dataStore/handleGroups";
+import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
 import { updateDatastoreOwnerAndName, updateSharedUsers, updateSharedUsersServices } from "../../utils/dataStore/updateDatastore";
+import { createRemoteDatastore } from "../../utils/nodes/createDatastore";
 import { toggleService } from "../../utils/services/toggleService";
 import { updateSMB } from "../../utils/services/updateSMB";
 import { CreateDataStoreInput } from "./CreateDataStoreInput";
 import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
 import { UpdateDatastoreInput } from "./UpdateDatastoreInput";
-import { createRemoteDatastore } from "../../utils/nodes/createDatastore"
-import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
-import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
-import { InitializeUserMutation } from "./InitUserMutation";
-import { ApolloError } from "apollo-server-core";
-import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
 
 @Resolver()
 export class DataStoreResolver {
@@ -91,11 +89,12 @@ export class DataStoreResolver {
         ownerPassword,
         initOwner: !isUserInitialized
       })
+
       await setStatusToOnline()
+      thisNode.initializedUsers = [...new Set([...thisNode.initializedUsers, ownerId])]
+      await thisNode.save()
 
       if (err) throw new Error(err)
-
-      return null
     } else {
       const { err } = await createGroup(groupName, owner.osUserName);
       if (err) {

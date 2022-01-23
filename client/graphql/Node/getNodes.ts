@@ -13,6 +13,7 @@ query GetNodesQuery {
       hostNode
       pingResult
       token
+      initializedUsers
     }
     nodeRequests {
       id

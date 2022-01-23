@@ -158,6 +158,7 @@ export const DataStoreContainer: React.FC<DataStoreContainerProps> = ({ ds, data
     defaultSMBEnabled = !!ds?.sharedUsers.find(({ id }) => id == me?.id)
       ?.smbEnabled;
 
+  console.log(ds)
   return (
     <DatastoreContainerWrapper>
       <ConditionOverlay condition={!ds.userInitialized} renderOverlay={

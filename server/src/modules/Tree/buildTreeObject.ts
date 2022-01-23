@@ -1,9 +1,8 @@
 import { ApolloError } from "apollo-server-core";
-import { Datastore } from "../../entity/Datastore";
 import { Node } from "../../entity/CloudNode";
-import { Tree } from "./TreeObject";
-import { SharedDataStore } from "../../entity/SharedDataStore";
+import { Datastore } from "../../entity/Datastore";
 import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
+import { Tree } from "./TreeObject";
 
 interface Params {
   datastoreId: number | null;
@@ -28,8 +27,12 @@ export const buildTreeObject = async ({
 
   if (!(await hasAccessToDatastore(datastore.id, userId, datastore.userId))) throw new ApolloError("No access allowed")
 
-  const node = await Node.findOne({ where: { id: datastore.localHostNodeId } })
+  const node = await Node.findOne({ where: { id: datastore.localNodeId } })
   if (!node) throw new ApolloError("Node not found")
+
+  if (!node.hostNode) {
+    console.log("get remote tree")
+  }
 
   return await new Tree(node.initializedUsers.includes(userId)).init(path, depth, datastore.basePath, directoryTree);
 };

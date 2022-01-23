@@ -67,6 +67,7 @@ export class Connection {
 			console.log(e.message)
 		}
 	}
+
 	loadToken(): Promise<any> {
 		return new Promise((res, rej) => {
 			try {

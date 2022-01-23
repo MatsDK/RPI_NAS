@@ -55,6 +55,7 @@ export const AcceptNodeRequestForm: React.FC<AcceptNodeRequest> = ({ id, hostLog
 				password
 			}, { refetchQueries: [{ query: getNodesQuery, variables: {} }] })
 			setLoading(false)
+			console.log(res)
 
 			if (!res.data.acceptNodeRequest) {
 				console.log(res)
@@ -76,7 +77,7 @@ export const AcceptNodeRequestForm: React.FC<AcceptNodeRequest> = ({ id, hostLog
 			</div>
 			<div>
 				<Label>Password</Label>
-				<Input placeholder="pasword" value={password} onChange={setPassword} />
+				<Input type="password" placeholder="pasword" value={password} onChange={setPassword} />
 			</div>
 		</div>
 		<SubmitButton>

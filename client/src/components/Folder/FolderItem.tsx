@@ -5,6 +5,7 @@ import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import Icon from "src/ui/Icon";
 import { useRouter } from "next/router";
+import prettyBytes from "pretty-bytes"
 
 interface Props {
   item: TreeItem & { idx?: number };
@@ -169,7 +170,8 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
             </Link>
           </div>
         ) : (
-          <p>{item.name}</p>
+          <p>{item.name}  {!!item.size && prettyBytes(item.size)}</p>
+
         )}
       </Name>
     </FolderItemWrapper>

@@ -55,7 +55,7 @@ export class resolver {
 		return true
 	}
 
-	@Query(() => [GetDatastoreSizes])
+	@Query(() => [GetDatastoreSizesInput])
 	getDatastoresSizes(@Arg("datastores", () => [GetDatastoreSizesInput]) datastores: [GetDatastoreSizesInput]) {
 		return datastores.length ? getDatastoreSizes(datastores) : []
 	}

@@ -579,7 +579,7 @@ export type DeleteNodeRequestMutationMutation = { __typename?: 'Mutation', delet
 export type GetNodesQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: { __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, port: number, name: string, loginName: string, basePath: string, hostNode: boolean, pingResult: boolean, token?: string | null | undefined }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> } | null | undefined };
+export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: { __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, port: number, name: string, loginName: string, basePath: string, hostNode: boolean, pingResult: boolean, token?: string | null | undefined, initializedUsers: Array<number> }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> } | null | undefined };
 
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadPathsInput> | DownloadPathsInput;
@@ -605,7 +605,7 @@ export type GetDirectoryTreeQueryQueryVariables = Exact<{
 }>;
 
 
-export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree?: { __typename: 'Tree', path: string, tree?: Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: number | null | undefined, sharedDataStore?: boolean | null | undefined, name: string, relativePath: string, path: string }> | null | undefined } | null | undefined };
+export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree?: { __typename: 'Tree', path: string, tree?: Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: number | null | undefined, sharedDataStore?: boolean | null | undefined, name: string, relativePath: string, path: string, size?: number | null | undefined }> | null | undefined } | null | undefined };
 
 export type GetTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
@@ -614,7 +614,7 @@ export type GetTreeQueryQueryVariables = Exact<{
 }>;
 
 
-export type GetTreeQueryQuery = { __typename?: 'Query', tree?: { __typename?: 'Tree', path: string, userInitialized: boolean, tree?: Array<{ __typename?: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string }> | null | undefined } | null | undefined };
+export type GetTreeQueryQuery = { __typename?: 'Query', tree?: { __typename?: 'Tree', path: string, userInitialized: boolean, tree?: Array<{ __typename?: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string, size?: number | null | undefined }> | null | undefined } | null | undefined };
 
 export type UploadMutationVariables = Exact<{
   file: Scalars['Upload'];
@@ -1374,6 +1374,7 @@ export const GetNodesQueryDocument = gql`
       hostNode
       pingResult
       token
+      initializedUsers
     }
     nodeRequests {
       id
@@ -1505,6 +1506,7 @@ export const GetDirectoryTreeQueryDocument = gql`
       name
       relativePath
       path
+      size
       __typename
     }
   }
@@ -1550,6 +1552,7 @@ export const GetTreeQueryDocument = gql`
       isDirectory
       name
       path
+      size
     }
   }
 }

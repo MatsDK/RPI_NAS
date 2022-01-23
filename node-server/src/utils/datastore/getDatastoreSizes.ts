@@ -1,8 +1,8 @@
-import { GetDatastoreSizesInput, SizeObject } from "../../modules/GetDatastoreSizes";
+import { GetDatastoreSizes, GetDatastoreSizesInput, SizeObject } from "../../modules/GetDatastoreSizes";
 import { dfOptions } from "../../constants";
 const df = require("node-df");
 
-export const getDatastoreSizes = (datastores: GetDatastoreSizesInput[]) => {
+export const getDatastoreSizes = (datastores: GetDatastoreSizesInput[]): Promise<GetDatastoreSizesInput[]> => {
 	return new Promise((res, rej) => {
 		df(dfOptions, (err: any, r: any) => {
 			if (err) rej(err);

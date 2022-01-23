@@ -127,14 +127,21 @@ export class NodeResolver {
 		}
 
 		try {
-			const res = await nodeClient.conn.mutate({ mutation: SETUPNODE_MUTATION, variables: { data: { ...node } } });
+			const data = {
+				loginName: node.loginName,
+				password: node.password,
+				token: node.token,
+				id: node.id
+			}
+
+			const res = await nodeClient.conn.mutate({ mutation: SETUPNODE_MUTATION, variables: { data } });
 			if (!res.data?.setupNode) {
 				console.log("failed to setup");
 				await deleteNode();
 				return null
 			}
 		} catch (e) {
-			console.log(e);
+			console.log(e.message);
 			await deleteNode();
 			return null
 		}
@@ -143,12 +150,12 @@ export class NodeResolver {
 		return node
 	}
 
+	@UseMiddleware(isAuth, isAdmin)
 	@Mutation(() => Boolean, { nullable: true })
 	async createConnection(@Arg("uri") uri: string): Promise<boolean | null> {
 		const client = await getOrCreateNodeClient({ uri, ping: true })
 		return true
 	}
-
 
 	@UseMiddleware(isAuth, getUser)
 	@Mutation(() => Boolean, { nullable: true })

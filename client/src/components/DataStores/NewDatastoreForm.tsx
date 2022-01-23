@@ -8,7 +8,7 @@ import { useMeState } from 'src/hooks/useMeState';
 import { ProfilePicture } from "src/ui/ProfilePicture";
 import { Select } from 'src/ui/Select';
 import styled from 'styled-components';
-import { Input } from "../../ui/Input";
+import { Input, Label as InputLabel } from "../../ui/Input";
 import { BgButton, Button, ConditionButton, LoadingOverlay } from "../../ui/Button"
 import { useApollo } from 'src/hooks/useApollo';
 import { CreateDataStoreMutation } from 'graphql/DataStores/CreateDataStore';
@@ -154,7 +154,9 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 	const [name, setName] = useState("")
 	const [selectedOwner, setSelectedOwner] = useState<number | null>(null)
 	const [selectedNode, setSelectedNode] = useState<number | null>(null)
+
 	const [sizeInput, setSizeInput] = useInput<string | null>(null)
+	const [passwordInput, setPasswordInput] = useInput<string>("")
 
 	const [loading, setLoading] = useState<boolean>(false)
 	const client: any = useApolloClient();
@@ -173,6 +175,9 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 		return null
 	}
 
+	const passwordRequired = me && selectedNode != null && selectedOwner != null &&
+		!nodes?.getNodes?.nodes.find(({ id }) => +selectedNode == +id)?.initializedUsers.includes(+me.id) &&
+		+me.id == +selectedOwner
 
 	const createDatastore = async () => {
 		if (!name.trim() || selectedNode == null || selectedOwner == null || !isValidSize(sizeInput || "")) return null
@@ -185,7 +190,7 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 				localNodeId: Number(selectedNode),
 				name: name.trim(),
 				sizeInMb: isValidSize(sizeInput!),
-				ownerPassword: null
+				ownerPassword: passwordInput?.trim()
 			},
 			{ refetchQueries: [{ query: getDataStoresQuery, variables: {} }] },
 		);
@@ -212,20 +217,6 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 								<Input placeholder="Name" value={name} onChange={(e) => setName(e.currentTarget.value.replace(/[^a-z0-9]/gi, "_"))} />
 							</Section>
 							<Section>
-								<Label>Datastore owner</Label>
-								<Select data={[me, ...(friends?.getFriends || [])]} label="Datastore owner" setValue={(owner) => setSelectedOwner(owner.id)} renderItem={
-									(item, idx, setSelected) => (<SelectOwnerItem
-										key={idx}
-										onClick={setSelected}
-									>
-										<ProfilePicture
-											src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${item.id}`}
-										/>
-										<span>{item.userName}</span>
-									</SelectOwnerItem>)
-								} uniqueKey="id" selectedLabelKey="userName" />
-							</Section>
-							<Section>
 								<Label>Datastore host</Label>
 								<Select data={nodes?.getNodes?.nodes || []} label="Datastore host" setValue={(node) => setSelectedNode(node.id)} renderItem={
 									(item, idx, setSelected) => (
@@ -240,6 +231,30 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 								} uniqueKey="id" selectedLabelKey="name" />
 							</Section>
 							<Section>
+
+								<Label>Datastore owner</Label>
+								<div style={{ display: "flex", flexDirection: "column" }}>
+
+									<Select data={[me, ...(friends?.getFriends || [])]} label="Datastore owner" setValue={(owner) => setSelectedOwner(owner.id)} renderItem={
+										(item, idx, setSelected) => (<SelectOwnerItem
+											key={idx}
+											onClick={setSelected}
+										>
+											<ProfilePicture
+												src={`${process.env.NEXT_PUBLIC_SERVER_URL}/profile/${item.id}`}
+											/>
+											<span>{item.userName}</span>
+										</SelectOwnerItem>)
+									} uniqueKey="id" selectedLabelKey="userName" />
+									{passwordRequired &&
+										<>
+											<InputLabel>Your password</InputLabel>
+											<Input placeholder="password" type="password" value={passwordInput} onChange={setPasswordInput} />
+										</>
+									}
+								</div>
+							</Section>
+							<Section>
 								<Label>Size</Label>
 								<Input placeholder="Size" value={sizeInput || ""} onChange={setSizeInput} />
 							</Section>
@@ -248,7 +263,8 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 							<ConditionButton condition={!loading} >
 								<Button onClick={hide} >Cancel</Button>
 							</ConditionButton>
-							<ConditionButton condition={!loading && !!isValidSize(sizeInput || "") && selectedOwner != null && selectedNode != null && !!name.trim()}>
+							<ConditionButton condition={!loading && !!isValidSize(sizeInput || "") && selectedOwner != null && selectedNode != null && !!name.trim()
+								&& (passwordRequired && passwordInput.trim())}>
 								<LoadingOverlay loading={loading}>
 									<BgButton onClick={createDatastore}>Create datastore</BgButton>
 								</LoadingOverlay>

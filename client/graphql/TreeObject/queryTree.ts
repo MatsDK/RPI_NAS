@@ -10,6 +10,7 @@ export const getTreeQuery = gql`
         isDirectory
         name
         path
+        size
       }
     }
   }

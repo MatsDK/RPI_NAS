@@ -18,7 +18,7 @@ export const MoveCopyData = async ({
 
   const { destDatastore, srcDatastore, srcNode, destNode } = rest as GetDsAndNodeReturn
 
-  if (srcNode.id == destNode.id)
+  if (srcNode.id == destNode.id && srcNode.hostNode)
     for (const { path } of data) {
       const srcPath = fsPath.join(srcDatastore.basePath, path),
         destPath = fsPath.join(

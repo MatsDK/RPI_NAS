@@ -2,15 +2,19 @@ import { Node } from "../../entity/CloudNode";
 import { getOrCreateNodeClient } from "./nodeClients";
 
 export const pingNodes = async (nodes: Node[]): Promise<Node[]> => {
-	nodes.forEach(async (node) => {
+	const ret: Node[] = []
+
+	for (let node of nodes) {
 		if (node.hostNode) {
 			node.pingResult = true
-			return
+		} else {
+			const client = await getOrCreateNodeClient({ node, ping: true })
+			node.pingResult = !!client?.ping
+			console.log(node)
 		}
 
-		const client = await getOrCreateNodeClient({ node, ping: true })
-		node.pingResult = !!client?.ping
-	})
+		ret.push(node)
+	}
 
-	return nodes
+	return ret
 }
