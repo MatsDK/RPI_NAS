@@ -10,6 +10,9 @@ import { MoveCopyData } from "./moveCopyData";
 import { exec } from "../../utils/exec";
 import { Node } from "../../entity/CloudNode";
 import { MyContext } from "../../types/Context";
+import { ApolloError } from "apollo-server-core";
+import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
+import { UpdateOwnershipMutation } from "./UpdateOwnershipMutation";
 
 @Resolver()
 export class FolderResolver {
@@ -84,19 +87,37 @@ export class FolderResolver {
     const datastore = await Datastore.findOne({ where: { id: datastoreId } })
     if (!datastore) return null
 
-    const node = await Node.findOne({ where: { id: datastore.localHostNodeId } })
+    const node = await Node.findOne({ where: { id: datastore.localNodeId } })
     if (!node) return null
 
     if (node.hostNode) {
       const { stderr } =
         await exec(`chown ${node.loginName}:${fsPath.basename(datastore.basePath)} ${datastore.basePath}/* -R`)
+
       if (stderr) {
         console.log(stderr)
-        return null
+        throw new ApolloError(stderr)
       }
+    } else {
+      const client = await getOrCreateNodeClient({ node, ping: false })
 
-      return true
+      try {
+        const res = await client?.conn.mutate({
+          mutation: UpdateOwnershipMutation,
+          variables: {
+            loginName: node.loginName,
+            datastoreName: fsPath.basename(datastore.basePath),
+            path: datastore.basePath
+          }
+        })
+
+        console.log(res)
+      } catch (e) {
+        console.log(e)
+        throw new ApolloError(e)
+      }
     }
-    return false
+
+    return true
   }
 }

@@ -200,6 +200,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 						}
 					}]
 				})
+
 			console.log(res)
 
 			setLoading(false)

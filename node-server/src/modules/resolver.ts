@@ -1,13 +1,14 @@
-import { Resolver, Mutation, Query, Arg } from "type-graphql";
-import { Node } from "./SetupNodeInput";
-import { CreateDatastoreInput } from "./CreateDatastoreInput";
-import { createUser } from "../utils/createUser";
-import { getOrCreateConnection } from "../utils/client";
 import { ApolloError } from "apollo-server-express";
-import { createDatastoreFolder } from "../utils/datastore/createDatastoreFolder"
-import { createGroup, addToGroup } from "../utils/datastore/handleGroups";
-import { GetDatastoreSizes, GetDatastoreSizesInput } from "./GetDatastoreSizes";
+import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { getOrCreateConnection } from "../utils/client";
+import { createUser } from "../utils/createUser";
+import { createDatastoreFolder } from "../utils/datastore/createDatastoreFolder";
 import { getDatastoreSizes } from "../utils/datastore/getDatastoreSizes";
+import { addToGroup, createGroup } from "../utils/datastore/handleGroups";
+import { exec } from "../utils/exec";
+import { CreateDatastoreInput } from "./CreateDatastoreInput";
+import { GetDatastoreSizes, GetDatastoreSizesInput } from "./GetDatastoreSizes";
+import { Node } from "./SetupNodeInput";
 
 @Resolver()
 export class resolver {
@@ -55,9 +56,9 @@ export class resolver {
 		return true
 	}
 
-	@Query(() => [GetDatastoreSizesInput])
-	getDatastoresSizes(@Arg("datastores", () => [GetDatastoreSizesInput]) datastores: [GetDatastoreSizesInput]) {
-		return datastores.length ? getDatastoreSizes(datastores) : []
+	@Query(() => [GetDatastoreSizes])
+	getDatastoresSizes(@Arg("datastores", () => [GetDatastoreSizesInput]) datastores: GetDatastoreSizesInput[]) {
+		return getDatastoreSizes(datastores)
 	}
 
 	@Mutation(() => Boolean, { nullable: true })
@@ -69,6 +70,18 @@ export class resolver {
 			console.log(e)
 			return null
 		}
+
+		return true
+	}
+
+	@Mutation(() => Boolean, { nullable: true })
+	async updateOwnership(
+		@Arg("loginName") loginName: string,
+		@Arg("datastoreName") datastoreName: string,
+		@Arg("path") path: string
+	) {
+		const { stderr } = await exec(`chown ${loginName}:${datastoreName} ${path}/* -R`)
+		if (stderr) throw new ApolloError(stderr)
 
 		return true
 	}
