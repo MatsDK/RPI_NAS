@@ -117,8 +117,7 @@ const FolderNavbar = () => {
           path: relativePath,
           type: isDirectory ? "directory" : "file",
         })),
-
-        dataStoreId: Number(router.query.d),
+        datastoreId: +router.query.d,
       },
       {
         refetchQueries: [

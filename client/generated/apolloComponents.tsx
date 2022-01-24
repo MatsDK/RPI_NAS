@@ -18,19 +18,19 @@ export type Scalars = {
 
 export type AcceptNodeRequestInput = {
   id: Scalars['Float'];
-  loginName: Scalars['String'];
   name: Scalars['String'];
+  loginName: Scalars['String'];
   password: Scalars['String'];
 };
 
 export type AllowedSmbUser = {
-  allowed: Scalars['Boolean'];
   userId: Scalars['Float'];
+  allowed: Scalars['Boolean'];
 };
 
 export type CopyMoveDataObject = {
-  path: Scalars['String'];
   type: Scalars['String'];
+  path: Scalars['String'];
 };
 
 export type CopyMoveDestinationObject = {
@@ -39,22 +39,22 @@ export type CopyMoveDestinationObject = {
 };
 
 export type CopyMoveInput = {
-  data: Array<CopyMoveDataObject>;
   datastoreId: Scalars['Float'];
   destination: CopyMoveDestinationObject;
+  data: Array<CopyMoveDataObject>;
 };
 
 export type CreateDataStoreInput = {
   localNodeId: Scalars['Float'];
   name: Scalars['String'];
+  sizeInMB: Scalars['Float'];
   ownerId: Scalars['Float'];
   ownerPassword?: Maybe<Scalars['String']>;
-  sizeInMB: Scalars['Float'];
 };
 
 export type CreateNodeInput = {
-  loginName: Scalars['String'];
   name: Scalars['String'];
+  loginName: Scalars['String'];
   password: Scalars['String'];
 };
 
@@ -64,26 +64,26 @@ export type CreateSharedDataStoreInput = {
 
 export type Datastore = {
   __typename?: 'Datastore';
-  allowedSMBUsers: Array<Scalars['Float']>;
-  basePath: Scalars['String'];
   id: Scalars['ID'];
+  name: Scalars['String'];
+  userId: Scalars['Float'];
   localHostNodeId: Scalars['Float'];
   localNodeId: Scalars['Float'];
-  name: Scalars['String'];
-  owner?: Maybe<User>;
-  sharedUsers: Array<User>;
-  size?: Maybe<SizeObject>;
+  basePath: Scalars['String'];
   sizeInMB?: Maybe<Scalars['Float']>;
+  size?: Maybe<SizeObject>;
   status: Scalars['String'];
-  userId: Scalars['Float'];
+  allowedSMBUsers: Array<Scalars['Float']>;
+  sharedUsers: Array<User>;
+  owner?: Maybe<User>;
   userInitialized?: Maybe<Scalars['Boolean']>;
 };
 
 export type DatastoreService = {
   __typename?: 'DatastoreService';
-  datastoreId: Scalars['Float'];
   serviceName: Scalars['String'];
   userId: Scalars['Float'];
+  datastoreId: Scalars['Float'];
 };
 
 export type DeletePathsInput = {
@@ -97,9 +97,9 @@ export type DownloadPathsInput = {
 };
 
 export type DownloadSessionInput = {
-  dataStoreId: Scalars['Float'];
-  downloadPaths: Array<DownloadPathsInput>;
   type: Scalars['String'];
+  downloadPaths: Array<DownloadPathsInput>;
+  dataStoreId: Scalars['Float'];
 };
 
 export type DownloadSessionObject = {
@@ -110,12 +110,12 @@ export type DownloadSessionObject = {
 
 export type DownloadSessionReturn = {
   __typename?: 'DownloadSessionReturn';
+  id?: Maybe<Scalars['String']>;
   data?: Maybe<Array<DownloadSessionObject>>;
   hostIp?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
-  password?: Maybe<Scalars['String']>;
-  port?: Maybe<Scalars['Float']>;
   username?: Maybe<Scalars['String']>;
+  port?: Maybe<Scalars['Float']>;
+  password?: Maybe<Scalars['String']>;
 };
 
 export type FriendRequest = {
@@ -133,67 +133,42 @@ export type FriendsQueryReturn = {
 
 export type GetNodesReturn = {
   __typename?: 'GetNodesReturn';
-  nodeRequests: Array<NodeRequest>;
   nodes: Array<Node>;
+  nodeRequests: Array<NodeRequest>;
 };
 
 export type GetTreeInput = {
+  path: Scalars['String'];
   datastoreId?: Maybe<Scalars['Float']>;
   depth?: Maybe<Scalars['Float']>;
-  path: Scalars['String'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  UploadProfilePicture?: Maybe<Scalars['Boolean']>;
-  acceptFriendRequest?: Maybe<Scalars['Boolean']>;
-  acceptNodeRequest?: Maybe<Node>;
-  copy?: Maybe<Scalars['Boolean']>;
-  createConnection?: Maybe<Scalars['Boolean']>;
   createDataStore?: Maybe<Datastore>;
-  createDownloadSession?: Maybe<DownloadSessionReturn>;
-  createFolder?: Maybe<Scalars['String']>;
-  createNode?: Maybe<Node>;
-  createNodeRequest: Scalars['Boolean'];
   createSharedDataStore?: Maybe<Scalars['Boolean']>;
-  createUploadSession?: Maybe<UploadSessionReturn>;
-  delete?: Maybe<Scalars['Boolean']>;
-  deleteNodeRequest: Scalars['Boolean'];
-  initUser?: Maybe<Scalars['Boolean']>;
-  login?: Maybe<User>;
-  logout?: Maybe<Scalars['Boolean']>;
-  move?: Maybe<Scalars['Boolean']>;
-  register?: Maybe<User>;
-  sendFriendRequest?: Maybe<Scalars['Boolean']>;
-  setDefaultDownloadPath?: Maybe<Scalars['Boolean']>;
   toggleDatastoreService?: Maybe<Scalars['Boolean']>;
   updateDatastore?: Maybe<Scalars['Boolean']>;
+  createFolder?: Maybe<Scalars['String']>;
+  delete?: Maybe<Scalars['Boolean']>;
+  copy?: Maybe<Scalars['Boolean']>;
+  move?: Maybe<Scalars['Boolean']>;
   updateOwnership?: Maybe<Scalars['Boolean']>;
-};
-
-
-export type MutationUploadProfilePictureArgs = {
-  file: Scalars['Upload'];
-};
-
-
-export type MutationAcceptFriendRequestArgs = {
-  userId: Scalars['Float'];
-};
-
-
-export type MutationAcceptNodeRequestArgs = {
-  data: AcceptNodeRequestInput;
-};
-
-
-export type MutationCopyArgs = {
-  data: CopyMoveInput;
-};
-
-
-export type MutationCreateConnectionArgs = {
-  uri: Scalars['String'];
+  createNode?: Maybe<Node>;
+  createNodeRequest: Scalars['Boolean'];
+  deleteNodeRequest: Scalars['Boolean'];
+  acceptNodeRequest?: Maybe<Node>;
+  createConnection?: Maybe<Scalars['Boolean']>;
+  initUser?: Maybe<Scalars['Boolean']>;
+  createUploadSession?: Maybe<UploadSessionReturn>;
+  createDownloadSession?: Maybe<DownloadSessionReturn>;
+  login?: Maybe<User>;
+  logout?: Maybe<Scalars['Boolean']>;
+  register?: Maybe<User>;
+  setDefaultDownloadPath?: Maybe<Scalars['Boolean']>;
+  sendFriendRequest?: Maybe<Scalars['Boolean']>;
+  acceptFriendRequest?: Maybe<Scalars['Boolean']>;
+  UploadProfilePicture?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -202,14 +177,47 @@ export type MutationCreateDataStoreArgs = {
 };
 
 
-export type MutationCreateDownloadSessionArgs = {
-  data: DownloadSessionInput;
+export type MutationCreateSharedDataStoreArgs = {
+  data: CreateSharedDataStoreInput;
+};
+
+
+export type MutationToggleDatastoreServiceArgs = {
+  serviceName: Scalars['String'];
+  dataStoreId: Scalars['Float'];
+};
+
+
+export type MutationUpdateDatastoreArgs = {
+  updateProps: UpdateDatastoreInput;
+  dataStoreId: Scalars['Float'];
 };
 
 
 export type MutationCreateFolderArgs = {
-  dataStoreId: Scalars['Float'];
   path: Scalars['String'];
+  datastoreId: Scalars['Float'];
+};
+
+
+export type MutationDeleteArgs = {
+  paths: Array<DeletePathsInput>;
+  dataStoreId: Scalars['Float'];
+};
+
+
+export type MutationCopyArgs = {
+  data: CopyMoveInput;
+};
+
+
+export type MutationMoveArgs = {
+  data: CopyMoveInput;
+};
+
+
+export type MutationUpdateOwnershipArgs = {
+  datastoreId: Scalars['Float'];
 };
 
 
@@ -219,24 +227,8 @@ export type MutationCreateNodeArgs = {
 
 
 export type MutationCreateNodeRequestArgs = {
-  ip: Scalars['String'];
   port: Scalars['Float'];
-};
-
-
-export type MutationCreateSharedDataStoreArgs = {
-  data: CreateSharedDataStoreInput;
-};
-
-
-export type MutationCreateUploadSessionArgs = {
-  data: UploadSessionInput;
-};
-
-
-export type MutationDeleteArgs = {
-  dataStoreId: Scalars['Float'];
-  paths: Array<DeletePathsInput>;
+  ip: Scalars['String'];
 };
 
 
@@ -245,20 +237,35 @@ export type MutationDeleteNodeRequestArgs = {
 };
 
 
+export type MutationAcceptNodeRequestArgs = {
+  data: AcceptNodeRequestInput;
+};
+
+
+export type MutationCreateConnectionArgs = {
+  uri: Scalars['String'];
+};
+
+
 export type MutationInitUserArgs = {
-  datastoreId: Scalars['Float'];
   password: Scalars['String'];
+  datastoreId: Scalars['Float'];
+};
+
+
+export type MutationCreateUploadSessionArgs = {
+  data: UploadSessionInput;
+};
+
+
+export type MutationCreateDownloadSessionArgs = {
+  data: DownloadSessionInput;
 };
 
 
 export type MutationLoginArgs = {
-  email: Scalars['String'];
   password: Scalars['String'];
-};
-
-
-export type MutationMoveArgs = {
-  data: CopyMoveInput;
+  email: Scalars['String'];
 };
 
 
@@ -267,46 +274,39 @@ export type MutationRegisterArgs = {
 };
 
 
-export type MutationSendFriendRequestArgs = {
-  userId: Scalars['Float'];
-};
-
-
 export type MutationSetDefaultDownloadPathArgs = {
   path: Scalars['String'];
 };
 
 
-export type MutationToggleDatastoreServiceArgs = {
-  dataStoreId: Scalars['Float'];
-  serviceName: Scalars['String'];
+export type MutationSendFriendRequestArgs = {
+  userId: Scalars['Float'];
 };
 
 
-export type MutationUpdateDatastoreArgs = {
-  dataStoreId: Scalars['Float'];
-  updateProps: UpdateDatastoreInput;
+export type MutationAcceptFriendRequestArgs = {
+  userId: Scalars['Float'];
 };
 
 
-export type MutationUpdateOwnershipArgs = {
-  datastoreId: Scalars['Float'];
+export type MutationUploadProfilePictureArgs = {
+  file: Scalars['Upload'];
 };
 
 export type Node = {
   __typename?: 'Node';
-  basePath: Scalars['String'];
-  hostNode: Scalars['Boolean'];
   id: Scalars['ID'];
-  initializedUsers: Array<Scalars['Float']>;
+  name: Scalars['String'];
   ip: Scalars['String'];
   loginName: Scalars['String'];
-  name: Scalars['String'];
   password: Scalars['String'];
-  pingResult: Scalars['Boolean'];
   port: Scalars['Float'];
   sshPort: Scalars['Float'];
+  basePath: Scalars['String'];
+  hostNode: Scalars['Boolean'];
   token?: Maybe<Scalars['String']>;
+  initializedUsers: Array<Scalars['Float']>;
+  pingResult: Scalars['Boolean'];
 };
 
 export type NodeRequest = {
@@ -318,22 +318,17 @@ export type NodeRequest = {
 
 export type Query = {
   __typename?: 'Query';
-  directoryTree?: Maybe<Tree>;
-  friends?: Maybe<FriendsQueryReturn>;
   getDataStores?: Maybe<Array<Datastore>>;
   getDatastore?: Maybe<Datastore>;
-  getFriends?: Maybe<Array<User>>;
-  getMyDataStores?: Maybe<Array<Datastore>>;
   getNodes?: Maybe<GetNodesReturn>;
-  getUsersByName?: Maybe<Array<User>>;
-  me?: Maybe<User>;
   ping: Scalars['Boolean'];
   tree?: Maybe<Tree>;
-};
-
-
-export type QueryDirectoryTreeArgs = {
-  data: GetTreeInput;
+  directoryTree?: Maybe<Tree>;
+  me?: Maybe<User>;
+  friends?: Maybe<FriendsQueryReturn>;
+  getFriends?: Maybe<Array<User>>;
+  getMyDataStores?: Maybe<Array<Datastore>>;
+  getUsersByName?: Maybe<Array<User>>;
 };
 
 
@@ -342,13 +337,18 @@ export type QueryGetDatastoreArgs = {
 };
 
 
-export type QueryGetUsersByNameArgs = {
-  name: Scalars['String'];
+export type QueryTreeArgs = {
+  data: GetTreeInput;
 };
 
 
-export type QueryTreeArgs = {
+export type QueryDirectoryTreeArgs = {
   data: GetTreeInput;
+};
+
+
+export type QueryGetUsersByNameArgs = {
+  name: Scalars['String'];
 };
 
 export type RegisterInput = {
@@ -359,21 +359,21 @@ export type RegisterInput = {
 
 export type SharedDataStore = {
   __typename?: 'SharedDataStore';
-  dataStoreId: Scalars['Float'];
   id: Scalars['ID'];
-  initialized: Scalars['Boolean'];
   userId: Scalars['Float'];
+  dataStoreId: Scalars['Float'];
+  initialized: Scalars['Boolean'];
 };
 
 export type SharedDataStoresIdsInput = {
-  dataStoreId: Scalars['Float'];
   userId: Scalars['Float'];
+  dataStoreId: Scalars['Float'];
 };
 
 export type SizeObject = {
   __typename?: 'SizeObject';
-  usedPercent: Scalars['Float'];
   usedSize: Scalars['Float'];
+  usedPercent: Scalars['Float'];
 };
 
 export type Tree = {
@@ -385,47 +385,48 @@ export type Tree = {
 
 export type TreeItem = {
   __typename?: 'TreeItem';
-  dataStoreId?: Maybe<Scalars['Float']>;
-  isDirectory: Scalars['Boolean'];
   name: Scalars['String'];
   path: Scalars['String'];
   relativePath: Scalars['String'];
+  isDirectory: Scalars['Boolean'];
+  dataStoreId?: Maybe<Scalars['Float']>;
   sharedDataStore?: Maybe<Scalars['Boolean']>;
   size?: Maybe<Scalars['Float']>;
   tree?: Maybe<Array<TreeItem>>;
 };
 
 export type UpdateDatastoreInput = {
-  allowedSMBUsers?: Maybe<Array<AllowedSmbUser>>;
   name?: Maybe<Scalars['String']>;
   ownerSMBEnabled?: Maybe<Scalars['Boolean']>;
   sharedUsers?: Maybe<Array<Scalars['Float']>>;
+  allowedSMBUsers?: Maybe<Array<AllowedSmbUser>>;
 };
 
+
 export type UploadSessionInput = {
-  dataStoreId: Scalars['Float'];
   uploadPath: Scalars['String'];
+  dataStoreId: Scalars['Float'];
 };
 
 export type UploadSessionReturn = {
   __typename?: 'UploadSessionReturn';
-  hostIp: Scalars['String'];
-  password: Scalars['String'];
-  port: Scalars['Float'];
   uploadPath: Scalars['String'];
+  hostIp: Scalars['String'];
   username: Scalars['String'];
+  port: Scalars['Float'];
+  password: Scalars['String'];
 };
 
 export type User = {
   __typename?: 'User';
-  defaultDownloadPath?: Maybe<Scalars['String']>;
-  email: Scalars['String'];
-  friends: Array<User>;
   id: Scalars['ID'];
-  isAdmin: Scalars['Boolean'];
-  osUserName: Scalars['String'];
-  smbEnabled?: Maybe<Scalars['Boolean']>;
+  email: Scalars['String'];
   userName: Scalars['String'];
+  osUserName: Scalars['String'];
+  isAdmin: Scalars['Boolean'];
+  defaultDownloadPath?: Maybe<Scalars['String']>;
+  smbEnabled?: Maybe<Scalars['Boolean']>;
+  friends: Array<User>;
 };
 
 export type CreateDataStoreMutionMutationVariables = Exact<{
@@ -437,7 +438,7 @@ export type CreateDataStoreMutionMutationVariables = Exact<{
 }>;
 
 
-export type CreateDataStoreMutionMutation = { __typename?: 'Mutation', createDataStore?: { __typename?: 'Datastore', id: string } | null | undefined };
+export type CreateDataStoreMutionMutation = { __typename?: 'Mutation', createDataStore?: Maybe<{ __typename?: 'Datastore', id: string }> };
 
 export type InitializeUserMutationVariables = Exact<{
   datastoreId: Scalars['Float'];
@@ -445,26 +446,26 @@ export type InitializeUserMutationVariables = Exact<{
 }>;
 
 
-export type InitializeUserMutation = { __typename?: 'Mutation', initUser?: boolean | null | undefined };
+export type InitializeUserMutation = { __typename?: 'Mutation', initUser?: Maybe<boolean> };
 
 export type CreateSharedDataStoresMutaionMutationVariables = Exact<{
   ids: Array<SharedDataStoresIdsInput> | SharedDataStoresIdsInput;
 }>;
 
 
-export type CreateSharedDataStoresMutaionMutation = { __typename?: 'Mutation', createSharedDataStore?: boolean | null | undefined };
+export type CreateSharedDataStoresMutaionMutation = { __typename?: 'Mutation', createSharedDataStore?: Maybe<boolean> };
 
 export type GetDataStoresQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: number | null | undefined, userInitialized?: boolean | null | undefined, status: string, size?: { __typename?: 'SizeObject', usedSize: number, usedPercent: number } | null | undefined, owner?: { __typename?: 'User', id: string, userName: string, isAdmin: boolean } | null | undefined, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }> | null | undefined };
+export type GetDataStoresQuery = { __typename?: 'Query', getDataStores?: Maybe<Array<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: Maybe<number>, userInitialized?: Maybe<boolean>, status: string, size?: Maybe<{ __typename?: 'SizeObject', usedSize: number, usedPercent: number }>, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', userName: string, isAdmin: boolean, id: string }> }>> };
 
 export type GetDatastoreQueryVariables = Exact<{
   datastoreId: Scalars['Float'];
 }>;
 
 
-export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: { __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: number | null | undefined, allowedSMBUsers: Array<number>, userInitialized?: boolean | null | undefined, status: string, size?: { __typename?: 'SizeObject', usedSize: number, usedPercent: number } | null | undefined, owner?: { __typename?: 'User', id: string, userName: string, smbEnabled?: boolean | null | undefined, isAdmin: boolean } | null | undefined, sharedUsers: Array<{ __typename?: 'User', id: string, userName: string, smbEnabled?: boolean | null | undefined, isAdmin: boolean }> } | null | undefined };
+export type GetDatastoreQuery = { __typename?: 'Query', getDatastore?: Maybe<{ __typename?: 'Datastore', id: string, name: string, userId: number, localHostNodeId: number, localNodeId: number, basePath: string, sizeInMB?: Maybe<number>, allowedSMBUsers: Array<number>, userInitialized?: Maybe<boolean>, status: string, size?: Maybe<{ __typename?: 'SizeObject', usedSize: number, usedPercent: number }>, owner?: Maybe<{ __typename?: 'User', id: string, userName: string, smbEnabled?: Maybe<boolean>, isAdmin: boolean }>, sharedUsers: Array<{ __typename?: 'User', id: string, userName: string, smbEnabled?: Maybe<boolean>, isAdmin: boolean }> }> };
 
 export type ToggleDatastoreServiceMutationMutationVariables = Exact<{
   serviceName: Scalars['String'];
@@ -472,7 +473,7 @@ export type ToggleDatastoreServiceMutationMutationVariables = Exact<{
 }>;
 
 
-export type ToggleDatastoreServiceMutationMutation = { __typename?: 'Mutation', toggleDatastoreService?: boolean | null | undefined };
+export type ToggleDatastoreServiceMutationMutation = { __typename?: 'Mutation', toggleDatastoreService?: Maybe<boolean> };
 
 export type UpdateDatastoreMutationMutationVariables = Exact<{
   datastoreId: Scalars['Float'];
@@ -483,7 +484,7 @@ export type UpdateDatastoreMutationMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDatastoreMutationMutation = { __typename?: 'Mutation', updateDatastore?: boolean | null | undefined };
+export type UpdateDatastoreMutationMutation = { __typename?: 'Mutation', updateDatastore?: Maybe<boolean> };
 
 export type CopyDataMutationMutationVariables = Exact<{
   datastoreId: Scalars['Float'];
@@ -492,15 +493,15 @@ export type CopyDataMutationMutationVariables = Exact<{
 }>;
 
 
-export type CopyDataMutationMutation = { __typename?: 'Mutation', copy?: boolean | null | undefined };
+export type CopyDataMutationMutation = { __typename?: 'Mutation', copy?: Maybe<boolean> };
 
 export type CreateFolderMutationMutationVariables = Exact<{
   path: Scalars['String'];
-  dataStoreId: Scalars['Float'];
+  datastoreId: Scalars['Float'];
 }>;
 
 
-export type CreateFolderMutationMutation = { __typename?: 'Mutation', createFolder?: string | null | undefined };
+export type CreateFolderMutationMutation = { __typename?: 'Mutation', createFolder?: Maybe<string> };
 
 export type DeleteDataMutationMutationVariables = Exact<{
   paths: Array<DeletePathsInput> | DeletePathsInput;
@@ -508,7 +509,7 @@ export type DeleteDataMutationMutationVariables = Exact<{
 }>;
 
 
-export type DeleteDataMutationMutation = { __typename?: 'Mutation', delete?: boolean | null | undefined };
+export type DeleteDataMutationMutation = { __typename?: 'Mutation', delete?: Maybe<boolean> };
 
 export type MoveDataMutationMutationVariables = Exact<{
   datastoreId: Scalars['Float'];
@@ -517,38 +518,38 @@ export type MoveDataMutationMutationVariables = Exact<{
 }>;
 
 
-export type MoveDataMutationMutation = { __typename?: 'Mutation', move?: boolean | null | undefined };
+export type MoveDataMutationMutation = { __typename?: 'Mutation', move?: Maybe<boolean> };
 
 export type UpdateOwnershipMutationVariables = Exact<{
   datastoreId: Scalars['Float'];
 }>;
 
 
-export type UpdateOwnershipMutation = { __typename?: 'Mutation', updateOwnership?: boolean | null | undefined };
+export type UpdateOwnershipMutation = { __typename?: 'Mutation', updateOwnership?: Maybe<boolean> };
 
 export type AcceptFriendRequestMutationVariables = Exact<{
   userId: Scalars['Float'];
 }>;
 
 
-export type AcceptFriendRequestMutation = { __typename?: 'Mutation', acceptFriendRequest?: boolean | null | undefined };
+export type AcceptFriendRequestMutation = { __typename?: 'Mutation', acceptFriendRequest?: Maybe<boolean> };
 
 export type GetFriendsAndFriendRequestsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetFriendsAndFriendRequestsQueryQuery = { __typename?: 'Query', friends?: { __typename?: 'FriendsQueryReturn', friends: Array<{ __typename?: 'User', id: string, userName: string }>, friendsRequest: Array<{ __typename?: 'User', id: string, userName: string }> } | null | undefined };
+export type GetFriendsAndFriendRequestsQueryQuery = { __typename?: 'Query', friends?: Maybe<{ __typename?: 'FriendsQueryReturn', friends: Array<{ __typename?: 'User', id: string, userName: string }>, friendsRequest: Array<{ __typename?: 'User', id: string, userName: string }> }> };
 
 export type GetFriendsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetFriendsQueryQuery = { __typename?: 'Query', getFriends?: Array<{ __typename?: 'User', id: string, userName: string }> | null | undefined };
+export type GetFriendsQueryQuery = { __typename?: 'Query', getFriends?: Maybe<Array<{ __typename?: 'User', id: string, userName: string }>> };
 
 export type SendFriendRequestMutationVariables = Exact<{
   userId: Scalars['Float'];
 }>;
 
 
-export type SendFriendRequestMutation = { __typename?: 'Mutation', sendFriendRequest?: boolean | null | undefined };
+export type SendFriendRequestMutation = { __typename?: 'Mutation', sendFriendRequest?: Maybe<boolean> };
 
 export type AcceptNodeRequestMutationVariables = Exact<{
   id: Scalars['Float'];
@@ -558,7 +559,7 @@ export type AcceptNodeRequestMutationVariables = Exact<{
 }>;
 
 
-export type AcceptNodeRequestMutation = { __typename?: 'Mutation', acceptNodeRequest?: { __typename?: 'Node', id: string } | null | undefined };
+export type AcceptNodeRequestMutation = { __typename?: 'Mutation', acceptNodeRequest?: Maybe<{ __typename?: 'Node', id: string }> };
 
 export type CreateHostNodeMutationMutationVariables = Exact<{
   name: Scalars['String'];
@@ -567,7 +568,7 @@ export type CreateHostNodeMutationMutationVariables = Exact<{
 }>;
 
 
-export type CreateHostNodeMutationMutation = { __typename?: 'Mutation', createNode?: { __typename?: 'Node', id: string } | null | undefined };
+export type CreateHostNodeMutationMutation = { __typename?: 'Mutation', createNode?: Maybe<{ __typename?: 'Node', id: string }> };
 
 export type DeleteNodeRequestMutationMutationVariables = Exact<{
   id: Scalars['Float'];
@@ -579,7 +580,7 @@ export type DeleteNodeRequestMutationMutation = { __typename?: 'Mutation', delet
 export type GetNodesQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: { __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, port: number, name: string, loginName: string, basePath: string, hostNode: boolean, pingResult: boolean, token?: string | null | undefined, initializedUsers: Array<number> }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> } | null | undefined };
+export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: Maybe<{ __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, port: number, name: string, loginName: string, basePath: string, hostNode: boolean, pingResult: boolean, token?: Maybe<string>, initializedUsers: Array<number> }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> }> };
 
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadPathsInput> | DownloadPathsInput;
@@ -588,7 +589,7 @@ export type CreateSessionMutationVariables = Exact<{
 }>;
 
 
-export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSession?: { __typename?: 'DownloadSessionReturn', hostIp?: string | null | undefined, username?: string | null | undefined, password?: string | null | undefined, port?: number | null | undefined, id?: string | null | undefined, data?: Array<{ __typename?: 'DownloadSessionObject', type: string, path: string }> | null | undefined } | null | undefined };
+export type CreateSessionMutation = { __typename?: 'Mutation', createDownloadSession?: Maybe<{ __typename?: 'DownloadSessionReturn', hostIp?: Maybe<string>, username?: Maybe<string>, password?: Maybe<string>, port?: Maybe<number>, id?: Maybe<string>, data?: Maybe<Array<{ __typename?: 'DownloadSessionObject', type: string, path: string }>> }> };
 
 export type CreateUploadSessionMutationMutationVariables = Exact<{
   uploadPath: Scalars['String'];
@@ -596,7 +597,7 @@ export type CreateUploadSessionMutationMutationVariables = Exact<{
 }>;
 
 
-export type CreateUploadSessionMutationMutation = { __typename?: 'Mutation', createUploadSession?: { __typename?: 'UploadSessionReturn', uploadPath: string, hostIp: string, username: string, port: number, password: string } | null | undefined };
+export type CreateUploadSessionMutationMutation = { __typename?: 'Mutation', createUploadSession?: Maybe<{ __typename?: 'UploadSessionReturn', uploadPath: string, hostIp: string, username: string, port: number, password: string }> };
 
 export type GetDirectoryTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
@@ -605,7 +606,7 @@ export type GetDirectoryTreeQueryQueryVariables = Exact<{
 }>;
 
 
-export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree?: { __typename: 'Tree', path: string, tree?: Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: number | null | undefined, sharedDataStore?: boolean | null | undefined, name: string, relativePath: string, path: string, size?: number | null | undefined }> | null | undefined } | null | undefined };
+export type GetDirectoryTreeQueryQuery = { __typename?: 'Query', directoryTree?: Maybe<{ __typename: 'Tree', path: string, tree?: Maybe<Array<{ __typename: 'TreeItem', isDirectory: boolean, dataStoreId?: Maybe<number>, sharedDataStore?: Maybe<boolean>, name: string, relativePath: string, path: string }>> }> };
 
 export type GetTreeQueryQueryVariables = Exact<{
   path: Scalars['String'];
@@ -614,26 +615,26 @@ export type GetTreeQueryQueryVariables = Exact<{
 }>;
 
 
-export type GetTreeQueryQuery = { __typename?: 'Query', tree?: { __typename?: 'Tree', path: string, userInitialized: boolean, tree?: Array<{ __typename?: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string, size?: number | null | undefined }> | null | undefined } | null | undefined };
+export type GetTreeQueryQuery = { __typename?: 'Query', tree?: Maybe<{ __typename?: 'Tree', path: string, userInitialized: boolean, tree?: Maybe<Array<{ __typename?: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string, size?: Maybe<number> }>> }> };
 
 export type UploadMutationVariables = Exact<{
   file: Scalars['Upload'];
 }>;
 
 
-export type UploadMutation = { __typename?: 'Mutation', UploadProfilePicture?: boolean | null | undefined };
+export type UploadMutation = { __typename?: 'Mutation', UploadProfilePicture?: Maybe<boolean> };
 
 export type GetUserNameByNameQueryVariables = Exact<{
   name: Scalars['String'];
 }>;
 
 
-export type GetUserNameByNameQuery = { __typename?: 'Query', getUsersByName?: Array<{ __typename?: 'User', userName: string, id: string }> | null | undefined };
+export type GetUserNameByNameQuery = { __typename?: 'Query', getUsersByName?: Maybe<Array<{ __typename?: 'User', userName: string, id: string }>> };
 
 export type GetMyDataStoresQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyDataStoresQuery = { __typename?: 'Query', getMyDataStores?: Array<{ __typename?: 'Datastore', id: string, name: string }> | null | undefined };
+export type GetMyDataStoresQuery = { __typename?: 'Query', getMyDataStores?: Maybe<Array<{ __typename?: 'Datastore', id: string, name: string }>> };
 
 export type LoginMutationMutationVariables = Exact<{
   email: Scalars['String'];
@@ -641,17 +642,17 @@ export type LoginMutationMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutationMutation = { __typename?: 'Mutation', login?: { __typename?: 'User', id: string } | null | undefined };
+export type LoginMutationMutation = { __typename?: 'Mutation', login?: Maybe<{ __typename?: 'User', id: string }> };
 
 export type LogoutMutationMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutationMutation = { __typename?: 'Mutation', logout?: boolean | null | undefined };
+export type LogoutMutationMutation = { __typename?: 'Mutation', logout?: Maybe<boolean> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', email: string, id: string, userName: string, isAdmin: boolean, defaultDownloadPath?: string | null | undefined } | null | undefined };
+export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', email: string, id: string, userName: string, isAdmin: boolean, defaultDownloadPath?: Maybe<string> }> };
 
 export type RegisterMutationMutationVariables = Exact<{
   email: Scalars['String'];
@@ -660,14 +661,14 @@ export type RegisterMutationMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutationMutation = { __typename?: 'Mutation', register?: { __typename?: 'User', id: string } | null | undefined };
+export type RegisterMutationMutation = { __typename?: 'Mutation', register?: Maybe<{ __typename?: 'User', id: string }> };
 
 export type SetDefaultDownloadPathMutationVariables = Exact<{
   path: Scalars['String'];
 }>;
 
 
-export type SetDefaultDownloadPathMutation = { __typename?: 'Mutation', setDefaultDownloadPath?: boolean | null | undefined };
+export type SetDefaultDownloadPathMutation = { __typename?: 'Mutation', setDefaultDownloadPath?: Maybe<boolean> };
 
 
 export const CreateDataStoreMutionDocument = gql`
@@ -992,8 +993,8 @@ export type CopyDataMutationMutationHookResult = ReturnType<typeof useCopyDataMu
 export type CopyDataMutationMutationResult = Apollo.MutationResult<CopyDataMutationMutation>;
 export type CopyDataMutationMutationOptions = Apollo.BaseMutationOptions<CopyDataMutationMutation, CopyDataMutationMutationVariables>;
 export const CreateFolderMutationDocument = gql`
-    mutation CreateFolderMutation($path: String!, $dataStoreId: Float!) {
-  createFolder(path: $path, dataStoreId: $dataStoreId)
+    mutation CreateFolderMutation($path: String!, $datastoreId: Float!) {
+  createFolder(path: $path, datastoreId: $datastoreId)
 }
     `;
 export type CreateFolderMutationMutationFn = Apollo.MutationFunction<CreateFolderMutationMutation, CreateFolderMutationMutationVariables>;
@@ -1012,7 +1013,7 @@ export type CreateFolderMutationMutationFn = Apollo.MutationFunction<CreateFolde
  * const [createFolderMutationMutation, { data, loading, error }] = useCreateFolderMutationMutation({
  *   variables: {
  *      path: // value for 'path'
- *      dataStoreId: // value for 'dataStoreId'
+ *      datastoreId: // value for 'datastoreId'
  *   },
  * });
  */
@@ -1506,7 +1507,6 @@ export const GetDirectoryTreeQueryDocument = gql`
       name
       relativePath
       path
-      size
       __typename
     }
   }

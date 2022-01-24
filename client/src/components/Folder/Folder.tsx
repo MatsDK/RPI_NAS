@@ -122,7 +122,7 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
       CreateFolderMutation,
       {
         path: newPath,
-        dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
+        datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
       },
       {
         refetchQueries: [
