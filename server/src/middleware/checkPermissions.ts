@@ -3,10 +3,10 @@ import { getConnection } from "typeorm";
 import { MyContext } from "../types/Context";
 
 export const checkPermissions: MiddlewareFn<MyContext> = async (
-  { context: { req }, args: { data, dataStoreId } },
+  { context: { req }, args: { data, datastoreId } },
   next
 ) => {
-  const id = dataStoreId != null ? dataStoreId : data.dataStoreId;
+  const id = datastoreId != null ? datastoreId : data.datastoreId;
   if (id == null) return next();
 
   const [res] = await getConnection().query(

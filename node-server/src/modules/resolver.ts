@@ -1,4 +1,5 @@
 import { ApolloError } from "apollo-server-express";
+import fs from "fs";
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { getOrCreateConnection } from "../utils/client";
 import { createUser } from "../utils/createUser";
@@ -95,5 +96,22 @@ export class resolver {
 		@Arg("directoryTree") directoryTree: boolean,
 	) {
 		return await new Tree().init(path, basePath, depth, directoryTree)
+	}
+
+	@Mutation(() => Boolean, { nullable: true })
+	async createDir(
+		@Arg("path") path: string,
+		@Arg("datastoreName") datastoreName: string,
+		@Arg("loginName") loginName: string,
+	) {
+		try {
+			fs.mkdirSync(path);
+			await exec(`chown ${loginName}:${datastoreName} "${path}"`);
+			return true
+		} catch (err) {
+			console.log(err)
+			return false
+		}
+
 	}
 }

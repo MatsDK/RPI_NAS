@@ -1,17 +1,18 @@
-import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
-import { Datastore } from "../../entity/Datastore";
-import fs from "fs-extra";
-import { isAuth } from "../../middleware/auth";
-import fsPath from "path";
-import { checkPermissions } from "../../middleware/checkPermissions";
-import { DeletePathsInput } from "./deletePathsInput";
-import { CopyMoveInput } from "./copyMoveMutationInput";
-import { MoveCopyData } from "./moveCopyData";
-import { exec } from "../../utils/exec";
-import { Node } from "../../entity/CloudNode";
-import { MyContext } from "../../types/Context";
 import { ApolloError } from "apollo-server-core";
+import fs from "fs-extra";
+import fsPath from "path";
+import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { Node } from "../../entity/CloudNode";
+import { Datastore } from "../../entity/Datastore";
+import { isAuth } from "../../middleware/auth";
+import { checkPermissions } from "../../middleware/checkPermissions";
+import { MyContext } from "../../types/Context";
+import { exec } from "../../utils/exec";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
+import { CopyMoveInput } from "./copyMoveMutationInput";
+import { CreateDirectoryMutation } from "./CreateDirectoryMutation";
+import { DeletePathsInput } from "./deletePathsInput";
+import { MoveCopyData } from "./moveCopyData";
 import { UpdateOwnershipMutation } from "./UpdateOwnershipMutation";
 
 @Resolver()
@@ -22,44 +23,59 @@ export class FolderResolver {
     @Arg("dataStoreId") dataStoreId: number,
     @Arg("path") path: string
   ): Promise<string | null> {
-    const dataStore = await Datastore.findOne({ where: { id: dataStoreId } });
-    if (!dataStore) return null;
+    const datastore = await Datastore.findOne({ where: { id: dataStoreId } });
+    if (!datastore) return null;
 
-    const host = await Node.findOne({ where: { id: dataStore.localNodeId } });
-    if (!host) return null;
+    const node = await Node.findOne({ where: { id: datastore.localNodeId } });
+    if (!node) return null;
 
     try {
-      const full_path = fsPath.join(dataStore.basePath, path);
+      const full_path = fsPath.join(datastore.basePath, path);
 
-      if (host.hostNode) {
+      if (node.hostNode) {
         fs.mkdirSync(full_path);
 
-        const cmd = `chown ${host.loginName}:${fsPath.basename(dataStore.basePath)} "${full_path}"`;
+        const cmd = `chown ${node.loginName}:${fsPath.basename(datastore.basePath)} "${full_path}"`;
 
         await exec(cmd);
       } else {
-        console.log("create remote dir")
+        const client = await getOrCreateNodeClient({ node, ping: false })
+        if (!client) throw new ApolloError("Client not found");
+
+        const { errors, data } = await client.conn.mutate({
+          mutation: CreateDirectoryMutation,
+          variables: {
+            path: full_path,
+            datastoreName: fsPath.basename(datastore.basePath),
+            loginName: node.loginName
+          }
+        })
+
+        if (errors || !data.createDir) {
+          console.log(errors, data)
+          return null
+        }
       }
     } catch (error) {
       console.log(error);
       return null;
     }
 
-    return fsPath.join(dataStore.basePath, path);
+    return fsPath.join(datastore.basePath, path);
   }
 
   @UseMiddleware(isAuth, checkPermissions)
   @Mutation(() => Boolean, { nullable: true })
   async delete(
-    @Arg("dataStoreId") dataStoreId: number,
+    @Arg("datastoreId") datastoreId: number,
     @Arg("paths", () => [DeletePathsInput]) paths: DeletePathsInput[]
   ): Promise<boolean | null> {
-    const dataStore = await Datastore.findOne({ where: { id: dataStoreId } });
-    if (!dataStore) return null;
+    const datastore = await Datastore.findOne({ where: { id: datastoreId } });
+    if (!datastore) return null;
 
     try {
       for (const { path, type } of paths) {
-        const fullPath = fsPath.join(dataStore.basePath, path);
+        const fullPath = fsPath.join(datastore.basePath, path);
 
         if (type == "file") fs.rmSync(fullPath);
         else fs.rmdirSync(fullPath, { recursive: true });
