@@ -9,6 +9,7 @@ import { exec } from "../utils/exec";
 import { CreateDatastoreInput } from "./CreateDatastoreInput";
 import { GetDatastoreSizes, GetDatastoreSizesInput } from "./GetDatastoreSizes";
 import { Node } from "./SetupNodeInput";
+import { Tree } from "./Tree/Tree";
 
 @Resolver()
 export class resolver {
@@ -84,5 +85,15 @@ export class resolver {
 		if (stderr) throw new ApolloError(stderr)
 
 		return true
+	}
+
+	@Query(() => Tree, { nullable: true })
+	async queryTree(
+		@Arg("path") path: string,
+		@Arg("basePath") basePath: string,
+		@Arg("depth") depth: number,
+		@Arg("directoryTree") directoryTree: boolean,
+	) {
+		return await new Tree().init(path, basePath, depth, directoryTree)
 	}
 }

@@ -170,7 +170,7 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
             </Link>
           </div>
         ) : (
-          <p>{item.name}  {!!item.size && prettyBytes(item.size)}</p>
+          <p>{item.name}  {item.size != null && prettyBytes(item.size)}</p>
 
         )}
       </Name>

@@ -2,7 +2,10 @@ import { ApolloError } from "apollo-server-core";
 import { Node } from "../../entity/CloudNode";
 import { Datastore } from "../../entity/Datastore";
 import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
+import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
+import { GetTreeQuery } from "./GetTreeQuery";
 import { Tree } from "./TreeObject";
+import fsPath from "path";
 
 interface Params {
   datastoreId: number | null;
@@ -31,7 +34,25 @@ export const buildTreeObject = async ({
   if (!node) throw new ApolloError("Node not found")
 
   if (!node.hostNode) {
-    console.log("get remote tree")
+    const client = await getOrCreateNodeClient({ node, ping: false })
+    if (!client) throw new ApolloError("Could not connect to client")
+
+    const { data, errors } = await client.conn.query({
+      query: GetTreeQuery,
+      variables: {
+        path: fsPath.join(datastore.basePath, path),
+        basePath: datastore.basePath,
+        depth,
+        directoryTree
+      }
+    })
+
+    if (errors) {
+      console.log(errors)
+      throw new ApolloError("Error occured")
+    }
+
+    return { ...data.queryTree, path, userInitialized: node.initializedUsers.includes(userId) } as Tree
   }
 
   return await new Tree(node.initializedUsers.includes(userId)).init(path, depth, datastore.basePath, directoryTree);

@@ -30,13 +30,16 @@ export class FolderResolver {
 
     try {
       const full_path = fsPath.join(dataStore.basePath, path);
-      fs.mkdirSync(full_path);
-      const cmd = `chown ${host.loginName}:${fsPath.basename(
-        dataStore.basePath
-      )} "${full_path}"`;
-      await exec(
-        cmd
-      );
+
+      if (host.hostNode) {
+        fs.mkdirSync(full_path);
+
+        const cmd = `chown ${host.loginName}:${fsPath.basename(dataStore.basePath)} "${full_path}"`;
+
+        await exec(cmd);
+      } else {
+        console.log("create remote dir")
+      }
     } catch (error) {
       console.log(error);
       return null;

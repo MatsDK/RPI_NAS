@@ -21,6 +21,7 @@ export const getTreeObject = (
       if (!thisPathstats.isDirectory()) return null;
     }
   } catch (e) {
+    console.log(e)
     return []
   }
 
@@ -51,12 +52,13 @@ export const getTreeObject = (
 
       item.name = currPath;
       item.size = stats.size;
-      item.path = thisPath;
       item.relativePath = fsPath.relative(basePath, thisPath);
       item.isDirectory = stats.isDirectory();
 
       items.push(item);
-    } catch (error) { }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return items || [];

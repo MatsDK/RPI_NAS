@@ -38,5 +38,6 @@ export class TreeItem {
       directoryTree,
       basePath,
     });
+    this.path = path
   }
 }
