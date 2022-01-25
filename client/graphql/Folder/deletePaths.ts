@@ -3,8 +3,8 @@ import gql from "graphql-tag";
 export const DeletePtahsMutation = gql`
   mutation DeleteDataMutation(
     $paths: [DeletePathsInput!]!
-    $dataStoreId: Float!
+    $datastoreId: Float!
   ) {
-    delete(paths: $paths, dataStoreId: $dataStoreId)
+    delete(paths: $paths, datastoreId: $datastoreId)
   }
 `;

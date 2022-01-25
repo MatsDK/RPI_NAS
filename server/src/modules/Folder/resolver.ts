@@ -20,10 +20,10 @@ export class FolderResolver {
   @UseMiddleware(isAuth, checkPermissions)
   @Mutation(() => String, { nullable: true })
   async createFolder(
-    @Arg("dataStoreId") dataStoreId: number,
+    @Arg("datastoreId") datastoreId: number,
     @Arg("path") path: string
   ): Promise<string | null> {
-    const datastore = await Datastore.findOne({ where: { id: dataStoreId } });
+    const datastore = await Datastore.findOne({ where: { id: datastoreId } });
     if (!datastore) return null;
 
     const node = await Node.findOne({ where: { id: datastore.localNodeId } });
@@ -73,12 +73,19 @@ export class FolderResolver {
     const datastore = await Datastore.findOne({ where: { id: datastoreId } });
     if (!datastore) return null;
 
-    try {
-      for (const { path, type } of paths) {
-        const fullPath = fsPath.join(datastore.basePath, path);
+    const node = await Node.findOne({ where: { id: datastore.localNodeId } })
+    if (!node) return null
 
-        if (type == "file") fs.rmSync(fullPath);
-        else fs.rmdirSync(fullPath, { recursive: true });
+    try {
+      if (node.hostNode) {
+        for (const { path, type } of paths) {
+          const fullPath = fsPath.join(datastore.basePath, path);
+
+          if (type == "file") fs.rmSync(fullPath);
+          else fs.rmdirSync(fullPath, { recursive: true });
+        }
+      } else {
+        console.log("delete remote")
       }
     } catch (error) {
       console.log(error);
@@ -133,7 +140,7 @@ export class FolderResolver {
         console.log(res)
       } catch (e) {
         console.log(e)
-        throw new ApolloError(e)
+        throw new ApolloError(e as any)
       }
     }
 

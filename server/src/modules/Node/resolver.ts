@@ -140,8 +140,8 @@ export class NodeResolver {
 				await deleteNode();
 				return null
 			}
-		} catch (e) {
-			console.log(e.message);
+		} catch (err) {
+			console.log(err);
 			await deleteNode();
 			return null
 		}

@@ -27,6 +27,7 @@ export const SSHDownloadDropdownWrapper = styled.div`
   h1 {
     padding-bottom: 10px;
     font-size: 25px;
+    font-weight: 600;
     color: ${(props) => props.theme.textColors[1]};
   }
 `;
@@ -46,7 +47,6 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
   close,
 }) => {
   const { me } = useMeState();
-
   const folderCtx: FolderContextType = useContext(FolderContext);
   const { mutate } = useApollo();
 

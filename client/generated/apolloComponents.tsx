@@ -202,7 +202,7 @@ export type MutationCreateFolderArgs = {
 
 export type MutationDeleteArgs = {
   paths: Array<DeletePathsInput>;
-  dataStoreId: Scalars['Float'];
+  datastoreId: Scalars['Float'];
 };
 
 
@@ -505,7 +505,7 @@ export type CreateFolderMutationMutation = { __typename?: 'Mutation', createFold
 
 export type DeleteDataMutationMutationVariables = Exact<{
   paths: Array<DeletePathsInput> | DeletePathsInput;
-  dataStoreId: Scalars['Float'];
+  datastoreId: Scalars['Float'];
 }>;
 
 
@@ -1025,8 +1025,8 @@ export type CreateFolderMutationMutationHookResult = ReturnType<typeof useCreate
 export type CreateFolderMutationMutationResult = Apollo.MutationResult<CreateFolderMutationMutation>;
 export type CreateFolderMutationMutationOptions = Apollo.BaseMutationOptions<CreateFolderMutationMutation, CreateFolderMutationMutationVariables>;
 export const DeleteDataMutationDocument = gql`
-    mutation DeleteDataMutation($paths: [DeletePathsInput!]!, $dataStoreId: Float!) {
-  delete(paths: $paths, dataStoreId: $dataStoreId)
+    mutation DeleteDataMutation($paths: [DeletePathsInput!]!, $datastoreId: Float!) {
+  delete(paths: $paths, datastoreId: $datastoreId)
 }
     `;
 export type DeleteDataMutationMutationFn = Apollo.MutationFunction<DeleteDataMutationMutation, DeleteDataMutationMutationVariables>;
@@ -1045,7 +1045,7 @@ export type DeleteDataMutationMutationFn = Apollo.MutationFunction<DeleteDataMut
  * const [deleteDataMutationMutation, { data, loading, error }] = useDeleteDataMutationMutation({
  *   variables: {
  *      paths: // value for 'paths'
- *      dataStoreId: // value for 'dataStoreId'
+ *      datastoreId: // value for 'datastoreId'
  *   },
  * });
  */

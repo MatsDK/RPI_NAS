@@ -1,4 +1,5 @@
 import { DeletePtahsMutation } from "graphql/Folder/deletePaths";
+import { DeleteDropdown } from "./DeleteDropdown";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import { useRouter } from "next/dist/client/router";
@@ -58,6 +59,7 @@ const FolderNavbar = () => {
   const folderCtx: FolderContextType = useContext(FolderContext);
 
   const downloadDropdown: any = useRef();
+
   useDropdown(
     downloadDropdown,
     () => showSSHDownloadDropdown && setShowSSHDownloadDropdown(false)
@@ -65,6 +67,7 @@ const FolderNavbar = () => {
 
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [showSSHDownloadDropdown, setShowSSHDownloadDropdown] = useState(false);
+  const [showDeleteDropdown, setShowDeleteDropdown] = useState(false);
   const [showCopyToForm, setShowCopyToForm] = useState(false);
   const [showMoveToForm, setShowMoveToForm] = useState(false);
 
@@ -97,47 +100,6 @@ const FolderNavbar = () => {
         "_blank"
       )
       ?.focus();
-  };
-
-  const deleteSelected = async () => {
-    if (!folderCtx) return;
-
-    const selected = Array.from(folderCtx.selected.selectedItems).map(
-      ([_, v]) => v
-    );
-
-    if (!router.query.d) return;
-
-    if (!selected.length) return;
-
-    const { data, errors } = await mutate(
-      DeletePtahsMutation,
-      {
-        paths: selected.map(({ isDirectory, relativePath }) => ({
-          path: relativePath,
-          type: isDirectory ? "directory" : "file",
-        })),
-        datastoreId: +router.query.d,
-      },
-      {
-        refetchQueries: [
-          {
-            query: getTreeQuery,
-            variables: {
-              depth: 1,
-              datastoreId: folderCtx.currentFolderPath?.folderPath.datastoreId,
-              path: folderCtx.currentFolderPath?.folderPath.path,
-            },
-          },
-        ],
-      }
-    );
-
-    if (errors) return console.log(errors);
-
-    folderCtx.selected.setSelected?.(new Map());
-
-    console.log(data);
   };
 
   return (
@@ -181,7 +143,8 @@ const FolderNavbar = () => {
             )}
           </ConditionButton>
           <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
-            <Button onClick={deleteSelected}>Delete</Button>
+            <Button onClick={() => setShowDeleteDropdown(s => !s)}>Delete</Button>
+            {showDeleteDropdown && <DeleteDropdown hide={() => setShowDeleteDropdown(false)} />}
           </ConditionButton>
           <ConditionButton condition={!!folderCtx?.selected.selectedItems.size}>
             <Button onClick={() => setShowMoveToForm((s) => !s)}>Move To</Button>
@@ -194,7 +157,7 @@ const FolderNavbar = () => {
           <Icon name="searchIcon" width={20} height={20} color={{ idx: 1, propName: "textColors" }} />
         </SearchButton>
       </FolderNavbarWrapper>
-    </FolderNavBarContainer>
+    </FolderNavBarContainer >
   );
 };
 

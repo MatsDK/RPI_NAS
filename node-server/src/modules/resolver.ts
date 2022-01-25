@@ -1,4 +1,5 @@
 import { ApolloError } from "apollo-server-express";
+import fsPath from "fs"
 import fs from "fs";
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { getOrCreateConnection } from "../utils/client";
