@@ -1,5 +1,4 @@
 import { ApolloError } from "apollo-server-express";
-import fsPath from "fs"
 import fs from "fs";
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { getOrCreateConnection } from "../utils/client";
@@ -9,6 +8,7 @@ import { getDatastoreSizes } from "../utils/datastore/getDatastoreSizes";
 import { addToGroup, createGroup } from "../utils/datastore/handleGroups";
 import { exec } from "../utils/exec";
 import { CreateDatastoreInput } from "./CreateDatastoreInput";
+import { DeletePaths } from "./DeletePaths";
 import { GetDatastoreSizes, GetDatastoreSizesInput } from "./GetDatastoreSizes";
 import { Node } from "./SetupNodeInput";
 import { Tree } from "./Tree/Tree";
@@ -114,5 +114,20 @@ export class resolver {
 			return false
 		}
 
+	}
+
+	@Mutation(() => Boolean, { nullable: true })
+	delete(@Arg("paths", () => [DeletePaths]) paths: DeletePaths[]) {
+		try {
+			for (const { path, type } of paths) {
+				if (type === "file") fs.rmSync(path)
+				else fs.rmdirSync(path, { recursive: true })
+			}
+
+			return true
+		} catch (err) {
+			console.log(err)
+			return null
+		}
 	}
 }

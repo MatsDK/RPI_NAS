@@ -11,6 +11,7 @@ import { exec } from "../../utils/exec";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { CopyMoveInput } from "./copyMoveMutationInput";
 import { CreateDirectoryMutation } from "./CreateDirectoryMutation";
+import { DeleteMutation } from "./DeleteMutation";
 import { DeletePathsInput } from "./deletePathsInput";
 import { MoveCopyData } from "./moveCopyData";
 import { UpdateOwnershipMutation } from "./UpdateOwnershipMutation";
@@ -85,7 +86,23 @@ export class FolderResolver {
           else fs.rmdirSync(fullPath, { recursive: true });
         }
       } else {
-        console.log("delete remote")
+        const client = await getOrCreateNodeClient({ node, ping: false })
+        if (!client) throw new ApolloError("Could not connect to client")
+
+        const res = await client.conn.mutate({
+          mutation: DeleteMutation,
+          variables: {
+            paths: paths.map(({ path, type }) => ({
+              path: fsPath.join(datastore.basePath, path),
+              type
+            }))
+          }
+        })
+
+        if (res.errors || !res.data.delete) {
+          console.log(res)
+          return null
+        }
       }
     } catch (error) {
       console.log(error);
