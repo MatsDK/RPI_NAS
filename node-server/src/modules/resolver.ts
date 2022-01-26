@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-express";
-import fs from "fs";
+import fs from "fs-extra";
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { getOrCreateConnection } from "../utils/client";
 import { createUser } from "../utils/createUser";
@@ -7,10 +7,12 @@ import { createDatastoreFolder } from "../utils/datastore/createDatastoreFolder"
 import { getDatastoreSizes } from "../utils/datastore/getDatastoreSizes";
 import { addToGroup, createGroup } from "../utils/datastore/handleGroups";
 import { exec } from "../utils/exec";
+import { isSubDir } from "../utils/isSubDir";
+import { CopyAndMoveInput } from "./CopyAndMoveInput";
 import { CreateDatastoreInput } from "./CreateDatastoreInput";
 import { DeletePaths } from "./DeletePaths";
 import { GetDatastoreSizes, GetDatastoreSizesInput } from "./GetDatastoreSizes";
-import { Node } from "./SetupNodeInput";
+import { SetupNodeInput } from "./SetupNodeInput";
 import { Tree } from "./Tree/Tree";
 
 @Resolver()
@@ -21,7 +23,7 @@ export class resolver {
 	}
 
 	@Mutation(() => Boolean, { nullable: true })
-	async setupNode(@Arg("data", () => Node) { loginName, password, token, id }: Node): Promise<boolean | null> {
+	async setupNode(@Arg("data", () => SetupNodeInput) { loginName, password, token, id }: SetupNodeInput): Promise<boolean | null> {
 		const { err } = await createUser(loginName, password)
 		if (err) throw new ApolloError(err)
 
@@ -129,5 +131,30 @@ export class resolver {
 			console.log(err)
 			return null
 		}
+	}
+	@Mutation(() => Boolean, { nullable: true })
+	async copyAndMove(@Arg("data", () => CopyAndMoveInput) { type, remote, srcNode, downloadFiles, downloadDirectories }: CopyAndMoveInput) {
+		if (!remote) {
+			for (const { remote, local } of [...downloadFiles, ...downloadDirectories]) {
+				switch (type) {
+					case "move": {
+						if (isSubDir(remote, local)) {
+							console.log("Cannot move inside itself")
+							continue
+						}
+
+						fs.moveSync(remote, local)
+						break
+					}
+					case "copy": {
+						fs.copySync(remote, local, { recursive: true });
+						break
+					}
+				}
+			}
+		} else {
+			console.log("copy / move to remote node")
+		}
+		return true
 	}
 }

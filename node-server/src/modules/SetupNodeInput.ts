@@ -1,7 +1,7 @@
 import { InputType, Field } from "type-graphql";
 
 @InputType()
-export class Node {
+export class SetupNodeInput {
 	@Field()
 	id: number;
 

@@ -35,6 +35,18 @@ const NodesListItem = styled.div`
     border-bottom: 1px solid ${(props) => props.theme.textColors[3]};
 `
 
+const CreateHostLink = styled.span`
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 18px;
+    color: ${props => props.theme.textColors[1]};
+    transition: color .15s ease-in-out;
+
+    :hover {
+        color: ${props => props.theme.textColors[0]};
+    }
+`
+
 const NameSection = styled.div`
     display: flex;
     align-items: center;
@@ -163,11 +175,8 @@ export const NodesView: React.FC = ({ }) => {
     return (
         <Wrapper>
             <ConditionOverlay condition={!host} renderOverlay={() =>
-                <div>
-                    <Link href={"/nodes/createhost"}>Create host node</Link>
-                </div>
+                <Link href={"/nodes/createhost"}><CreateHostLink>Create host node</CreateHostLink></Link>
             } >
-
                 {loading ? <Spinner loading={true} /> :
                     <>
                         <Header>

@@ -49,7 +49,7 @@ export const MoveCopyData = async ({
       }
     }
   else {
-    await moveAndCopyRemote(rest as GetDsAndNodeReturn, { type, data, destination })
+    const { err } = await moveAndCopyRemote(rest as GetDsAndNodeReturn, { type, data, destination })
   }
 
   return true;
@@ -86,13 +86,13 @@ const getDsAndNodes = async (srcDatastoreId: number, destDatastoreId: number, us
   }
 
   const nodes = await Node.find({
-    where: [{ id: srcDatastore.localHostNodeId }, { id: destDatastore.localHostNodeId }],
+    where: [{ id: srcDatastore.localNodeId }, { id: destDatastore.localNodeId }],
   });
 
   nodes.forEach((v) => nodesMap.set(v.id, v));
 
-  const srcNode = nodesMap.get(srcDatastore.localHostNodeId),
-    destNode = nodesMap.get(destDatastore.localHostNodeId);
+  const srcNode = nodesMap.get(srcDatastore.localNodeId),
+    destNode = nodesMap.get(destDatastore.localNodeId);
 
   if (!srcNode || !destNode) return {
     err: "nodes not found"
