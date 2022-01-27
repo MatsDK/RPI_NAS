@@ -8,6 +8,7 @@ import { getDatastoreSizes } from "../utils/datastore/getDatastoreSizes";
 import { addToGroup, createGroup } from "../utils/datastore/handleGroups";
 import { exec } from "../utils/exec";
 import { isSubDir } from "../utils/isSubDir";
+import { createSSHClientForNode } from "../utils/nodes/createSSHClient";
 import { CopyAndMoveInput } from "./CopyAndMoveInput";
 import { CreateDatastoreInput } from "./CreateDatastoreInput";
 import { DeletePaths } from "./DeletePaths";
@@ -132,6 +133,7 @@ export class resolver {
 			return null
 		}
 	}
+
 	@Mutation(() => Boolean, { nullable: true })
 	async copyAndMove(@Arg("data", () => CopyAndMoveInput) { type, remote, srcNode, downloadFiles, downloadDirectories }: CopyAndMoveInput) {
 		if (!remote) {
@@ -153,8 +155,23 @@ export class resolver {
 				}
 			}
 		} else {
-			console.log("copy / move to remote node")
+			try {
+				const client = await createSSHClientForNode(srcNode);
+
+				await Promise.all([
+					client.download.files(downloadFiles),
+					client.download.directories(downloadDirectories),
+				])
+
+				if (type === "move") {
+					console.log("remove from remote")
+				}
+			} catch (err) {
+				console.log(err)
+				return null
+			}
 		}
+
 		return true
 	}
 }

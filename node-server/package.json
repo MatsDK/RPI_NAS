@@ -22,6 +22,7 @@
     "graphql": "^15.8.0",
     "node-df": "^0.1.4",
     "reflect-metadata": "^0.1.13",
+    "ssh-package": "^1.0.2",
     "ts-node": "^10.4.0",
     "ts-node-dev": "^1.1.8",
     "type-graphql": "^1.1.1",

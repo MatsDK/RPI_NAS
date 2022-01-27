@@ -8,103 +8,103 @@ import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore
 import { moveAndCopyRemote } from "./moveAndCopyRemote";
 
 export const MoveCopyData = async ({
-  data,
-  datastoreId,
-  destination,
-  type,
+	data,
+	datastoreId,
+	destination,
+	type,
 }: CopyMoveInput & { type: "copy" | "move" }, userId: number) => {
-  const { err, ...rest } = await getDsAndNodes(datastoreId, destination.datastoreId, userId)
-  if (err) throw new ApolloError(err)
+	const { err, ...rest } = await getDsAndNodes(datastoreId, destination.datastoreId, userId)
+	if (err) throw new ApolloError(err)
 
-  const { destDatastore, srcDatastore, srcNode, destNode } = rest as GetDsAndNodeReturn
+	const { destDatastore, srcDatastore, srcNode, destNode } = rest as GetDsAndNodeReturn
 
-  if (srcNode.id == destNode.id && srcNode.hostNode)
-    for (const { path } of data) {
-      const srcPath = fsPath.join(srcDatastore.basePath, path),
-        destPath = fsPath.join(
-          destDatastore.basePath,
-          destination.path,
-          fsPath.basename(path)
-        );
+	if (srcNode.id == destNode.id && srcNode.hostNode)
+		for (const { path } of data) {
+			const srcPath = fsPath.join(srcDatastore.basePath, path),
+				destPath = fsPath.join(
+					destDatastore.basePath,
+					destination.path,
+					fsPath.basename(path)
+				);
 
-      try {
-        switch (type) {
-          case "move": {
-            if (isSubDir(srcPath, destPath)) {
-              console.log("Cannot move inside itself")
-              continue
-            }
+			try {
+				switch (type) {
+					case "move": {
+						if (isSubDir(srcPath, destPath)) {
+							console.log("Cannot move inside itself")
+							continue
+						}
 
-            fs.moveSync(srcPath, destPath)
-            break
-          }
-          case "copy": {
-            fs.copySync(srcPath, destPath, { recursive: true });
-            break
-          }
-        }
-      } catch (error) {
-        console.log(error);
-        return null;
-      }
-    }
-  else {
-    const { err } = await moveAndCopyRemote(rest as GetDsAndNodeReturn, { type, data, destination })
-  }
+						fs.moveSync(srcPath, destPath)
+						break
+					}
+					case "copy": {
+						fs.copySync(srcPath, destPath, { recursive: true });
+						break
+					}
+				}
+			} catch (error) {
+				console.log(error);
+				return null;
+			}
+		}
+	else {
+		const { err } = await moveAndCopyRemote(rest as GetDsAndNodeReturn, { type, data, destination })
+	}
 
-  return true;
+	return true;
 };
 
 const isSubDir = (srcPath: string, destPath: string): boolean => {
-  const relative = fsPath.relative(srcPath, destPath);
-  return !!relative && !relative.startsWith('..') && !fsPath.isAbsolute(relative);
+	const relative = fsPath.relative(srcPath, destPath);
+	return !!relative && !relative.startsWith('..') && !fsPath.isAbsolute(relative);
 }
 
 export interface GetDsAndNodeReturn {
-  srcDatastore: Datastore,
-  srcNode: Node
-  destDatastore: Datastore,
-  destNode: Node;
-  err?: any
+	srcDatastore: Datastore,
+	srcNode: Node
+	destDatastore: Datastore,
+	destNode: Node;
+	err?: any
 }
 
 const getDsAndNodes = async (srcDatastoreId: number, destDatastoreId: number, userId: number): Promise<GetDsAndNodeReturn | { err: any }> => {
-  const datastoresMap: Map<number, Datastore> = new Map();
-  const nodesMap: Map<number, Node> = new Map();
+	const datastoresMap: Map<number, Datastore> = new Map();
+	const nodesMap: Map<number, Node> = new Map();
 
-  const datastores = await Datastore.find({
-    where: [{ id: srcDatastoreId }, { id: destDatastoreId }],
-  });
+	const datastores = await Datastore.find({
+		where: [{ id: srcDatastoreId }, { id: destDatastoreId }],
+	});
 
-  datastores.forEach((v) => datastoresMap.set(v.id, v));
+	datastores.forEach((v) => datastoresMap.set(v.id, v));
 
-  const srcDatastore = datastoresMap.get(srcDatastoreId),
-    destDatastore = datastoresMap.get(destDatastoreId);
+	const srcDatastore = datastoresMap.get(srcDatastoreId),
+		destDatastore = datastoresMap.get(destDatastoreId);
 
-  if (!srcDatastore || !destDatastore) return {
-    err: "Datastores not found"
-  }
+	if (!srcDatastore || !destDatastore) return {
+		err: "Datastores not found"
+	}
 
-  const nodes = await Node.find({
-    where: [{ id: srcDatastore.localNodeId }, { id: destDatastore.localNodeId }],
-  });
+	const nodes = await Node.find({
+		where: [{ id: srcDatastore.localNodeId }, { id: destDatastore.localNodeId }],
+	});
 
-  nodes.forEach((v) => nodesMap.set(v.id, v));
+	nodes.forEach((v) => nodesMap.set(v.id, v));
 
-  const srcNode = nodesMap.get(srcDatastore.localNodeId),
-    destNode = nodesMap.get(destDatastore.localNodeId);
+	const srcNode = nodesMap.get(srcDatastore.localNodeId),
+		destNode = nodesMap.get(destDatastore.localNodeId);
 
-  if (!srcNode || !destNode) return {
-    err: "nodes not found"
-  }
+	if (!srcNode || !destNode) return {
+		err: "nodes not found"
+	}
 
-  if (!(await hasAccessToDatastore(srcDatastoreId, userId, srcDatastore.userId)) ||
-    !(await hasAccessToDatastore(destDatastoreId, userId, destDatastore.userId))) return { err: "No Access allowed" }
+	if (!(await hasAccessToDatastore(srcDatastoreId, userId, srcDatastore.userId)) ||
+		!(await hasAccessToDatastore(destDatastoreId, userId, destDatastore.userId))) return { err: "No Access allowed" }
 
-  return {
-    srcDatastore,
-    destDatastore,
-    srcNode,
-    destNode,
-  }
+	return {
+		srcDatastore,
+		destDatastore,
+		srcNode,
+		destNode,
+	}
 }

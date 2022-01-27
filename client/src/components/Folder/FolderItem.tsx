@@ -19,6 +19,7 @@ export const FolderItemWrapper = styled.div`
   display: flex;
   padding: 2px 3px;
   align-items: center;
+  width: 100%;
 
   :hover input[type="checkbox"] {
     opacity: 1;
@@ -56,13 +57,29 @@ const FolderButtonItem = styled.p`
 `;
 
 const Name = styled.div`
-  p {
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: -moz-none;
-    -o-user-select: none;
-    user-select: none;;
+  flex: 1;
+
+  > div  {
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    > p {
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: -moz-none;
+      -o-user-select: none;
+      user-select: none;;
+
+      :first-child {
+        width: 50%;
+      }
+    }
   }
+`
+
+const Size = styled.p`
+  color: ${props => props.theme.textColors[1]};
 `
 
 const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
@@ -170,8 +187,10 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
             </Link>
           </div>
         ) : (
-          <p>{item.name}  {item.size != null && prettyBytes(item.size)}</p>
-
+          <div>
+            <p>{item.name} </p>
+            {item.size != null && <Size>{prettyBytes(item.size)}</Size>}
+          </div>
         )}
       </Name>
     </FolderItemWrapper>
