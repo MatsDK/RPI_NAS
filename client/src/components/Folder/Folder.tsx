@@ -99,7 +99,7 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
       selected.selectedItems = new Map();
       currentFolderPath?.setFolderPath({ path, datastoreId, datastoreName });
     }
-  }, [path]);
+  }, [path, datastoreId, datastoreName]);
 
   if (loading) return <div>Loading</div>;
 

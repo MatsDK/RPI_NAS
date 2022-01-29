@@ -6,6 +6,7 @@ import { GetDsAndNodeReturn } from "./moveCopyData";
 import { Datastore } from "../../entity/Datastore";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { CopyMoveMutation } from "./CopyMoveMutation";
+import { DeleteMutation } from "./DeleteMutation";
 
 interface moveAndCopyProps {
 	type: "copy" | "move"
@@ -25,9 +26,23 @@ export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcD
 			])
 
 			if (type === "move") {
+				const client = await getOrCreateNodeClient({ node: srcNode, ping: false })
+				if (!client) return { "err": "could not connect to client" }
 
+				const res = await client.conn.mutate({
+					mutation: DeleteMutation,
+					variables: {
+						paths: data.map(({ type, path }) => ({
+							path: fsPath.join(srcDatastore.basePath, path),
+							type
+						}))
+					}
+				})
+
+				console.log(res)
 			}
 		} catch (err) {
+			console.log(err)
 			return { err }
 		}
 	} else {
@@ -43,7 +58,8 @@ export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcD
 				remote: destNode.id !== srcNode.id,
 				downloadDirectories,
 				downloadFiles,
-				srcNode
+				srcNode,
+				srcDatastoreId: srcDatastore.id
 			}
 		})
 
@@ -65,7 +81,7 @@ const createSSHClientForNode = async ({ ip, password, loginName }: Node): Promis
 })
 
 const parseMoveAndCopyDataPaths = (data: CopyMoveDataObject[], srcDatastore: Datastore, destDatastore: Datastore, destinationPath: string) => {
-	const _ = (_data: CopyMoveDataObject[]) => _data.map(({ path }) => {
+	const _ = (_data: CopyMoveDataObject[]) => _data.map(({ path, type }) => {
 		const remote = fsPath.join(srcDatastore.basePath, path),
 			local = fsPath.join(
 				destDatastore.basePath,
@@ -73,7 +89,7 @@ const parseMoveAndCopyDataPaths = (data: CopyMoveDataObject[], srcDatastore: Dat
 				fsPath.basename(path)
 			)
 
-		return { local, remote }
+		return { local, remote, type }
 	})
 
 	return {

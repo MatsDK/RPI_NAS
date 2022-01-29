@@ -8,6 +8,9 @@ class CopyMovePath {
 
 	@Field()
 	remote: string
+
+	@Field()
+	type: string
 }
 
 @InputType()
@@ -20,6 +23,9 @@ export class CopyAndMoveInput {
 
 	@Field(() => Node)
 	srcNode: Node
+
+	@Field()
+	srcDatastoreId: number
 
 	@Field(() => [CopyMovePath])
 	downloadDirectories: CopyMovePath[]

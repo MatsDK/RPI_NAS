@@ -1,5 +1,6 @@
-import { ApolloClient, InMemoryCache, gql, createHttpLink } from "@apollo/client/core";
+import { ApolloClient, InMemoryCache, gql, createHttpLink, NormalizedCacheObject } from "@apollo/client/core";
 import { setContext } from '@apollo/client/link/context';
+
 import fs from "fs-extra";
 
 const CREATE_NODE_REQUEST_MUTATION = gql`
@@ -12,7 +13,7 @@ export class Connection {
 	uri: string
 	token: string | null
 	id: number | null
-	client: any
+	client: ApolloClient<NormalizedCacheObject>
 	headersCallback: (() => ({ id: null | number, token: null | string })) | null
 
 	constructor(uri: string) {
@@ -99,8 +100,16 @@ export class Connection {
 
 interface GlobalType {
 	CONNECTION: Connection
+	APOLLO_CLIENTS: Map<string, ApolloClient<NormalizedCacheObject>>
 }
+
 const Global = global as unknown as GlobalType;
 
-export const getOrCreateConnection = (): Connection =>
-	Global.CONNECTION || (Global.CONNECTION = new Connection(`http://${process.env.HOST_IP}:${process.env.HOST_PORT}/graphql`))
+export const getOrCreateConnection = (uri: string = `http://${process.env.HOST_IP}:${process.env.HOST_PORT}/graphql`): Connection =>
+	Global.CONNECTION || (Global.CONNECTION = new Connection(uri))
+
+export const getOrCreateApolloClient = (uri: string = `http://${process.env.HOST_IP}:${process.env.HOST_PORT}/graphql`): ApolloClient<NormalizedCacheObject> =>
+	Global.APOLLO_CLIENTS.get(uri) || (Global.APOLLO_CLIENTS.set(uri, new ApolloClient({
+		uri,
+		cache: new InMemoryCache()
+	})).get(uri)!)

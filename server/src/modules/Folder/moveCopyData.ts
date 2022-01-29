@@ -43,13 +43,15 @@ export const MoveCopyData = async ({
 						break
 					}
 				}
-			} catch (error) {
-				console.log(error);
+			} catch (err) {
+				console.log(err);
 				return null;
 			}
 		}
 	else {
 		const { err } = await moveAndCopyRemote(rest as GetDsAndNodeReturn, { type, data, destination })
+		console.log(err)
+		return null
 	}
 
 	return true;

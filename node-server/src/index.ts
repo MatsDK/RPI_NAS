@@ -4,7 +4,7 @@ import 'cross-fetch/polyfill';
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql"
 import Express from "express";
-import { getOrCreateConnection } from "./utils/client";
+import { getOrCreateConnection } from "./utils/nodes/client";
 import {
 	ApolloServerPluginLandingPageDisabled,
 	ApolloServerPluginLandingPageGraphQLPlayground,

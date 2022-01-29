@@ -7,6 +7,7 @@ import { Datastore } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
 import { checkPermissions } from "../../middleware/checkPermissions";
 import { MyContext } from "../../types/Context";
+import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
 import { exec } from "../../utils/exec";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { CopyMoveInput } from "./copyMoveMutationInput";
@@ -18,14 +19,17 @@ import { UpdateOwnershipMutation } from "./UpdateOwnershipMutation";
 
 @Resolver()
 export class FolderResolver {
-  @UseMiddleware(isAuth, checkPermissions)
+  @UseMiddleware(isAuth)
   @Mutation(() => String, { nullable: true })
   async createFolder(
+    @Ctx() { req }: MyContext,
     @Arg("datastoreId") datastoreId: number,
     @Arg("path") path: string
   ): Promise<string | null> {
     const datastore = await Datastore.findOne({ where: { id: datastoreId } });
     if (!datastore) return null;
+
+    if (!(await hasAccessToDatastore(datastoreId, req.userId, datastore.userId))) return null
 
     const node = await Node.findOne({ where: { id: datastore.localNodeId } });
     if (!node) return null;
@@ -126,9 +130,14 @@ export class FolderResolver {
 
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
-  async updateOwnership(@Arg("datastoreId") datastoreId: number) {
+  async updateOwnership(
+    @Ctx() { req }: MyContext,
+    @Arg("datastoreId") datastoreId: number
+  ) {
     const datastore = await Datastore.findOne({ where: { id: datastoreId } })
     if (!datastore) return null
+
+    if (!(await hasAccessToDatastore(datastoreId, req.userId, datastore.userId))) return null
 
     const node = await Node.findOne({ where: { id: datastore.localNodeId } })
     if (!node) return null

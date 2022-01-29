@@ -1,7 +1,7 @@
-import { ApolloError } from "apollo-server-express";
+import { ApolloError, gql } from "apollo-server-express";
 import fs from "fs-extra";
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
-import { getOrCreateConnection } from "../utils/client";
+import { getOrCreateApolloClient, getOrCreateConnection } from "../utils/nodes/client";
 import { createUser } from "../utils/createUser";
 import { createDatastoreFolder } from "../utils/datastore/createDatastoreFolder";
 import { getDatastoreSizes } from "../utils/datastore/getDatastoreSizes";
@@ -15,6 +15,8 @@ import { DeletePaths } from "./DeletePaths";
 import { GetDatastoreSizes, GetDatastoreSizesInput } from "./GetDatastoreSizes";
 import { SetupNodeInput } from "./SetupNodeInput";
 import { Tree } from "./Tree/Tree";
+import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
+import { DeleteMutation } from "./DeleteMutation";
 
 @Resolver()
 export class resolver {
@@ -135,7 +137,7 @@ export class resolver {
 	}
 
 	@Mutation(() => Boolean, { nullable: true })
-	async copyAndMove(@Arg("data", () => CopyAndMoveInput) { type, remote, srcNode, downloadFiles, downloadDirectories }: CopyAndMoveInput) {
+	async copyAndMove(@Arg("data", () => CopyAndMoveInput) { type, remote, srcNode, downloadFiles, downloadDirectories, srcDatastoreId }: CopyAndMoveInput) {
 		if (!remote) {
 			for (const { remote, local } of [...downloadFiles, ...downloadDirectories]) {
 				switch (type) {
@@ -164,7 +166,22 @@ export class resolver {
 				])
 
 				if (type === "move") {
-					console.log("remove from remote")
+					const client = srcNode.hostNode ?
+						getOrCreateConnection().client :
+						getOrCreateApolloClient(`http://${srcNode.ip}:${srcNode.port}/graphql`)
+
+					const { errors } = await client.mutate({
+						mutation: DeleteMutation,
+						variables: {
+							datastoreId: srcDatastoreId,
+							paths: [...downloadDirectories, ...downloadFiles].map(({ type, remote }) => ({ path: remote, type }))
+						}
+					})
+
+					if (errors) {
+						console.log(errors)
+						return null
+					}
 				}
 			} catch (err) {
 				console.log(err)
