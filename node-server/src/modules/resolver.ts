@@ -16,7 +16,7 @@ import { GetDatastoreSizes, GetDatastoreSizesInput } from "./GetDatastoreSizes";
 import { SetupNodeInput } from "./SetupNodeInput";
 import { Tree } from "./Tree/Tree";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
-import { DeleteMutation } from "./DeleteMutation";
+import { DeleteMutation, DeleteOnHostMutation } from "./DeleteMutation";
 
 @Resolver()
 export class resolver {
@@ -171,7 +171,7 @@ export class resolver {
 						getOrCreateApolloClient(`http://${srcNode.ip}:${srcNode.port}/graphql`)
 
 					const { errors } = await client.mutate({
-						mutation: DeleteMutation,
+						mutation: srcNode.hostNode ? DeleteOnHostMutation : DeleteMutation,
 						variables: {
 							datastoreId: srcDatastoreId,
 							paths: [...downloadDirectories, ...downloadFiles].map(({ type, remote }) => ({ path: remote, type }))

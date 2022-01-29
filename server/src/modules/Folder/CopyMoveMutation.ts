@@ -5,6 +5,7 @@ mutation CopyAndMoveMutation(
   $type: String!
   $remote: Boolean!
   $srcNode: Node!
+  $srcDatastoreId: Float!
   $downloadDirectories: [CopyMovePath!]!
   $downloadFiles: [CopyMovePath!]!
 ) {
@@ -13,6 +14,7 @@ mutation CopyAndMoveMutation(
       type: $type
       remote: $remote
       srcNode: $srcNode
+      srcDatastoreId: $srcDatastoreId
       downloadDirectories: $downloadDirectories
       downloadFiles: $downloadFiles
     }
