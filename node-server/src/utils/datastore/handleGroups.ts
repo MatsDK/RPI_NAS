@@ -19,7 +19,16 @@ export const addToGroup = async (userName: string, groupName: string): Promise<b
 	const { stderr } = await exec(`usermod -aG ${groupName} ${userName}`)
 	if (stderr) {
 		throw new Error(stderr)
-		return false
+	}
+
+	return true
+}
+
+export const removeFromGroup = async (userName: string, groupName: string): Promise<boolean> => {
+	const { stderr } = await exec(`gpasswd -d ${userName} ${groupName}`)
+
+	if (stderr) {
+		throw new Error(stderr)
 	}
 
 	return true

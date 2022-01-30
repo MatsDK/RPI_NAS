@@ -6,6 +6,8 @@ import { Datastore } from "../../entity/Datastore";
 import { groups } from "./handleGroups";
 import { UpdateDatastoreInput } from "../../modules/DataStore/UpdateDatastoreInput";
 import { Node } from "../../entity/CloudNode";
+import fsPath from "path";
+import { updateRemoteSharedUsers } from "./updateRemoteSharedUsers";
 
 interface UpdateSharedUsersProps {
 	sharedUsers: number[]
@@ -16,6 +18,7 @@ interface UpdateSharedUsersProps {
 }
 
 export const updateSharedUsers = async ({ sharedUsers, datastoreId, datastore, updateSMBRequired, host }: UpdateSharedUsersProps): Promise<boolean> => {
+	const remoteSharedUsers = { newUsers: [] as number[], removedUsers: [] as number[] }
 	const sharedDatastoreUsers = await SharedDataStore.find({
 		where: { dataStoreId: datastoreId },
 	});
@@ -31,19 +34,28 @@ export const updateSharedUsers = async ({ sharedUsers, datastoreId, datastore, u
 		await SharedDataStore.insert(
 			newSharedUsers.map((id) => ({ userId: id, dataStoreId: datastoreId, initialized: host.initializedUsers.includes(id) }))
 		);
-		await groups.add(
-			newSharedUsers.map((id) => ({
-				userId: id,
-				dataStoreId: datastore.id,
-			}))
-		);
+
+		if (host.hostNode)
+			await groups.add(
+				newSharedUsers.map((id) => ({
+					userId: id,
+					dataStoreId: datastore.id,
+				}))
+			);
+		else remoteSharedUsers.newUsers.concat(newSharedUsers.filter((id) => host.initializedUsers.includes(id)))
 	}
+
+	if (removedSharedUsers.length) {
+		if (host.hostNode) await groups.remove(removedSharedUsers);
+		else remoteSharedUsers.removedUsers = removedSharedUsers.map(({ id }) => id)
+	}
+
+	const err = await updateRemoteSharedUsers(remoteSharedUsers, fsPath.basename(datastore.basePath), host)
 
 	if (removedSharedUsers.length) {
 		await SharedDataStore.delete({
 			id: Any(removedSharedUsers.map(({ id }) => id)),
 		});
-		await groups.remove(removedSharedUsers);
 
 		const ids = removedSharedUsers.map(({ userId }) => userId);
 

@@ -173,6 +173,7 @@ export class FolderResolver {
 		return true
 	}
 
+	// TODO: validate request
 	@Mutation(() => Boolean, { nullable: true })
 	async deleteFromRemote(
 		@Arg("datastoreId") _datastoreId: number,

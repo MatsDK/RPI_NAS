@@ -14,6 +14,7 @@ interface moveAndCopyProps {
 	destination: CopyMoveDestinationObject
 }
 
+// TODO: When copying to remote update permissions after
 export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcDatastore }: GetDsAndNodeReturn, { type, data, destination }: moveAndCopyProps): Promise<{ err: any }> => {
 	if (destNode.hostNode) {
 		try {

@@ -5,7 +5,7 @@ import { getOrCreateApolloClient, getOrCreateConnection } from "../utils/nodes/c
 import { createUser } from "../utils/createUser";
 import { createDatastoreFolder } from "../utils/datastore/createDatastoreFolder";
 import { getDatastoreSizes } from "../utils/datastore/getDatastoreSizes";
-import { addToGroup, createGroup } from "../utils/datastore/handleGroups";
+import { addToGroup, createGroup, removeFromGroup } from "../utils/datastore/handleGroups";
 import { exec } from "../utils/exec";
 import { isSubDir } from "../utils/isSubDir";
 import { createSSHClientForNode } from "../utils/nodes/createSSHClient";
@@ -74,8 +74,36 @@ export class resolver {
 		try {
 			await createUser(userName, password)
 			await addToGroup(userName, groupName)
-		} catch (e) {
-			console.log(e)
+		} catch (err) {
+			console.log(err)
+			return null
+		}
+
+		return true
+	}
+
+	@Mutation(() => Boolean, { nullable: true })
+	async addUsersToGroup(@Arg("newUsers") newUsers: string[], @Arg("removedUsers") removedUsers: string[], @Arg("groupName") groupName: string): Promise<boolean | null> {
+		try {
+			for (const newUser of newUsers) {
+				try {
+					await addToGroup(newUser, groupName)
+				} catch (err) {
+					console.log(err)
+					continue
+				}
+			}
+
+			for (const removedUser of removedUsers) {
+				try {
+					await removeFromGroup(removedUser, groupName)
+				} catch (err) {
+					console.log(err)
+					continue
+				}
+			}
+		} catch (err) {
+			console.log(err)
 			return null
 		}
 
