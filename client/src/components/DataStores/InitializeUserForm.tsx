@@ -1,3 +1,4 @@
+import { Datastore } from 'generated/apolloComponents';
 import { getDataStoresQuery } from 'graphql/DataStores/getDataStores';
 import { InitializeUserMutation } from 'graphql/DataStores/InitializeUser';
 import React, { useState } from 'react'
@@ -8,8 +9,7 @@ import { Input, Label } from 'src/ui/Input';
 import styled from 'styled-components';
 
 interface InitializeUserFormProps {
-	datastoreId: number
-	datastoreName: string
+	datastore: Datastore
 }
 
 const Wrapper = styled.div`
@@ -36,7 +36,7 @@ const Title = styled.h1`
 	font-weight: 600;
 `
 
-export const InitializeUserForm: React.FC<InitializeUserFormProps> = ({ datastoreName, datastoreId }) => {
+export const InitializeUserForm: React.FC<InitializeUserFormProps> = ({ datastore }) => {
 	const { mutate } = useApollo()
 	const [passwordInput, setPasswordInput] = useInput("")
 	const [loading, setLoading] = useState(false)
@@ -48,7 +48,7 @@ export const InitializeUserForm: React.FC<InitializeUserFormProps> = ({ datastor
 			setLoading(true)
 			const { data, errors } = await mutate(
 				InitializeUserMutation,
-				{ password: passwordInput.trim(), datastoreId },
+				{ password: passwordInput.trim(), nodeId: datastore.localNodeId },
 				{ refetchQueries: [{ query: getDataStoresQuery, variables: {} }] }
 			)
 			setLoading(false)
@@ -68,7 +68,7 @@ export const InitializeUserForm: React.FC<InitializeUserFormProps> = ({ datastor
 	return (
 		<Wrapper>
 			<Title>Initialize user</Title>
-			<span>Input your password to use {datastoreName}</span>
+			<span>Input your password to use {datastore.name}</span>
 			<Label>Password</Label>
 			<div>
 				<Input

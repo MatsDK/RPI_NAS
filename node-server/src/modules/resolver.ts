@@ -70,10 +70,10 @@ export class resolver {
 	}
 
 	@Mutation(() => Boolean, { nullable: true })
-	async initUser(@Arg("userName") userName: string, @Arg("password") password: string, @Arg("groupName") groupName: string): Promise<boolean | null> {
+	async initUser(@Arg("userName") userName: string, @Arg("password") password: string, @Arg("groupNames", () => [String]) groupNames: string[]): Promise<boolean | null> {
 		try {
 			await createUser(userName, password)
-			await addToGroup(userName, groupName)
+			await addToGroup(userName, groupNames)
 		} catch (err) {
 			console.log(err)
 			return null
@@ -83,7 +83,7 @@ export class resolver {
 	}
 
 	@Mutation(() => Boolean, { nullable: true })
-	async addUsersToGroup(@Arg("newUsers") newUsers: string[], @Arg("removedUsers") removedUsers: string[], @Arg("groupName") groupName: string): Promise<boolean | null> {
+	async addUsersToGroup(@Arg("newUsers", () => [String]) newUsers: string[], @Arg("removedUsers", () => [String]) removedUsers: string[], @Arg("groupName") groupName: string): Promise<boolean | null> {
 		try {
 			for (const newUser of newUsers) {
 				try {

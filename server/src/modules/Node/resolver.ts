@@ -1,10 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { ApolloError } from "apollo-server-express";
-import fsPath from "path";
 import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { v4 } from "uuid";
 import { Node } from "../../entity/CloudNode";
-import { Datastore } from "../../entity/Datastore";
 import { NodeRequest } from "../../entity/NodeRequest";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
@@ -12,6 +10,7 @@ import { getUser } from "../../middleware/getUser";
 import { isAdmin } from "../../middleware/isAdmin";
 import { MyContext } from "../../types/Context";
 import { createUser } from "../../utils/createUser";
+import { getSharedDatastoresWithoutInitializedUser } from "../../utils/nodes/getSharedDatastoresWithoutInitializedUser";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { pingNodes } from "../../utils/nodes/pingNodes";
 import { InitializeUserMutation } from "../DataStore/InitUserMutation";
@@ -161,32 +160,31 @@ export class NodeResolver {
 	@Mutation(() => Boolean, { nullable: true })
 	async initUser(
 		@Ctx() { req }: MyContext,
-		@Arg("datastoreId") datastoreId: number,
+		@Arg("nodeId") nodeId: number,
 		@Arg("password") password: string
 	): Promise<boolean | null> {
 		if (!password.trim() || !req.user) return null
 
-		const datastore = await Datastore.findOne({ where: { id: datastoreId } });
-		if (!datastore) return null
-
-		const node = await Node.findOne({ where: { id: datastore.localHostNodeId } });
+		const node = await Node.findOne({ where: { id: nodeId } });
 		if (!node || node.hostNode || node.initializedUsers.includes(req.userId)) return null
 
 		const client = await getOrCreateNodeClient({ node, ping: false })
 		if (!client) return null
 
+		const groupNames = await getSharedDatastoresWithoutInitializedUser(req.userId, node.id)
+
 		try {
-			const res = await client.conn.mutate({
+			const { errors } = await client.conn.mutate({
 				mutation: InitializeUserMutation,
 				variables: {
-					groupName: fsPath.basename(datastore.basePath),
+					groupNames,
 					userName: req.user.osUserName,
 					password: password.trim()
 				}
 			})
 
-			if (res.errors) {
-				console.log(res.errors)
+			if (errors) {
+				console.log(errors)
 				return null
 			}
 
@@ -199,6 +197,4 @@ export class NodeResolver {
 
 		return true
 	}
-
-
 }

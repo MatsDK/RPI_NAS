@@ -154,6 +154,7 @@ export type Mutation = {
   copy?: Maybe<Scalars['Boolean']>;
   move?: Maybe<Scalars['Boolean']>;
   updateOwnership?: Maybe<Scalars['Boolean']>;
+  deleteFromRemote?: Maybe<Scalars['Boolean']>;
   createNode?: Maybe<Node>;
   createNodeRequest: Scalars['Boolean'];
   deleteNodeRequest: Scalars['Boolean'];
@@ -221,6 +222,12 @@ export type MutationUpdateOwnershipArgs = {
 };
 
 
+export type MutationDeleteFromRemoteArgs = {
+  paths: Array<DeletePathsInput>;
+  datastoreId: Scalars['Float'];
+};
+
+
 export type MutationCreateNodeArgs = {
   data: CreateNodeInput;
 };
@@ -249,7 +256,7 @@ export type MutationCreateConnectionArgs = {
 
 export type MutationInitUserArgs = {
   password: Scalars['String'];
-  datastoreId: Scalars['Float'];
+  nodeId: Scalars['Float'];
 };
 
 
@@ -441,7 +448,7 @@ export type CreateDataStoreMutionMutationVariables = Exact<{
 export type CreateDataStoreMutionMutation = { __typename?: 'Mutation', createDataStore?: Maybe<{ __typename?: 'Datastore', id: string }> };
 
 export type InitializeUserMutationVariables = Exact<{
-  datastoreId: Scalars['Float'];
+  nodeId: Scalars['Float'];
   password: Scalars['String'];
 }>;
 
@@ -711,8 +718,8 @@ export type CreateDataStoreMutionMutationHookResult = ReturnType<typeof useCreat
 export type CreateDataStoreMutionMutationResult = Apollo.MutationResult<CreateDataStoreMutionMutation>;
 export type CreateDataStoreMutionMutationOptions = Apollo.BaseMutationOptions<CreateDataStoreMutionMutation, CreateDataStoreMutionMutationVariables>;
 export const InitializeUserDocument = gql`
-    mutation InitializeUser($datastoreId: Float!, $password: String!) {
-  initUser(password: $password, datastoreId: $datastoreId)
+    mutation InitializeUser($nodeId: Float!, $password: String!) {
+  initUser(password: $password, nodeId: $nodeId)
 }
     `;
 export type InitializeUserMutationFn = Apollo.MutationFunction<InitializeUserMutation, InitializeUserMutationVariables>;
@@ -730,7 +737,7 @@ export type InitializeUserMutationFn = Apollo.MutationFunction<InitializeUserMut
  * @example
  * const [initializeUserMutation, { data, loading, error }] = useInitializeUserMutation({
  *   variables: {
- *      datastoreId: // value for 'datastoreId'
+ *      nodeId: // value for 'nodeId'
  *      password: // value for 'password'
  *   },
  * });

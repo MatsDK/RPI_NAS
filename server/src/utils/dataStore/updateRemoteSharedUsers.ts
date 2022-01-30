@@ -27,7 +27,7 @@ export const updateRemoteSharedUsers = async ({ newUsers, removedUsers }: Remote
 		console.log(res)
 
 	} catch (err) {
-		return err
+		return err as string
 	}
 
 	return false
