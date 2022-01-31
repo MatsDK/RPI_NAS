@@ -17,6 +17,7 @@ import { SetupNodeInput } from "./SetupNodeInput";
 import { Tree } from "./Tree/Tree";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { DeleteMutation, DeleteOnHostMutation } from "./DeleteMutation";
+import { updateOwnership } from "../utils/datastore/updateOwnership";
 
 @Resolver()
 export class resolver {
@@ -116,10 +117,7 @@ export class resolver {
 		@Arg("datastoreName") datastoreName: string,
 		@Arg("path") path: string
 	) {
-		const { stderr } = await exec(`chown ${loginName}:${datastoreName} ${path}/* -R`)
-		if (stderr) throw new ApolloError(stderr)
-
-		return true
+		return await updateOwnership(loginName, datastoreName, path)
 	}
 
 	@Query(() => Tree, { nullable: true })
@@ -165,7 +163,7 @@ export class resolver {
 	}
 
 	@Mutation(() => Boolean, { nullable: true })
-	async copyAndMove(@Arg("data", () => CopyAndMoveInput) { type, remote, srcNode, downloadFiles, downloadDirectories, srcDatastoreId }: CopyAndMoveInput) {
+	async copyAndMove(@Arg("data", () => CopyAndMoveInput) { type, remote, srcNode, downloadFiles, downloadDirectories, srcDatastoreId, datastoreName, datastoreBasePath, nodeLoginName }: CopyAndMoveInput) {
 		if (!remote) {
 			for (const { remote, local } of [...downloadFiles, ...downloadDirectories]) {
 				switch (type) {
@@ -216,6 +214,8 @@ export class resolver {
 				return null
 			}
 		}
+
+		await updateOwnership(nodeLoginName, datastoreName, datastoreBasePath)
 
 		return true
 	}

@@ -15,6 +15,7 @@ import { CreateDirectoryMutation } from "./CreateDirectoryMutation";
 import { DeleteMutation } from "./DeleteMutation";
 import { DeletePathsInput } from "./deletePathsInput";
 import { MoveCopyData } from "./moveCopyData";
+import { updateOwnership } from "./updateOwnership";
 import { UpdateOwnershipMutation } from "./UpdateOwnershipMutation";
 
 @Resolver()
@@ -134,43 +135,7 @@ export class FolderResolver {
 		@Ctx() { req }: MyContext,
 		@Arg("datastoreId") datastoreId: number
 	) {
-		const datastore = await Datastore.findOne({ where: { id: datastoreId } })
-		if (!datastore) return null
-
-		if (!(await hasAccessToDatastore(datastoreId, req.userId, datastore.userId))) return null
-
-		const node = await Node.findOne({ where: { id: datastore.localNodeId } })
-		if (!node) return null
-
-		if (node.hostNode) {
-			const { stderr } =
-				await exec(`chown ${node.loginName}:${fsPath.basename(datastore.basePath)} ${datastore.basePath}/* -R`)
-
-			if (stderr) {
-				console.log(stderr)
-				throw new ApolloError(stderr)
-			}
-		} else {
-			const client = await getOrCreateNodeClient({ node, ping: false })
-
-			try {
-				const res = await client?.conn.mutate({
-					mutation: UpdateOwnershipMutation,
-					variables: {
-						loginName: node.loginName,
-						datastoreName: fsPath.basename(datastore.basePath),
-						path: datastore.basePath
-					}
-				})
-
-				console.log(res)
-			} catch (e) {
-				console.log(e)
-				throw new ApolloError(e as any)
-			}
-		}
-
-		return true
+		return updateOwnership(datastoreId, req.userId)
 	}
 
 	// TODO: validate request

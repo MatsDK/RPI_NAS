@@ -6,6 +6,7 @@ import { Node } from "../../entity/CloudNode";
 import { ApolloError } from "apollo-server-core";
 import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
 import { moveAndCopyRemote } from "./moveAndCopyRemote";
+import { updateOwnership } from "./updateOwnership";
 
 export const MoveCopyData = async ({
 	data,
@@ -43,15 +44,19 @@ export const MoveCopyData = async ({
 						break
 					}
 				}
+
+				await updateOwnership(datastoreId, userId, { node: destNode, datastore: destDatastore })
 			} catch (err) {
 				console.log(err);
 				return null;
 			}
 		}
 	else {
-		const { err } = await moveAndCopyRemote(rest as GetDsAndNodeReturn, { type, data, destination })
-		console.log(err)
-		return null
+		const { err } = await moveAndCopyRemote(rest as GetDsAndNodeReturn, userId, { type, data, destination })
+		if (err) {
+			console.log(err)
+			return null
+		}
 	}
 
 	return true;

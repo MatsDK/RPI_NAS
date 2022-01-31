@@ -19,6 +19,15 @@ export class CopyAndMoveInput {
 	type: string
 
 	@Field()
+	nodeLoginName: string
+
+	@Field()
+	datastoreName: string
+
+	@Field()
+	datastoreBasePath: string
+
+	@Field()
 	remote: boolean
 
 	@Field(() => Node)

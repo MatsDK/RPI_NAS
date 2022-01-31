@@ -7,6 +7,7 @@ import { Datastore } from "../../entity/Datastore";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { CopyMoveMutation } from "./CopyMoveMutation";
 import { DeleteMutation } from "./DeleteMutation";
+import { updateOwnership } from "./updateOwnership";
 
 interface moveAndCopyProps {
 	type: "copy" | "move"
@@ -14,8 +15,7 @@ interface moveAndCopyProps {
 	destination: CopyMoveDestinationObject
 }
 
-// TODO: When copying to remote update permissions after
-export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcDatastore }: GetDsAndNodeReturn, { type, data, destination }: moveAndCopyProps): Promise<{ err: any }> => {
+export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcDatastore }: GetDsAndNodeReturn, userId: number, { type, data, destination }: moveAndCopyProps): Promise<{ err: any }> => {
 	if (destNode.hostNode) {
 		try {
 			const client = await createSSHClientForNode(srcNode)
@@ -42,6 +42,8 @@ export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcD
 
 				console.log(res)
 			}
+
+			await updateOwnership(destDatastore.id, userId, { node: destNode, datastore: destDatastore })
 		} catch (err) {
 			console.log(err)
 			return { err }
@@ -56,6 +58,9 @@ export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcD
 			mutation: CopyMoveMutation,
 			variables: {
 				type,
+				nodeLoginName: destNode.loginName,
+				datastoreName: fsPath.basename(destDatastore.basePath),
+				datastoreBasePath: destDatastore.basePath,
 				remote: destNode.id !== srcNode.id,
 				downloadDirectories,
 				downloadFiles,
@@ -64,7 +69,10 @@ export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcD
 			}
 		})
 
-		console.log(res)
+		if (!res.errors) {
+			console.log(res.erros)
+			return { err: "errors" }
+		}
 	}
 
 	return { err: false }

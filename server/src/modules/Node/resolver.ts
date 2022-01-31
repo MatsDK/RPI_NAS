@@ -1,4 +1,3 @@
-import { gql } from "@apollo/client/core";
 import { ApolloError } from "apollo-server-express";
 import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { v4 } from "uuid";
@@ -17,12 +16,7 @@ import { InitializeUserMutation } from "../DataStore/InitUserMutation";
 import { AcceptNodeRequestInput } from "./AcceptNodeRequestInput";
 import { CreateNodeInput } from "./CreateNodeInput";
 import { GetNodesReturn } from "./GetNodesReturn";
-
-const SETUPNODE_MUTATION = gql`
-mutation SetupNodeMutation($data: Node!) {
-	setupNode(data: $data)
-}
-`
+import { SETUPNODE_MUTATION } from "./SetupNodeMutation";
 
 @Resolver()
 export class NodeResolver {
