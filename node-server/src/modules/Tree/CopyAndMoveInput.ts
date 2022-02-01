@@ -1,5 +1,5 @@
-import { InputType, Field } from "type-graphql";
-import { Node } from "./Node";
+import { Field, InputType } from "type-graphql";
+import { Node } from "../Node/Node";
 
 @InputType()
 class CopyMovePath {

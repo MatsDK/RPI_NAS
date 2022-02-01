@@ -1,5 +1,4 @@
 import { Field, ObjectType } from "type-graphql";
-import fsPath from "path";
 import { getTreeObject } from "./getTreeObject";
 
 @ObjectType()

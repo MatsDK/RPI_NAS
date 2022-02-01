@@ -56,26 +56,21 @@ const FolderButtonItem = styled.p`
   }
 `;
 
-const Name = styled.div`
+const Info = styled.div`
   flex: 1;
 
-  > div  {
-    width: 100%;
+  > div {
     display: flex;
-    align-items: center;
-
-    > p {
-      -webkit-user-select: none;
-      -khtml-user-select: none;
-      -moz-user-select: -moz-none;
-      -o-user-select: none;
-      user-select: none;;
-
-      :first-child {
-        width: 50%;
-      }
-    }
   }
+`
+
+const Name = styled.p`
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: -moz-none;
+  -o-user-select: none;
+  user-select: none;
+  width: 50%;
 `
 
 const Size = styled.p`
@@ -179,20 +174,21 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
           </div>
         )}
       </IconWrapper>
-      <Name>
+      <Info>
         {item.isDirectory ? (
-          <div onClick={(e) => e.stopPropagation()}>
+          <div>
             <Link href={`/path/${item.relativePath}?d=${datastoreId}`}>
-              <FolderButtonItem >{item.name}</FolderButtonItem>
+              <FolderButtonItem onClick={e => e.stopPropagation()}>{item.name}</FolderButtonItem>
             </Link>
+            <p />
           </div>
         ) : (
           <div>
-            <p>{item.name} </p>
-            {item.size != null && <Size>{prettyBytes(item.size)}</Size>}
+            <Name>{item.name}</Name>
+            <p>{item.size != null && <Size>{prettyBytes(item.size)}</Size>}</p>
           </div>
         )}
-      </Name>
+      </Info>
     </FolderItemWrapper>
   );
 };

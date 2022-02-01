@@ -1,7 +1,4 @@
-import { DeletePtahsMutation } from "graphql/Folder/deletePaths";
-import { DeleteDropdown } from "./DeleteDropdown";
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
-import { getTreeQuery } from "graphql/TreeObject/queryTree";
 import { useRouter } from "next/dist/client/router";
 import React, { useContext, useRef, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
@@ -13,9 +10,10 @@ import { Scrollbar } from "src/ui/Scrollbar";
 import styled from "styled-components";
 import { CopyToWrapper } from "./CopyMove/CopyToWrapper";
 import { MoveToWrapper } from "./CopyMove/MoveToWrapper";
+import { DeleteDropdown } from "./DeleteDropdown";
 import {
   SSHDownloadDropdown,
-  SSHDownloadDropdownWrapper,
+  SSHDownloadDropdownWrapper
 } from "./SSHDownloadDropdown";
 import { UploadWrapper } from "./upload/UploadWrapper";
 
@@ -52,7 +50,11 @@ const SearchButton = styled.div`
   }
 `
 
-const FolderNavbar = () => {
+interface Props {
+  setFilterInput: React.Dispatch<React.SetStateAction<string>>
+}
+
+const FolderNavbar: React.FC<Props> = ({ setFilterInput }) => {
   const { mutate } = useApollo();
   const router = useRouter();
 
@@ -70,6 +72,7 @@ const FolderNavbar = () => {
   const [showDeleteDropdown, setShowDeleteDropdown] = useState(false);
   const [showCopyToForm, setShowCopyToForm] = useState(false);
   const [showMoveToForm, setShowMoveToForm] = useState(false);
+  const [showFilterInput, setShowFilterInput] = useState(false);
 
   const createDownloadSession = async (): Promise<void> => {
     if (!folderCtx) return;
@@ -153,7 +156,14 @@ const FolderNavbar = () => {
             <Button onClick={() => setShowCopyToForm((s) => !s)}>Copy To</Button>
           </ConditionButton>
         </FolderNavBarButtons>
-        <SearchButton>
+        {showFilterInput &&
+          <input
+            type="text"
+            placeholder="filter"
+            onChange={(e) => setFilterInput(e.currentTarget.value)}
+          />
+        }
+        <SearchButton onClick={() => setShowFilterInput(s => !s)}>
           <Icon name="searchIcon" width={20} height={20} color={{ idx: 1, propName: "textColors" }} />
         </SearchButton>
       </FolderNavbarWrapper>

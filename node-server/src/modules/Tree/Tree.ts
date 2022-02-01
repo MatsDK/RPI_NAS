@@ -1,6 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
-import { TreeItem } from "./TreeItem";
 import { getTreeObject } from "./getTreeObject";
+import { TreeItem } from "./TreeItem";
 
 @ObjectType()
 export class Tree {

@@ -1,27 +1,26 @@
 import { TreeItem, useGetTreeQueryQuery } from "generated/apolloComponents";
-import { FolderItemWrapper, IconWrapper } from "./FolderItem";
+import { CreateFolderMutation } from "graphql/Folder/createFolder";
+import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
 import fsPath from "path";
-import { useApolloClient } from "react-apollo";
 import React, {
   FormEvent,
   useContext,
   useEffect,
   useRef,
-  useState,
+  useState
 } from "react";
-import FolderItem from "./FolderItem";
-import { FolderContext, FolderContextType } from "src/providers/folderState";
-import FolderNavbar from "./FolderNavbar";
-import styled from "styled-components";
-import { CreateFolderMutation } from "graphql/Folder/createFolder";
-import Icon from "../../ui/Icon";
-import { FolderPath } from "./FolderPath";
-import { Scrollbar } from "src/ui/Scrollbar";
+import { useApolloClient } from "react-apollo";
 import { useApollo } from "src/hooks/useApollo";
-import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
-import { update } from "./newFolderUpdateQuery";
+import { FolderContext, FolderContextType } from "src/providers/folderState";
+import { Scrollbar } from "src/ui/Scrollbar";
+import styled from "styled-components";
+import Icon from "../../ui/Icon";
 import { ConditionOverlay } from "../ConditionOverlay";
+import FolderItem, { FolderItemWrapper, IconWrapper } from "./FolderItem";
+import FolderNavbar from "./FolderNavbar";
+import { FolderPath } from "./FolderPath";
 import { InitDatastoreOverlay } from "./InitDatastoreOverlay";
+import { update } from "./newFolderUpdateQuery";
 
 interface Props {
   path: string;
@@ -60,6 +59,12 @@ const Wrapper = styled.div`
 const sort = (data: any[]) =>
   data.sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
 
+const filter = (data: any[], filter: string) => {
+  if (!filter) return data
+
+  return data.filter(({ name }) => name.includes(filter))
+}
+
 
 const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
   if (!datastoreId) return null;
@@ -69,8 +74,8 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
 
   const folderCtx: FolderContextType = useContext(FolderContext);
 
+  const [filterInput, setFilterInput] = useState("")
   const [folderNameInput, setFolderNameInput] = useState("");
-
   const inputRef = useRef<HTMLInputElement>();
 
   useEffect(() => {
@@ -99,6 +104,8 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
       selected.selectedItems = new Map();
       currentFolderPath?.setFolderPath({ path, datastoreId, datastoreName });
     }
+
+    setFilterInput("")
   }, [path, datastoreId, datastoreName]);
 
   if (loading) return <div>Loading</div>;
@@ -144,13 +151,14 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
   };
 
 
+
   return (
     <Wrapper>
       <ConditionOverlay
         condition={!initialized}
         renderOverlay={() => <InitDatastoreOverlay datastoreName={datastoreName} datastoreId={datastoreId} />}
       >
-        <FolderNavbar />
+        <FolderNavbar setFilterInput={setFilterInput} />
         <FolderContainer>
           <FolderPath
             path={path.split("/")}
@@ -182,7 +190,7 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
                 </form>
               </FolderItemWrapper>
             )}
-            {(initialized ? sort(data.tree?.tree) : []).map((item, idx) => (
+            {(initialized ? filter(sort(data.tree?.tree), filterInput) : []).map((item, idx) => (
               <FolderItem
                 datastoreId={datastoreId}
                 item={item as TreeItem}

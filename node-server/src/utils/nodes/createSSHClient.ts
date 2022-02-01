@@ -1,4 +1,4 @@
-import { Node } from "../../modules/Node";
+import { Node } from "../../modules/Node/Node";
 import { Client } from "ssh-package";
 
 export const createSSHClientForNode = async ({ ip, password, loginName }: Node): Promise<Client> => new Promise((res, rej) => {

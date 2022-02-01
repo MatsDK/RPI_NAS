@@ -1,5 +1,5 @@
 import { dfOptions } from "../../constants";
-import { GetDatastoreSizes, GetDatastoreSizesInput, SizeObject } from "../../modules/GetDatastoreSizes";
+import { GetDatastoreSizes, GetDatastoreSizesInput, SizeObject } from "../../modules/Datastore/GetDatastoreSizes";
 const df = require("node-df");
 
 export const getDatastoreSizes = (datastores: GetDatastoreSizesInput[]): Promise<GetDatastoreSizes[]> => {
