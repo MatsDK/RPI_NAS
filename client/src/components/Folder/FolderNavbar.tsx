@@ -1,5 +1,6 @@
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { useRouter } from "next/dist/client/router";
+import { Input } from "src/ui/Input";
 import React, { useContext, useRef, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
 import { useDropdown } from "src/hooks/useDropdown";
@@ -47,6 +48,17 @@ const SearchButton = styled.div`
 
   :hover {
     opacity: 1;
+  }
+`
+
+const SearchContainer = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+
+  > input {
+    margin-right: 10px;
   }
 `
 
@@ -156,16 +168,19 @@ const FolderNavbar: React.FC<Props> = ({ setFilterInput }) => {
             <Button onClick={() => setShowCopyToForm((s) => !s)}>Copy To</Button>
           </ConditionButton>
         </FolderNavBarButtons>
-        {showFilterInput &&
-          <input
-            type="text"
-            placeholder="filter"
-            onChange={(e) => setFilterInput(e.currentTarget.value)}
-          />
-        }
-        <SearchButton onClick={() => setShowFilterInput(s => !s)}>
-          <Icon name="searchIcon" width={20} height={20} color={{ idx: 1, propName: "textColors" }} />
-        </SearchButton>
+        <SearchContainer>
+
+          {showFilterInput &&
+            <Input
+              type="text"
+              placeholder="filter"
+              onChange={(e) => setFilterInput(e.currentTarget.value.trim())}
+            />
+          }
+          <SearchButton onClick={() => setShowFilterInput(s => !s)}>
+            <Icon name="searchIcon" width={20} height={20} color={{ idx: 1, propName: "textColors" }} />
+          </SearchButton>
+        </SearchContainer>
       </FolderNavbarWrapper>
     </FolderNavBarContainer >
   );

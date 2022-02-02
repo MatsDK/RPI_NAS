@@ -59,12 +59,8 @@ const Wrapper = styled.div`
 const sort = (data: any[]) =>
   data.sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
 
-const filter = (data: any[], filter: string) => {
-  if (!filter) return data
-
-  return data.filter(({ name }) => name.includes(filter))
-}
-
+const filter = (data: any[], filter: string) =>
+  filter ? data.filter(({ name }) => name.includes(filter)) : data
 
 const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
   if (!datastoreId) return null;
@@ -109,9 +105,7 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
   }, [path, datastoreId, datastoreName]);
 
   if (loading) return <div>Loading</div>;
-
   if (error) return <div>error</div>;
-
   if (!data?.tree?.tree) return <div>folder not found</div>;
 
   const initialized = !!data?.tree?.userInitialized
@@ -149,8 +143,6 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
     folderCtx?.newFolderInput?.setShowNewFolderInput(false);
     setFolderNameInput("");
   };
-
-
 
   return (
     <Wrapper>

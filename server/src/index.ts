@@ -33,7 +33,6 @@ dotenv.config();
     context: ({ req, res }) => ({ req, res }),
   });
 
-
   await createConnection().then(() =>
     console.log("> Connected to postgreSQL database")
   );
