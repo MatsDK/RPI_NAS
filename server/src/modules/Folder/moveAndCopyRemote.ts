@@ -70,7 +70,7 @@ export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcD
 		})
 
 		if (!res.errors) {
-			console.log(res.erros)
+			console.log(res)
 			return { err: "errors" }
 		}
 	}

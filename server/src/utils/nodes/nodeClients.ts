@@ -1,5 +1,7 @@
 import { Node } from "../../entity/CloudNode";
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client/core";
+import { v4 } from "uuid";
+import { ApolloClient, InMemoryCache, gql, NormalizedCacheObject, createHttpLink } from "@apollo/client/core";
+import { setContext } from "@apollo/client/link/context";
 
 const PING_QUERY = gql`
 {
@@ -13,7 +15,8 @@ interface GlobalType {
 
 interface Client {
 	ping: boolean | null
-	conn: any
+	conn: ApolloClient<NormalizedCacheObject>
+	sessionToken: string
 }
 
 const Global = global as unknown as GlobalType;
@@ -27,11 +30,12 @@ export const getOrCreateNodeClient = async ({ node, uri, ping }: getOrCreateNode
 
 		if (!Global.CONNECTIONS) Global.CONNECTIONS = new Map()
 
-		const conn = new ApolloClient({
-			uri,
-			cache: new InMemoryCache()
-		});
-		const client = { conn, ping: null }
+		let client = node && Global.CONNECTIONS.get(node.id)
+
+		const sessionToken = client?.sessionToken || v4(),
+			conn = (node && client?.conn) || createNewClient(uri, sessionToken)
+
+		client = { conn, ping: null, sessionToken }
 		if (node) Global.CONNECTIONS.set(node.id, client);
 
 		if (ping) {
@@ -41,4 +45,24 @@ export const getOrCreateNodeClient = async ({ node, uri, ping }: getOrCreateNode
 
 		res(client)
 	})
+}
+
+const createNewClient = (uri: string, sessionToken: string) => {
+	const httpLink = createHttpLink({ uri }),
+		authLink = setContext((_, { headers }) => {
+			const token = sessionToken
+
+			return {
+				headers: {
+					...headers,
+					authorization: token
+				}
+			}
+		});
+
+	return new ApolloClient({
+		link: authLink.concat(httpLink),
+		cache: new InMemoryCache()
+	});
+
 }

@@ -31,6 +31,7 @@ export class Connection {
 			this.setupClient();
 		});
 	}
+
 	setupClient() {
 		const httpLink = createHttpLink({
 			uri: this.uri,
