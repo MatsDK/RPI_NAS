@@ -9,6 +9,13 @@ const PING_QUERY = gql`
 }
 `
 
+
+const SET_SESSION_TOKEN_MUTATION = gql`
+mutation SetSessionToken($sessionToken: String!, $token: String!) {
+  setSessionToken(sessionToken: $sessionToken, token: $token)
+}
+`
+
 interface GlobalType {
 	CONNECTIONS?: Map<number, Client>
 }
@@ -21,9 +28,9 @@ interface Client {
 
 const Global = global as unknown as GlobalType;
 
-type getOrCreateNodeClientProps = { node?: Node, uri?: string, ping: boolean }
+type getOrCreateNodeClientProps = { node?: Node, uri?: string, ping: boolean, setSessionToken?: boolean }
 
-export const getOrCreateNodeClient = async ({ node, uri, ping }: getOrCreateNodeClientProps): Promise<Client | null> => {
+export const getOrCreateNodeClient = async ({ node, uri, ping, setSessionToken = false }: getOrCreateNodeClientProps): Promise<Client | null> => {
 	return new Promise(async (res, rej) => {
 		uri = node == null ? uri : `http://${node.ip}:${node.port}/graphql`
 		if (!uri) return null
@@ -34,6 +41,18 @@ export const getOrCreateNodeClient = async ({ node, uri, ping }: getOrCreateNode
 
 		const sessionToken = client?.sessionToken || v4(),
 			conn = (node && client?.conn) || createNewClient(uri, sessionToken)
+
+		if (node && setSessionToken) {
+			const res = await conn.mutate({
+				mutation: SET_SESSION_TOKEN_MUTATION,
+				variables: {
+					token: node.token,
+					sessionToken
+				}
+			})
+
+			console.log("Connected to node", res)
+		}
 
 		client = { conn, ping: null, sessionToken }
 		if (node) Global.CONNECTIONS.set(node.id, client);

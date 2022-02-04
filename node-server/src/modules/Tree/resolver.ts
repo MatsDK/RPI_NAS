@@ -1,5 +1,6 @@
 import fs from "fs-extra";
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
+import { checkSessionToken } from "../../middleware/checkSessionToken";
 import { updateOwnership } from "../../utils/datastore/updateOwnership";
 import { exec } from "../../utils/exec";
 import { isSubDir } from "../../utils/isSubDir";
@@ -12,6 +13,7 @@ import { Tree } from "./Tree";
 
 @Resolver()
 export class TreeResolver {
+	@UseMiddleware(checkSessionToken)
 	@Query(() => Tree, { nullable: true })
 	async queryTree(
 		@Arg("path") path: string,
@@ -22,6 +24,7 @@ export class TreeResolver {
 		return await new Tree().init(path, basePath, depth, directoryTree)
 	}
 
+	@UseMiddleware(checkSessionToken)
 	@Mutation(() => Boolean, { nullable: true })
 	async createDir(
 		@Arg("path") path: string,
@@ -54,6 +57,7 @@ export class TreeResolver {
 		}
 	}
 
+	@UseMiddleware(checkSessionToken)
 	@Mutation(() => Boolean, { nullable: true })
 	async copyAndMove(@Arg("data", () => CopyAndMoveInput) { type, remote, srcNode, downloadFiles, downloadDirectories, srcDatastoreId, datastoreName, datastoreBasePath, nodeLoginName }: CopyAndMoveInput) {
 		if (!remote) {

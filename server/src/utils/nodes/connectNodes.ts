@@ -7,6 +7,7 @@ mutation ConnectRequestMutation {
   connectRequest
 }
 `
+
 export const connectNodes = async () => {
 	const nodes = await Node.find({ where: { hostNode: false } })
 

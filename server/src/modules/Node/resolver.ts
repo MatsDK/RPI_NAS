@@ -70,8 +70,14 @@ export class NodeResolver {
 		if (id_token?.length == 2) {
 			const [id, token] = id_token
 
-			if (token != null && id != null && (await Node.count({ where: { token, id: Number(id) } })))
-				return true
+			if (token != null && id != null) {
+				const node = await Node.findOne({ where: { token, id: Number(id) } })
+
+				if (node) {
+					await getOrCreateNodeClient({ node, ping: false, setSessionToken: true })
+					return true
+				}
+			}
 		}
 
 		if (!(await NodeRequest.count({ where: { ip, port } })))

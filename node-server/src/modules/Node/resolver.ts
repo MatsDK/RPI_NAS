@@ -73,4 +73,13 @@ export class NodeResolver {
 
 		return true
 	}
+
+	@Mutation(() => String, { nullable: true })
+	setSessionToken(@Arg("token") token: string, @Arg("sessionToken") sessionToken: string) {
+		const conn = getOrCreateConnection()
+		if (conn.token == null || conn.token != token) return null
+
+		conn.sessionToken = sessionToken
+		return sessionToken
+	}
 }

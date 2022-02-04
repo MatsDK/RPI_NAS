@@ -3,12 +3,14 @@ import "reflect-metadata";
 import 'cross-fetch/polyfill';
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql"
-import Express from "express";
+import Express, { Request, Response } from "express";
 import { getOrCreateConnection } from "./utils/nodes/client";
 import {
 	ApolloServerPluginLandingPageDisabled,
 	ApolloServerPluginLandingPageGraphQLPlayground,
 } from "apollo-server-core";
+
+export type MyContext = { req: Request, res: Response }
 
 (async () => {
 	const app = Express();
@@ -21,7 +23,7 @@ import {
 		schema: await buildSchema({
 			resolvers: [__dirname + "/modules/**/*.ts"],
 		}),
-		context: ({ req, res }) => ({ req, res }),
+		context: ({ req, res }) => ({ req, res })
 	});
 
 	getOrCreateConnection();

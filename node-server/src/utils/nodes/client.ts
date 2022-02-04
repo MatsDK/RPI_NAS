@@ -12,12 +12,14 @@ mutation CreateNodeRequestMutation($ip:String!, $port:Float!) {
 export class Connection {
 	uri: string
 	token: string | null
+	sessionToken: string | null
 	id: number | null
 	client: ApolloClient<NormalizedCacheObject>
 	headersCallback: (() => ({ id: null | number, token: null | string })) | null
 
 	constructor(uri: string) {
 		this.token = null;
+		this.sessionToken = null;
 		this.id = null
 		this.headersCallback = null;
 
