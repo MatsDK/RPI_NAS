@@ -9,7 +9,6 @@ const PING_QUERY = gql`
 }
 `
 
-
 const SET_SESSION_TOKEN_MUTATION = gql`
 mutation SetSessionToken($sessionToken: String!, $token: String!) {
   setSessionToken(sessionToken: $sessionToken, token: $token)

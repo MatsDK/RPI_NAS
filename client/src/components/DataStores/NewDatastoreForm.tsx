@@ -264,7 +264,7 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 								<Button onClick={hide} >Cancel</Button>
 							</ConditionButton>
 							<ConditionButton condition={!loading && !!isValidSize(sizeInput || "") && selectedOwner != null && selectedNode != null && !!name.trim()
-								&& (passwordRequired && passwordInput.trim())}>
+								&& !(passwordRequired && passwordInput.trim())}>
 								<LoadingOverlay loading={loading}>
 									<BgButton onClick={createDatastore}>Create datastore</BgButton>
 								</LoadingOverlay>

@@ -30,8 +30,11 @@ export const createDatastoreFolder = async (
 };
 
 const createFileSize = async (sizeInMb: number): Promise<{ err: any }> => {
+	// const { stderr } = await exec(
+	// 	`dd if=/dev/zero of=fileSize bs=1000 count=${sizeInMb}K`
+	// );
 	const { stderr } = await exec(
-		`dd if=/dev/zero of=fileSize bs=1000 count=${sizeInMb}K`
+		`truncate -s ${sizeInMb}M fileSize`
 	);
 	console.log(stderr)
 
