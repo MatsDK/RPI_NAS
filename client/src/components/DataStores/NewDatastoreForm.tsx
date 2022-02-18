@@ -288,12 +288,8 @@ const isValidSize = (sizeInput: string): null | number => {
 	if (lastChar == "g") m = 1024;
 	else if (lastChar != "m") return null;
 
-	const lastIdx = sizeInput.toLowerCase().indexOf(lastChar);
-	const num = Number(sizeInput.slice(0, lastIdx));
+	const lastIdx = sizeInput.toLowerCase().indexOf(lastChar),
+		num = Number(sizeInput.slice(0, lastIdx)) * m;
 
-	if (num)
-		return num * m >= 1 && num * m <= 200000
-			? num * m
-			: null;
-	else return null
+	return (!!num && num >= 1 && num <= 200000) ? num : null
 }

@@ -1,8 +1,9 @@
 import { gql } from "apollo-server-core";
 import { dfOptions } from "../../constants";
-import { Datastore, SizeObject } from "../../entity/Datastore";
+import { Datastore, DataStoreStatus, SizeObject } from "../../entity/Datastore";
 import { getOrCreateNodeClient } from "../nodes/nodeClients";
 import { Node } from "../../entity/CloudNode"
+import { withTimeout } from "../withTimeout";
 const df = require("node-df")
 
 const getLocalDatastoreSizes = (datastores: Datastore[]): Promise<Datastore[]> => new Promise((res, rej) => {
@@ -46,19 +47,24 @@ const getRemoteDatastoreSizes = async (datastores: Datastore[], node: Node): Pro
 		const client = await getOrCreateNodeClient({ node, ping: false })
 		if (!client) return []
 
-		const { data } = await client.conn.query({
+		const response = await withTimeout(client.conn.query({
 			query: GET_REMOTE_DATASTORE_SIZES_QUERY,
 			variables: { datastores: datastores.map(({ id, basePath }) => ({ id, path: basePath })) }
+		}), 300, () => {
+			datastores = datastores.map((ds) => ({ ...ds, status: DataStoreStatus.OFFLINE })) as Datastore[]
 		})
 
-		return datastores.map((ds) => ({
-			...ds,
-			size: (data.getDatastoresSizes as GetDatastoreSizesReturnObj[]).find(({ id }) => id === ds.id)?.size
-		}) as Datastore)
+		if (response?.data) {
+			return datastores.map((ds) => ({
+				...ds,
+				size: (response.data.getDatastoresSizes as GetDatastoreSizesReturnObj[]).find(({ id }) => id === ds.id)?.size
+			}) as Datastore)
+		}
 	} catch (e) {
 		console.log(e)
-		return []
 	}
+
+	return datastores
 }
 
 export const getDatastoreSizes = async (datastores: Datastore[], nodes: Node[]): Promise<Datastore[]> => {

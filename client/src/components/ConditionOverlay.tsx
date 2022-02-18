@@ -11,13 +11,11 @@ const Wrapper = styled.div`
 	width: 100%;
 	height: 100%;
 
-	> div{
+	> div {
 		width: 100%;
 		height: 100%;
-
 	}
 `
-
 
 interface OverlayProps {
 	show: boolean
@@ -47,6 +45,5 @@ export const ConditionOverlay: React.FC<ConditionOverlayProps> = ({ condition, c
 			<Children show={condition}>{children}</Children>
 			<Overlay show={condition}>{renderOverlay()}</Overlay>
 		</Wrapper>
-
 	);
 }

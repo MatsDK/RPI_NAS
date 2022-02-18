@@ -36,7 +36,7 @@ export const getOrCreateNodeClient = async ({ node, uri, ping, setSessionToken =
 
 		if (!Global.CONNECTIONS) Global.CONNECTIONS = new Map()
 
-		let client = node && Global.CONNECTIONS.get(node.id)
+		let client = node && Global.CONNECTIONS.get(node.id);
 
 		const sessionToken = client?.sessionToken || v4(),
 			conn = (node && client?.conn) || createNewClient(uri, sessionToken)
