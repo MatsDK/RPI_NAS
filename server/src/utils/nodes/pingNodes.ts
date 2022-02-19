@@ -10,7 +10,7 @@ export const pingNodes = async (nodes: Node[]): Promise<Node[]> => {
 		} else {
 			const client = await getOrCreateNodeClient({ node, ping: true })
 			node.pingResult = !!client?.ping
-			console.log(node)
+			console.log(node, client?.ping)
 		}
 
 		ret.push(node)

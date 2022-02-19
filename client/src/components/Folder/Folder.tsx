@@ -1,31 +1,23 @@
 import { TreeItem, useGetTreeQueryQuery } from "generated/apolloComponents";
-import { CreateFolderMutation } from "graphql/Folder/createFolder";
-import { getDirectoryTreeQuery } from "graphql/TreeObject/queryDirectoryTree";
-import fsPath from "path";
 import React, {
-  FormEvent,
-  useContext,
-  useEffect,
-  useRef,
-  useState
+	useContext,
+	useEffect, useState
 } from "react";
 import { useApolloClient } from "react-apollo";
-import { useApollo } from "src/hooks/useApollo";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import { Scrollbar } from "src/ui/Scrollbar";
 import styled from "styled-components";
-import Icon from "../../ui/Icon";
 import { ConditionOverlay } from "../ConditionOverlay";
-import FolderItem, { FolderItemWrapper, IconWrapper } from "./FolderItem";
+import FolderItem from "./FolderItem";
 import FolderNavbar from "./FolderNavbar";
 import { FolderPath } from "./FolderPath";
 import { InitDatastoreOverlay } from "./InitDatastoreOverlay";
-import { update } from "./newFolderUpdateQuery";
+import { NewFolderForm } from "./NewFolderForm";
 
 interface Props {
-  path: string;
-  datastoreId: number | null;
-  datastoreName: string;
+	path: string;
+	datastoreId: number | null;
+	datastoreName: string;
 }
 
 const FolderContent = styled.div`
@@ -43,163 +35,92 @@ const FolderContainer = styled.div`
   flex: 1;
 `;
 
-const NewFolderInput = styled.input`
-  border: 0;
-  outline: 0;
-  padding: 1px 2px;
-  font-size: 16px;
-  border-bottom: 1px solid ${(props) => props.theme.lightBgColors[2]};
-`;
-
 const Wrapper = styled.div`
   flex: 1;
   overflow: hidden;
 `
 
 const sort = (data: any[]) =>
-  data.sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
+	data.sort((a, b) => (b.isDirectory ? 1 : 0) - (a.isDirectory ? 1 : 0))
 
 const filter = (data: any[], filter: string) =>
-  filter ? data.filter(({ name }) => name.includes(filter)) : data
+	filter ? data.filter(({ name }) => name.includes(filter)) : data
 
 const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
-  if (!datastoreId) return null;
 
-  const { mutate } = useApollo();
-  const client: any = useApolloClient();
+	const client: any = useApolloClient();
+	const folderCtx: FolderContextType = useContext(FolderContext);
 
-  const folderCtx: FolderContextType = useContext(FolderContext);
+	const [filterInput, setFilterInput] = useState("")
 
-  const [filterInput, setFilterInput] = useState("")
-  const [folderNameInput, setFolderNameInput] = useState("");
-  const inputRef = useRef<HTMLInputElement>();
+	useEffect(() => {
+		if (folderCtx && !folderCtx.currentFolderPath?.folderPath.datastoreName)
+			folderCtx.currentFolderPath?.setFolderPath({ path, datastoreId, datastoreName });
+	}, [folderCtx]);
 
-  useEffect(() => {
-    if (folderCtx?.newFolderInput?.showNewFolderInput)
-      inputRef.current?.focus();
+	const { data, error, loading } = useGetTreeQueryQuery({
+		variables: {
+			depth: 1,
+			path,
+			datastoreId,
+		},
+		client,
+	});
 
-    if (folderCtx && !folderCtx.currentFolderPath?.folderPath.datastoreName)
-      folderCtx.currentFolderPath?.setFolderPath({ path, datastoreId, datastoreName });
-  }, [folderCtx]);
+	useEffect(() => {
+		if (folderCtx) {
+			const { selected, currentFolderPath } = folderCtx;
 
-  const { data, error, loading } = useGetTreeQueryQuery({
-    variables: {
-      depth: 1,
-      path,
-      datastoreId,
-    },
-    client,
-  });
+			folderCtx.selected?.setSelected?.(new Map());
 
-  useEffect(() => {
-    if (folderCtx) {
-      const { selected, currentFolderPath } = folderCtx;
+			selected.selectedItems = new Map();
+			currentFolderPath?.setFolderPath({ path, datastoreId, datastoreName });
+		}
 
-      folderCtx.selected?.setSelected?.(new Map());
+		setFilterInput("")
+	}, [path, datastoreId, datastoreName]);
 
-      selected.selectedItems = new Map();
-      currentFolderPath?.setFolderPath({ path, datastoreId, datastoreName });
-    }
+	if (loading) return <div>Loading</div>;
+	if (!datastoreId) return null;
+	if (error) return <div>error</div>;
+	if (!data?.tree?.tree) return <div>folder not found</div>;
 
-    setFilterInput("")
-  }, [path, datastoreId, datastoreName]);
-
-  if (loading) return <div>Loading</div>;
-  if (error) return <div>error</div>;
-  if (!data?.tree?.tree) return <div>folder not found</div>;
-
-  const initialized = !!data?.tree?.userInitialized
-
-  const createNewFolder = async (e: FormEvent) => {
-    e.preventDefault();
-    const newPath = fsPath.join(
-      folderCtx?.currentFolderPath?.folderPath.path || "",
-      folderNameInput
-    );
-
-    if (!folderNameInput.trim() || !newPath.trim()) return;
-
-    await mutate(
-      CreateFolderMutation,
-      {
-        path: newPath,
-        datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
-      },
-      {
-        refetchQueries: [
-          {
-            query: getDirectoryTreeQuery,
-            variables: {
-              depth: 1,
-              path: folderCtx?.currentFolderPath?.folderPath.path,
-              datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
-            },
-          },
-        ],
-        update: update(newPath, path, datastoreId)
-      },
-    );
-
-    folderCtx?.newFolderInput?.setShowNewFolderInput(false);
-    setFolderNameInput("");
-  };
-
-  return (
-    <Wrapper>
-      <ConditionOverlay
-        condition={!initialized}
-        renderOverlay={() => <InitDatastoreOverlay datastoreName={datastoreName} datastoreId={datastoreId} />}
-      >
-        <FolderNavbar setFilterInput={setFilterInput} />
-        <FolderContainer>
-          <FolderPath
-            path={path.split("/")}
-            dataStore={{
-              id: datastoreId,
-              name: datastoreName,
-            }}
-          />
-          <FolderContent>
-            {folderCtx?.newFolderInput?.showNewFolderInput && (
-              <FolderItemWrapper>
-                <div style={{ width: 38 }} />
-                <IconWrapper>
-                  <Icon
-                    color={{ idx: 2, propName: "bgColors" }}
-                    width={24}
-                    height={22}
-                    viewPort={30}
-                    name="folderIcon"
-                  />
-                </IconWrapper>
-                <form onSubmit={createNewFolder}>
-                  <NewFolderInput
-                    type="text"
-                    ref={inputRef as any}
-                    value={folderNameInput}
-                    onChange={(e) => setFolderNameInput(e.target.value)}
-                  />
-                </form>
-              </FolderItemWrapper>
-            )}
-            {(initialized ? filter(sort(data.tree?.tree), filterInput) : []).map((item, idx) => (
-              <FolderItem
-                datastoreId={datastoreId}
-                item={item as TreeItem}
-                idx={idx}
-                items={sort(data.tree?.tree || [])}
-                key={idx}
-              />
-            ))}
-          </FolderContent>
-          <div
-            style={{ minHeight: 300, flex: 1 }}
-            onClick={() => folderCtx?.selected?.setSelected?.(new Map())}
-          ></div>
-        </FolderContainer>
-      </ConditionOverlay>
-    </Wrapper>
-  );
+	const initialized = !!data?.tree?.userInitialized
+	return (
+		<Wrapper>
+			<ConditionOverlay
+				condition={!initialized}
+				renderOverlay={() => <InitDatastoreOverlay datastoreName={datastoreName} datastoreId={datastoreId} />}
+			>
+				<FolderNavbar setFilterInput={setFilterInput} />
+				<FolderContainer>
+					<FolderPath
+						path={path.split("/")}
+						dataStore={{
+							id: datastoreId,
+							name: datastoreName,
+						}}
+					/>
+					<FolderContent>
+						{folderCtx?.newFolderInput?.showNewFolderInput && (<NewFolderForm path={path} datastoreId={datastoreId} />)}
+						{(initialized ? filter(sort(data.tree?.tree), filterInput) : []).map((item, idx) => (
+							<FolderItem
+								datastoreId={datastoreId}
+								item={item as TreeItem}
+								idx={idx}
+								items={sort(data.tree?.tree || [])}
+								key={idx}
+							/>
+						))}
+					</FolderContent>
+					<div
+						style={{ minHeight: 300, flex: 1 }}
+						onClick={() => folderCtx?.selected?.setSelected?.(new Map())}
+					></div>
+				</FolderContainer>
+			</ConditionOverlay>
+		</Wrapper>
+	);
 };
 
 export default Folder;

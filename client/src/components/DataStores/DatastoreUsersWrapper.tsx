@@ -3,7 +3,7 @@ import React from 'react';
 import { useMeState } from 'src/hooks/useMeState';
 import { ProfilePicture } from 'src/ui/ProfilePicture';
 import styled from 'styled-components';
-import { UserWrapper, UserWrapperLeft } from './DataStoreContainer';
+import { UserWrapper, UserWrapperLeft } from './DatastoreContainer';
 import { DatastoreUsers } from './DatastoreUsers';
 
 interface DatastoreUsersWrapperProps {

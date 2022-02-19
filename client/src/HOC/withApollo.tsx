@@ -52,7 +52,7 @@ const withApollo = (App: any) => {
             />
           );
         } catch (error) {
-          // console.error("Error while running `getDataFromTree`", error);
+          console.error("Error while running `getDataFromTree`", error);
         }
 
         // getDataFromTree does not call componentWillUnmount
@@ -60,7 +60,6 @@ const withApollo = (App: any) => {
         Head.rewind();
       }
 
-      // Extract query data from the Apollo's store
       const apolloState = apollo.cache.extract();
 
       return {

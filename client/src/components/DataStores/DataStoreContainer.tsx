@@ -8,9 +8,7 @@ import { useMeState } from "src/hooks/useMeState";
 import { ConditionOverlay } from "../ConditionOverlay";
 import { Scrollbar } from "src/ui/Scrollbar";
 import styled from "styled-components";
-import {
-  Datastore
-} from "../../../generated/apolloComponents";
+import { Datastore } from "../../../generated/apolloComponents";
 import { DatastoreInfo } from "./DatastoreInfo";
 import { DatastoreUsersWrapper } from "./DatastoreUsersWrapper";
 import { UpdateChanged } from "./UpdateChanged";

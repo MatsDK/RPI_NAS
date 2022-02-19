@@ -8,6 +8,7 @@ import { useDropdown } from 'src/hooks/useDropdown';
 import { FolderContext } from 'src/providers/folderState';
 import { BgButton, Button } from 'src/ui/Button';
 import styled from 'styled-components';
+import { getDirectoryTreeQuery } from 'graphql/TreeObject/queryDirectoryTree';
 
 interface DeleteDropdownProps {
 	hide: () => void
@@ -86,6 +87,14 @@ export const DeleteDropdown: React.FC<DeleteDropdownProps> = ({ hide }) => {
 					refetchQueries: [
 						{
 							query: getTreeQuery,
+							variables: {
+								depth: 1,
+								datastoreId: folderCtx.currentFolderPath?.folderPath.datastoreId,
+								path: folderCtx.currentFolderPath?.folderPath.path,
+							},
+						},
+						{
+							query: getDirectoryTreeQuery,
 							variables: {
 								depth: 1,
 								datastoreId: folderCtx.currentFolderPath?.folderPath.datastoreId,

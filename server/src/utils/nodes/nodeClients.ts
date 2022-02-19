@@ -2,6 +2,7 @@ import { Node } from "../../entity/CloudNode";
 import { v4 } from "uuid";
 import { ApolloClient, InMemoryCache, gql, NormalizedCacheObject, createHttpLink } from "@apollo/client/core";
 import { setContext } from "@apollo/client/link/context";
+import { withTimeout } from "../withTimeout";
 
 const PING_QUERY = gql`
 {
@@ -57,8 +58,18 @@ export const getOrCreateNodeClient = async ({ node, uri, ping, setSessionToken =
 		if (node) Global.CONNECTIONS.set(node.id, client);
 
 		if (ping) {
-			const res = await client.conn.query({ query: PING_QUERY });
-			client.ping = res.data.ping || null
+			try {
+				const res = await withTimeout(
+					client.conn.query({ query: PING_QUERY }),
+					300,
+					() => client && (client.ping = false)
+				)
+
+				res?.data?.ping && (client.ping = res.data.ping)
+			} catch (e) {
+				client.ping = false
+
+			}
 		}
 
 		res(client)

@@ -7,7 +7,7 @@ import { useApolloClient } from "react-apollo";
 import { useMeState } from "src/hooks/useMeState";
 import styled from "styled-components";
 import { Scrollbar } from "src/ui/Scrollbar";
-import { DataStoreListItem } from "./DataStoreListItem";
+import { DataStoreListItem } from "./DatastoreListItem";
 
 const DataStoresWrapper = styled.div`
   padding: 25px 0 0 30px;

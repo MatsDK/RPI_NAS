@@ -1,10 +1,10 @@
 import { Layout } from "src/components/Layout";
 import SideBar from "src/components/SideBar";
 import { withAuth } from "src/HOC/withAuth";
-import DataStoresContainer from "src/components/DataStores/DataStoresContainer";
+import DataStoresContainer from "src/components/DataStores/DatastoresContainer";
 import { ApolloContext, NextFunctionComponentWithAuth } from "types/types";
 import { useMeState } from "src/hooks/useMeState";
-import { DataStoreContainer } from "src/components/DataStores/DataStoreContainer";
+import { DataStoreContainer } from "src/components/DataStores/DatastoreContainer";
 import { getDatastoreQuery } from "graphql/DataStores/getDatastore";
 import { Datastore, useGetDatastoreQuery } from "generated/apolloComponents";
 import { useRouter } from "next/router";

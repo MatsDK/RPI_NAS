@@ -7,11 +7,14 @@ interface DatastoreInfoProps {
 }
 
 const Wrapper = styled.div`
-	margin: 20px 0;
-	display: flex;
+	> div {
+		margin: 20px 0;
+		display: flex;
 
-	> div:not(:first-child) {
-		margin-left:20px;
+
+		> div:not(:first-child) {
+			margin-left:20px;
+		}
 	}
 `
 
@@ -44,8 +47,11 @@ const Size = styled.div`
 export const DatastoreInfo: React.FC<DatastoreInfoProps> = ({ datastore }) => {
 	return (
 		<Wrapper>
-			<Status status={datastore.status}>Status: <p>{capitalize(datastore.status)}</p></Status>
-			<Size>Size: <p>{formatSizeInMb(datastore.sizeInMB || 0)} ({datastore.size?.usedPercent}% Used)</p></Size>
+			<div>
+				<Status status={datastore.status}>Status: <p>{capitalize(datastore.status)}</p></Status>
+				<Size>Size: <p>{formatSizeInMb(datastore.sizeInMB || 0)} ({datastore.size?.usedPercent}% Used)</p></Size>
+			</div>
+			<div>//{datastore.localNodeId}/{datastore.name}</div>
 		</Wrapper>
 	);
 }

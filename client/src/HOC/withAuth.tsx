@@ -39,14 +39,9 @@ export const withAuth = <T extends object>(
     }
 
     render() {
-      if (!this.props.me || !validateFn(this.props.me)) {
+      if (!this.props.me || !validateFn(this.props.me as User)) {
         Router.push("/login");
         return null;
-      }
-
-      if (!validateFn(this.props.me)) {
-        Router.back()
-        return null
       }
 
       return <Component {...this.props} />;

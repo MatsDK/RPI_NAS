@@ -8,7 +8,7 @@ import { ProfilePicture } from "src/ui/ProfilePicture";
 import React, { useState } from "react";
 import { useApolloClient } from "react-apollo";
 import { useMeState } from "src/hooks/useMeState";
-import { UserWrapper, UserWrapperLeft } from "./DataStoreContainer";
+import { UserWrapper, UserWrapperLeft } from "./DatastoreContainer";
 import styled from "styled-components";
 import { Button } from "src/ui/Button";
 
