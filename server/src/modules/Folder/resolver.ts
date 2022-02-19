@@ -16,7 +16,6 @@ import { DeleteMutation } from "./DeleteMutation";
 import { DeletePathsInput } from "./deletePathsInput";
 import { MoveCopyData } from "./moveCopyData";
 import { updateOwnership } from "./updateOwnership";
-import { UpdateOwnershipMutation } from "./UpdateOwnershipMutation";
 
 @Resolver()
 export class FolderResolver {

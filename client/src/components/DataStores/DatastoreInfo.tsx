@@ -1,6 +1,8 @@
 import { Datastore } from 'generated/apolloComponents';
+import Icon from 'src/ui/Icon';
 import React from 'react'
 import styled from 'styled-components';
+import { copy } from 'src/utils/copyToClipboard';
 
 interface DatastoreInfoProps {
 	datastore: Datastore
@@ -41,17 +43,62 @@ const Size = styled.div`
 		margin-left: 3px;
 		color: ${props => props.theme.textColors[0]};
 	}
-	
+`
+
+const SMBConnect = styled.div`
+	display: flex;
+	align-items: center;
+
+	> p {
+		margin-right: 3px;
+		color: ${props => props.theme.textColors[1]};
+	}
+`
+
+const SMBConnectionString = styled.div`
+	border: 1px solid ${props => props.theme.lightBgColors[1]};
+	padding: 2px 5px;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+
+	:hover path {
+		fill: ${props => props.theme.textColors[0]};
+	}
+
+	svg {
+		margin-left: 10px;
+
+		path {
+			transition: fill .15s ease-in-out;
+		}
+	}
 `
 
 export const DatastoreInfo: React.FC<DatastoreInfoProps> = ({ datastore }) => {
+
 	return (
 		<Wrapper>
 			<div>
-				<Status status={datastore.status}>Status: <p>{capitalize(datastore.status)}</p></Status>
+				<Status status={datastore.status}>Status: <p>{capitalize(datastore.status === "init" ? "Initializing" : datastore.status)}</p></Status>
 				<Size>Size: <p>{formatSizeInMb(datastore.sizeInMB || 0)} ({datastore.size?.usedPercent}% Used)</p></Size>
 			</div>
-			<div>//{datastore.localNodeId}/{datastore.name}</div>
+			<div>
+				<SMBConnect>
+					<p>SMB connection location: </p>
+					<SMBConnectionString onClick={() => copy(datastore.smbConnectString || "")}>
+						{datastore.smbConnectString}
+						<Icon
+							name="copyIcon"
+							width={18}
+							height={18}
+							color={{ propName: "textColors", idx: 1 }}
+							viewPort={24}
+						/>
+					</SMBConnectionString>
+				</SMBConnect>
+			</div>
 		</Wrapper>
 	);
 }

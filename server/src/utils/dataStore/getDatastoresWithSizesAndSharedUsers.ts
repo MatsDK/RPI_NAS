@@ -54,11 +54,21 @@ export const getDatastoresWithSizesAndSharedUsers = async (
   });
 
 
-  const nodes = await Node.find({ where: { id: Any(datastores.map(({ localNodeId }) => localNodeId)) } })
+  const nodes: Node[] = await Node.find({ where: { id: Any(datastores.map(({ localNodeId }) => localNodeId)) } })
 
   datastores = await getDatastoresSharedUsersAndOwner(datastores, { users, sharedUsersMap })
   datastores = await getDatastoreSizes(datastores, nodes)
   datastores = getDatastoreInitializedStatus(datastores, { nodes, userId })
+
+  datastores = datastores.map((ds) => {
+    const node = nodes.find(({ id }) => id == ds.localNodeId)
+    if (!node) return ds
+
+    return {
+      ...ds,
+      smbConnectString: `\\\\${node.ip}\\${ds.name}`
+    } as Datastore
+  })
 
   return datastores;
 };

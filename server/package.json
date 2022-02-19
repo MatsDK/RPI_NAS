@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsnd --watch src --respawn ./src/index.ts",
     "start": "node ./dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "pm2": "NODE_ENV=production pm2 start ./dist/index.js --watch -i max"
   },
   "devDependencies": {
     "@types/archiver": "^5.1.1",

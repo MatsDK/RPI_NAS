@@ -12,6 +12,7 @@ export const getDatastoreQuery = gql`
       sizeInMB
       allowedSMBUsers
       userInitialized
+      smbConnectString
       size {
         usedSize
         usedPercent

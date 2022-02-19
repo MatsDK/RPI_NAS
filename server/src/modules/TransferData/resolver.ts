@@ -1,15 +1,15 @@
-import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
-import { DownloadSessionInput } from "./DownloadSessionInput";
-import { v4 } from "uuid";
-import { downloadSessions } from "../../utils/transferData/downloadSessions";
 import fsPath from "path";
-import { DownloadSessionReturn } from "./DownloadSessionReturn";
-import { UploadSessionReturn } from "./UploadSessionReturn";
+import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { v4 } from "uuid";
+import { Node } from "../../entity/CloudNode";
+import { Datastore } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
 import { getDataStoreAndNode } from "../../middleware/getDataStoreNode";
-import { Datastore } from "../../entity/Datastore";
+import { downloadSessions } from "../../utils/transferData/downloadSessions";
+import { DownloadSessionInput } from "./DownloadSessionInput";
+import { DownloadSessionReturn } from "./DownloadSessionReturn";
 import { UploadSessionInput } from "./UploadSessionInput";
-import { Node } from "../../entity/CloudNode";
+import { UploadSessionReturn } from "./UploadSessionReturn";
 
 @Resolver()
 export class TreeResolver {

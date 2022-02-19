@@ -71,4 +71,7 @@ export class Datastore extends BaseEntity {
 
   @Field(() => Boolean, { nullable: true })
   userInitialized: boolean;
+
+  @Field(() => String, { nullable: true })
+  smbConnectString?: string;
 }

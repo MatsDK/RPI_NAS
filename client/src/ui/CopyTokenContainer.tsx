@@ -1,6 +1,7 @@
 import React from 'react'
 import Icon from './Icon';
 import styled from 'styled-components';
+import { copy } from 'src/utils/copyToClipboard';
 
 interface CopyTokenContainerProps {
 	token: string
@@ -42,27 +43,11 @@ const Container = styled.div`
 `
 
 export const CopyTokenContainer: React.FC<CopyTokenContainerProps> = ({ token }) => {
-	const copy = () => {
-		if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(token);
-		else {
-			const textArea = document.createElement("textarea");
-			textArea.value = token;
-			textArea.style.position = "fixed";
-			textArea.style.left = "-999999px";
-			textArea.style.top = "-999999px";
-			document.body.appendChild(textArea);
-			textArea.focus();
-			textArea.select();
-
-			document.execCommand('copy')
-			textArea.remove();
-		}
-	}
 
 	return (
 		<Container>
 			<span>{token.slice(0, 12)}<p /></span>
-			<div onClick={copy}>
+			<div onClick={() => copy(token)}>
 				<Icon
 					name="copyIcon"
 					width={18}

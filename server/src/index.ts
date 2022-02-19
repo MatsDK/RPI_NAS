@@ -18,6 +18,7 @@ import "cross-fetch/polyfill"
 dotenv.config();
 
 (async () => {
+  console.log(process.env)
   const app = Express();
   app.use(cookieParser("Authorization"));
 
@@ -28,7 +29,7 @@ dotenv.config();
         : ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
     schema: await buildSchema({
-      resolvers: [__dirname + "/modules/**/*.ts"],
+      resolvers: [__dirname + `/modules/**/*.${process.env.NODE_ENV === "production" ? "js" : "ts"}`],
     }),
     context: ({ req, res }) => ({ req, res }),
   });
