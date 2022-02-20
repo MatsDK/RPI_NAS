@@ -1,4 +1,5 @@
 import { TreeItem, useGetTreeQueryQuery } from "generated/apolloComponents";
+import Link from "next/link";
 import React, {
 	useContext,
 	useEffect, useState
@@ -38,6 +39,19 @@ const FolderContainer = styled.div`
 const Wrapper = styled.div`
   flex: 1;
   overflow: hidden;
+`
+
+const Timeout = styled.div`
+	color: ${props => props.theme.textColors[1]};
+	margin-left: 10px;
+	display: flex;
+
+	p {
+		color: ${props => props.theme.textColors[0]};
+		cursor: pointer;
+		margin: 0 3px;
+		text-decoration: underline;
+	}
 `
 
 const sort = (data: any[]) =>
@@ -85,14 +99,16 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
 	if (error) return <div>error</div>;
 	if (!data?.tree?.tree) return <div>folder not found</div>;
 
+
 	const initialized = !!data?.tree?.userInitialized
+
 	return (
 		<Wrapper>
 			<ConditionOverlay
 				condition={!initialized}
 				renderOverlay={() => <InitDatastoreOverlay datastoreName={datastoreName} datastoreId={datastoreId} />}
 			>
-				<FolderNavbar setFilterInput={setFilterInput} />
+				<FolderNavbar setFilterInput={setFilterInput} filterInput={filterInput} />
 				<FolderContainer>
 					<FolderPath
 						path={path.split("/")}
@@ -101,6 +117,9 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
 							name: datastoreName,
 						}}
 					/>
+					{data.tree.timeout &&
+						<Timeout>Connection to <Link href={`/datastore/${datastoreId}`}><p>{datastoreName}</p></Link> timed out</Timeout>
+					}
 					<FolderContent>
 						{folderCtx?.newFolderInput?.showNewFolderInput && (<NewFolderForm path={path} datastoreId={datastoreId} />)}
 						{(initialized ? filter(sort(data.tree?.tree), filterInput) : []).map((item, idx) => (

@@ -1,7 +1,7 @@
 import { createSessionMutation } from "graphql/TransferData/createDownloadSession";
 import { useRouter } from "next/dist/client/router";
 import { Input } from "src/ui/Input";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
 import { useDropdown } from "src/hooks/useDropdown";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
@@ -64,13 +64,18 @@ const SearchContainer = styled.div`
 
 interface Props {
   setFilterInput: React.Dispatch<React.SetStateAction<string>>
+  filterInput: string
 }
 
-const FolderNavbar: React.FC<Props> = ({ setFilterInput }) => {
+const FolderNavbar: React.FC<Props> = ({ setFilterInput, filterInput }) => {
   const { mutate } = useApollo();
   const router = useRouter();
 
   const folderCtx: FolderContextType = useContext(FolderContext);
+
+  useEffect(() => {
+    setFilterInput("")
+  }, [folderCtx?.currentFolderPath?.folderPath])
 
   const downloadDropdown: any = useRef();
 
@@ -174,6 +179,7 @@ const FolderNavbar: React.FC<Props> = ({ setFilterInput }) => {
             <Input
               type="text"
               placeholder="filter"
+              value={filterInput}
               onChange={(e) => setFilterInput(e.currentTarget.value.trim())}
             />
           }

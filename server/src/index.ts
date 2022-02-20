@@ -34,7 +34,17 @@ dotenv.config();
     context: ({ req, res }) => ({ req, res }),
   });
 
-  await createConnection().then(() =>
+  await createConnection({
+    "synchronize": true,
+    "logging": process.env.NODE_ENV === "production",
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "postgres",
+    "password": process.env.POSTGRES_PASSWORD,
+    "database": "cloud",
+    "entities": [process.env.NODE_ENV === "production" ? "dist/entity/*.*" : "src/entity/*.*"]
+  }).then(() =>
     console.log("> Connected to postgreSQL database")
   );
 

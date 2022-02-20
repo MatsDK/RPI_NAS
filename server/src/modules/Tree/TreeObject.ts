@@ -14,6 +14,9 @@ export class Tree {
   @Field(() => Boolean)
   userInitialized: boolean
 
+  @Field(() => Boolean)
+  timeout: boolean
+
   constructor(userInitialized: boolean) {
     this.userInitialized = userInitialized
   }
@@ -26,6 +29,7 @@ export class Tree {
     userOptions?: { userId: number }
   ): Promise<Tree> {
     this.path = path;
+    this.timeout = false
 
     if (basePath != null)
       this.tree = getTreeObject(path, depth, {
@@ -38,7 +42,7 @@ export class Tree {
         userOptions,
         depth,
         path,
-        directoryTree
+        directoryTree,
       );
 
     return this;

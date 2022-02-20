@@ -387,6 +387,7 @@ export type SizeObject = {
 export type Tree = {
   __typename?: 'Tree';
   path: Scalars['String'];
+  timeout: Scalars['Boolean'];
   tree?: Maybe<Array<TreeItem>>;
   userInitialized: Scalars['Boolean'];
 };
@@ -622,7 +623,7 @@ export type GetTreeQueryQueryVariables = Exact<{
 }>;
 
 
-export type GetTreeQueryQuery = { __typename?: 'Query', tree?: { __typename?: 'Tree', path: string, userInitialized: boolean, tree?: Array<{ __typename?: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string, size?: number | null | undefined }> | null | undefined } | null | undefined };
+export type GetTreeQueryQuery = { __typename?: 'Query', tree?: { __typename?: 'Tree', path: string, timeout: boolean, userInitialized: boolean, tree?: Array<{ __typename?: 'TreeItem', relativePath: string, isDirectory: boolean, name: string, path: string, size?: number | null | undefined }> | null | undefined } | null | undefined };
 
 export type UploadMutationVariables = Exact<{
   file: Scalars['Upload'];
@@ -1554,6 +1555,7 @@ export const GetTreeQueryDocument = gql`
     query getTreeQuery($path: String!, $depth: Float!, $datastoreId: Float) {
   tree(data: {path: $path, datastoreId: $datastoreId, depth: $depth}) {
     path
+    timeout
     userInitialized
     tree {
       relativePath

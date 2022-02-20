@@ -6,6 +6,8 @@ import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { GetTreeQuery } from "./GetTreeQuery";
 import { Tree } from "./TreeObject";
 import fsPath from "path";
+import { withTimeout } from "../../utils/withTimeout";
+import { TreeItem } from "./TreeItem";
 
 interface Params {
   datastoreId: number | null;
@@ -33,11 +35,13 @@ export const buildTreeObject = async ({
   const node = await Node.findOne({ where: { id: datastore.localNodeId } })
   if (!node) throw new ApolloError("Node not found")
 
+  const userInitialized = node.initializedUsers.includes(userId)
+
   if (!node.hostNode) {
     const client = await getOrCreateNodeClient({ node, ping: false })
     if (!client) throw new ApolloError("Could not connect to client")
 
-    const { data, errors } = await client.conn.query({
+    const response = await withTimeout(client.conn.query({
       query: GetTreeQuery,
       variables: {
         path: fsPath.join(datastore.basePath, path),
@@ -45,15 +49,20 @@ export const buildTreeObject = async ({
         depth,
         directoryTree
       }
-    })
+    }), 500)
 
+    if (!response?.data) {
+      return { tree: [] as TreeItem[], path, userInitialized, timeout: true } as Tree
+    }
+
+    const { data, errors } = response
     if (errors) {
       console.log(errors)
       throw new ApolloError("Error occured")
     }
 
-    return { ...data.queryTree, path, userInitialized: node.initializedUsers.includes(userId) } as Tree
+    return { ...data.queryTree, path, userInitialized, timeout: false } as Tree
   }
 
-  return await new Tree(node.initializedUsers.includes(userId)).init(path, depth, datastore.basePath, directoryTree);
+  return await new Tree(userInitialized).init(path, depth, datastore.basePath, directoryTree);
 };
