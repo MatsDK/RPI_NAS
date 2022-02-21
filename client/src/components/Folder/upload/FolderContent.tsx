@@ -1,4 +1,6 @@
 import axios from "axios";
+import { DriveSelect } from './DriveSelect'
+import { Path } from "./Path"
 import { LoadingOverlay } from "src/ui/Button";
 import { useState, useEffect } from "react";
 import fsPath from "path"
@@ -7,9 +9,6 @@ import Icon from "src/ui/Icon";
 import { SelectedPaths } from "./UploadWrapper";
 
 interface FolderContentProps {
-	drive: null | string
-	path: string
-	setPath: React.Dispatch<React.SetStateAction<string>>
 	selected: SelectedPaths
 	setSelected: React.Dispatch<React.SetStateAction<SelectedPaths>>
 }
@@ -50,14 +49,27 @@ const FolderItem = styled.div<FolderItemProps>`
 	}
 `
 
-export const FolderContent: React.FC<FolderContentProps> = ({ drive, path, setPath, selected, setSelected }) => {
+const PathWrapper = styled.div`
+	display: flex;
+	/* max-width: 50%; */
+	width: 100%;
+	/* overflow-x: auto; */
+	align-items: baseline;
+`
+
+
+export const FolderContent: React.FC<FolderContentProps> = ({ selected, setSelected }) => {
 	const [folderData, setFolderData] = useState<FolderData>([])
 	const [loading, setLoading] = useState(false)
+	const isWin = navigator.platform.toLowerCase().includes("win")
+
+	const [currPath, setCurrPath] = useState("/")
+	const [selectedDrive, setSelectedDrive] = useState(isWin ? null : "")
 
 	const updateFolderData = async () => {
 		try {
 			setLoading(true)
-			const { data, status } = await axios.get(`/api/path/${drive}${path}`);
+			const { data, status } = await axios.get(`/api/path/${selectedDrive}${currPath}`);
 			setLoading(false)
 
 			if (status === 200) setFolderData(data.data);
@@ -68,9 +80,14 @@ export const FolderContent: React.FC<FolderContentProps> = ({ drive, path, setPa
 	};
 
 	useEffect(() => {
-		drive != null &&
+		selectedDrive != null &&
 			updateFolderData()
-	}, [drive, path])
+	}, [selectedDrive, currPath])
+
+
+	useEffect(() => {
+		setCurrPath("/")
+	}, [selectedDrive])
 
 	const selectItem = (item: {
 		name: string;
@@ -94,11 +111,15 @@ export const FolderContent: React.FC<FolderContentProps> = ({ drive, path, setPa
 	};
 
 	return <LoadingOverlay loading={loading}>
+		<PathWrapper>
+			{isWin && <DriveSelect setSelectedDrive={setSelectedDrive} />}
+			<Path path={currPath} setPath={setCurrPath} />
+		</PathWrapper>
 		{sort(folderData).map(({ isDirectory, name, path: itemPath }, idx) => {
 			return <FolderItem isDirectory={isDirectory} key={idx} selected={selected.has(itemPath)}>
 				<FolderEntryIcon isDirectory={isDirectory} />
 				<div>
-					<span onClick={() => isDirectory && setPath(fsPath.join(path, name))}>{name}</span>
+					<span onClick={() => isDirectory && setCurrPath(fsPath.join(currPath, name))}>{name}</span>
 				</div>
 				<input type="checkbox" onChange={() => { selectItem({ name, path: itemPath, isDirectory }) }} checked={selected.has(itemPath)} />
 			</FolderItem>

@@ -7,10 +7,8 @@ import { FolderContext, FolderContextType } from 'src/providers/folderState'
 import { BgButton, Button } from 'src/ui/Button'
 import { Scrollbar } from 'src/ui/Scrollbar'
 import styled from "styled-components"
-import { DriveSelect } from './DriveSelect'
 import { filterPaths } from './filterUploadPaths'
 import { FolderContent } from "./FolderContent"
-import { Path } from "./Path"
 import { SelectedContent } from "./SelectedContent"
 import { UpdateOwnershipMutation } from 'graphql/Folder/updateOwnership'
 import { getTreeQuery } from 'graphql/TreeObject/queryTree'
@@ -134,13 +132,6 @@ const Headers = styled.div`
 	}
 `
 
-const PathWrapper = styled.div`
-	display: flex;
-	max-width: 50%;
-	/* overflow-x: auto; */
-	align-items: baseline;
-`
-
 const Box = styled.div`
 	${Scrollbar}
 
@@ -148,21 +139,30 @@ const Box = styled.div`
 	overflow-y: auto;
 `
 
+const TabHeaders = styled.div`
+	display: flex;
+`
+
+const TabHeader = styled.span<{ selected: boolean }>`
+	color: ${props => props.theme.textColors[0]};
+	font-weight: 500;
+	cursor: pointer;
+
+	:first-child {
+		margin-right: 15px;
+	}
+
+	text-decoration: ${props => props.selected ? "underline" : "none"};
+`
+
 export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 	const folderCtx: FolderContextType = useContext(FolderContext);
 	const { mutate } = useApollo()
 
-	const isWin = navigator.platform.toLowerCase().includes("win")
-
-	const [selectedDrive, setSelectedDrive] = useState(isWin ? null : "")
 	const [loading, setLoading] = useState(false)
 	const [selected, setSelected] = useState<SelectedPaths>(new Map());
-	const [currPath, setCurrPath] = useState("/")
 
-	useEffect(() => {
-		setCurrPath("/")
-	}, [selectedDrive])
-
+	const [dropFilesSelected, setDropFilesSelected] = useState(false)
 
 	const upload = async () => {
 		const uploadData = filterPaths(selected)
@@ -219,15 +219,17 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 				<Title>Upload</Title>
 				<Section style={{ flex: 1 }}>
 					<Headers>
-						<PathWrapper>
-							{isWin && <DriveSelect setSelectedDrive={setSelectedDrive} />}
-							<Path path={currPath} setPath={setCurrPath} />
-						</PathWrapper>
+						<TabHeaders>
+							<TabHeader onClick={() => setDropFilesSelected(true)} selected={dropFilesSelected}>Drop files</TabHeader>
+							<TabHeader onClick={() => setDropFilesSelected(false)} selected={!dropFilesSelected}>Select files</TabHeader>
+						</TabHeaders>
 						<span>Selected<p>({selected.size})</p></span>
 					</Headers>
 					<BoxWrapper>
 						<Box>
-							<FolderContent selected={selected} setSelected={setSelected} setPath={setCurrPath} drive={selectedDrive} path={currPath} />
+							{!dropFilesSelected ?
+								<FolderContent selected={selected} setSelected={setSelected} />
+								: <div>Drop files</div>}
 						</Box>
 						<Divider />
 						<Box>
