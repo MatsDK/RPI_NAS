@@ -1,22 +1,22 @@
 import axios from 'axios'
-import { ConditionButton, LoadingOverlay } from 'src/ui/Button'
+import { UpdateOwnershipMutation } from 'graphql/Folder/updateOwnership'
 import { createUploadSessionMutation } from 'graphql/TransferData/createUploadSession'
-import React, { useContext, useEffect, useState } from 'react'
+import { getTreeQuery } from 'graphql/TreeObject/queryTree'
+import React, { useContext, useState } from 'react'
 import { useApollo } from 'src/hooks/useApollo'
 import { FolderContext, FolderContextType } from 'src/providers/folderState'
-import { BgButton, Button } from 'src/ui/Button'
+import { BgButton, Button, ConditionButton, LoadingOverlay } from 'src/ui/Button'
 import { Scrollbar } from 'src/ui/Scrollbar'
 import styled from "styled-components"
+import { DropFilesContainer } from './DropFilesContainer'
 import { filterPaths } from './filterUploadPaths'
 import { FolderContent } from "./FolderContent"
 import { SelectedContent } from "./SelectedContent"
-import { UpdateOwnershipMutation } from 'graphql/Folder/updateOwnership'
-import { getTreeQuery } from 'graphql/TreeObject/queryTree'
 
 interface UploadWrapperProps {
 	hide: () => void
 }
-export type SelectedPath = { isDir: boolean, name: string }
+export type SelectedPath = { isDir: boolean, name: string, file?: File }
 export type SelectedPaths = Map<string, SelectedPath>;
 
 const Wrapper = styled.div`
@@ -161,6 +161,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 
 	const [loading, setLoading] = useState(false)
 	const [selected, setSelected] = useState<SelectedPaths>(new Map());
+	const [dropSelected, setDropSelected] = useState<SelectedPaths>(new Map());
 
 	const [dropFilesSelected, setDropFilesSelected] = useState(false)
 
@@ -229,7 +230,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 						<Box>
 							{!dropFilesSelected ?
 								<FolderContent selected={selected} setSelected={setSelected} />
-								: <div>Drop files</div>}
+								: <DropFilesContainer selected={dropSelected} setSelected={setDropSelected} />}
 						</Box>
 						<Divider />
 						<Box>

@@ -12,6 +12,7 @@ interface FolderContentProps {
 	selected: SelectedPaths
 	setSelected: React.Dispatch<React.SetStateAction<SelectedPaths>>
 }
+
 type FolderData = Array<{ name: string; path: string; isDirectory: boolean }>;
 
 const sort = (data: FolderData) =>
@@ -51,10 +52,10 @@ const FolderItem = styled.div<FolderItemProps>`
 
 const PathWrapper = styled.div`
 	display: flex;
-	/* max-width: 50%; */
 	width: 100%;
-	/* overflow-x: auto; */
 	align-items: baseline;
+	/* max-width: 50%; */
+	/* overflow-x: auto; */
 `
 
 
