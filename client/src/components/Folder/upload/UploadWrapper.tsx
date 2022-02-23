@@ -165,54 +165,76 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 
 	const [dropFilesSelected, setDropFilesSelected] = useState(false)
 
-	const upload = async () => {
+	const uploadSelectedFiles = async () => {
 		const uploadData = filterPaths(selected)
-		if (!uploadData.length) return null
+		if (!uploadData.length) return { err: "no files selected" }
 
-		try {
-			setLoading(true)
-			const {
+		setLoading(true)
+		const {
+			data: {
+				createUploadSession: { uploadPath, ...connectionData },
+			},
+		} = await mutate(createUploadSessionMutation, {
+			uploadPath: folderCtx?.currentFolderPath?.folderPath.path,
+			dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
+		});
+
+		const { data } = await axios.get(`/api/upload`, {
+			params: {
 				data: {
-					createUploadSession: { uploadPath, ...connectionData },
+					connectionData,
+					uploadPath,
+					uploadData,
 				},
-			} = await mutate(createUploadSessionMutation, {
-				uploadPath: folderCtx?.currentFolderPath?.folderPath.path,
-				dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
-			});
+			},
+		});
 
-			const { data } = await axios.get(`/api/upload`, {
-				params: {
-					data: {
-						connectionData,
-						uploadPath,
-						uploadData,
-					},
-				},
-			});
+		const res = await mutate(UpdateOwnershipMutation,
+			{ datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId },
+			{
+				refetchQueries: [{
+					query: getTreeQuery, variables: {
+						depth: 1,
+						path: folderCtx?.currentFolderPath?.folderPath.path,
+						dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
+					}
+				}]
+			})
 
-			const res = await mutate(UpdateOwnershipMutation,
-				{ datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId },
-				{
-					refetchQueries: [{
-						query: getTreeQuery, variables: {
-							depth: 1,
-							path: folderCtx?.currentFolderPath?.folderPath.path,
-							dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
-						}
-					}]
-				})
+		console.log(res)
 
-			console.log(res)
+		setLoading(false)
 
-			setLoading(false)
+		return { err: data.err }
+	}
 
-			if (data.err) console.log(data.err)
-			else hide()
+	const upload = async () => {
+		try {
+			if (!dropFilesSelected) {
+				const { err } = await uploadSelectedFiles()
+				return console.log(err);
+			} else {
+				const files = Array.from(dropSelected).map(([_path, { file }]) => file)
+				console.log(files);
+			}
+
+			// hide()
 		} catch (e) {
 			console.log(e);
 			setLoading(false)
 		}
 	};
+
+	const selectedData = {
+		selected: {
+			selected,
+			setSelected
+		},
+		dropped: {
+			dropSelected,
+			setDropSelected
+		}
+	}
 
 	return (
 		<Wrapper>
@@ -224,7 +246,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 							<TabHeader onClick={() => setDropFilesSelected(true)} selected={dropFilesSelected}>Drop files</TabHeader>
 							<TabHeader onClick={() => setDropFilesSelected(false)} selected={!dropFilesSelected}>Select files</TabHeader>
 						</TabHeaders>
-						<span>Selected<p>({selected.size})</p></span>
+						<span>Selected<p>({dropFilesSelected ? dropSelected.size : selected.size})</p></span>
 					</Headers>
 					<BoxWrapper>
 						<Box>
@@ -234,7 +256,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 						</Box>
 						<Divider />
 						<Box>
-							<SelectedContent selected={selected} setSelected={setSelected} />
+							<SelectedContent {...selectedData} showSelected={!dropFilesSelected} />
 						</Box>
 					</BoxWrapper>
 				</Section>
@@ -245,7 +267,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 					</span>
 					<div>
 						<Button onClick={hide}>Cancel</Button>
-						<ConditionButton condition={!loading && !!selected.size}>
+						<ConditionButton condition={!loading && ((!dropFilesSelected && !!selected.size) || (dropFilesSelected && !!dropSelected.size))}>
 							<LoadingOverlay loading={loading}>
 								<BgButton onClick={upload}>Upload</BgButton>
 							</LoadingOverlay>

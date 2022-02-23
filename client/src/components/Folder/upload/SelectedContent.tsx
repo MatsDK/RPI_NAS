@@ -5,8 +5,15 @@ import { FolderEntryIcon } from "./FolderContent"
 import styled from 'styled-components';
 
 interface SelectedContentProps {
-	selected: SelectedPaths
-	setSelected: React.Dispatch<React.SetStateAction<SelectedPaths>>
+	selected: {
+		selected: SelectedPaths;
+		setSelected: React.Dispatch<React.SetStateAction<SelectedPaths>>;
+	};
+	dropped: {
+		dropSelected: SelectedPaths;
+		setDropSelected: React.Dispatch<React.SetStateAction<SelectedPaths>>;
+	};
+	showSelected: boolean
 }
 
 type Items = Array<[string, SelectedPath]>
@@ -64,29 +71,33 @@ const Name = styled.div`
 	> span:hover > p {
 		opacity: 1;
 	}
-
 `
 
-export const SelectedContent: React.FC<SelectedContentProps> = ({ selected, setSelected }) => {
+export const SelectedContent: React.FC<SelectedContentProps> = ({ selected: { selected, setSelected }, dropped: { dropSelected, setDropSelected }, showSelected }) => {
 	return (
 		<div>
-			{(Array.from(selected) as unknown as Items).map(([path, { isDir, name }], idx) => {
-				return <SelectedEntry key={idx}>
+			{(Array.from(showSelected ? selected : dropSelected) as unknown as Items).map(([path, { isDir, name }], idx) =>
+				<SelectedEntry key={idx}>
 					<FolderEntryIcon isDirectory={isDir} />
 					<Name>
 						<span>{name}
-							<p>{path.replace(/\\/g, "/")}</p>
+							{showSelected && <p>{path.replace(/\\/g, "/")}</p>}
 						</span>
 					</Name>
 
 					<div onClick={() => {
-						selected.delete(path)
-						setSelected(() => new Map(selected))
+						if (showSelected) {
+							selected.delete(path)
+							setSelected(() => new Map(selected))
+						} else {
+							dropSelected.delete(path)
+							setDropSelected(() => new Map(dropSelected))
+						}
 					}}>
 						<Icon name="removeIcon" width={20} height={20} viewPort={20} color={{ propName: "textColors", idx: 1 }} />
 					</div>
 				</SelectedEntry>
-			})}
+			)}
 			<div style={{ minHeight: 100 }} />
 		</div>
 	);
