@@ -171,6 +171,7 @@ export type Mutation = {
   toggleDatastoreService?: Maybe<Scalars['Boolean']>;
   updateDatastore?: Maybe<Scalars['Boolean']>;
   updateOwnership?: Maybe<Scalars['Boolean']>;
+  uploadFiles?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -299,6 +300,13 @@ export type MutationUpdateDatastoreArgs = {
 
 export type MutationUpdateOwnershipArgs = {
   datastoreId: Scalars['Float'];
+};
+
+
+export type MutationUploadFilesArgs = {
+  datastoreId: Scalars['Float'];
+  files: Array<Scalars['Upload']>;
+  path: Scalars['String'];
 };
 
 export type Node = {
@@ -589,6 +597,15 @@ export type GetNodesQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetNodesQueryQuery = { __typename?: 'Query', getNodes?: { __typename?: 'GetNodesReturn', nodes: Array<{ __typename?: 'Node', id: string, ip: string, port: number, name: string, loginName: string, basePath: string, hostNode: boolean, pingResult: boolean, token?: string | null | undefined, initializedUsers: Array<number> }>, nodeRequests: Array<{ __typename?: 'NodeRequest', id: number, ip: string, port: number }> } | null | undefined };
+
+export type UploadFilesMutationVariables = Exact<{
+  path: Scalars['String'];
+  datastoreId: Scalars['Float'];
+  files: Array<Scalars['Upload']> | Scalars['Upload'];
+}>;
+
+
+export type UploadFilesMutation = { __typename?: 'Mutation', uploadFiles?: boolean | null | undefined };
 
 export type CreateSessionMutationVariables = Exact<{
   data: Array<DownloadPathsInput> | DownloadPathsInput;
@@ -1421,6 +1438,39 @@ export function useGetNodesQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type GetNodesQueryQueryHookResult = ReturnType<typeof useGetNodesQueryQuery>;
 export type GetNodesQueryLazyQueryHookResult = ReturnType<typeof useGetNodesQueryLazyQuery>;
 export type GetNodesQueryQueryResult = Apollo.QueryResult<GetNodesQueryQuery, GetNodesQueryQueryVariables>;
+export const UploadFilesDocument = gql`
+    mutation UploadFiles($path: String!, $datastoreId: Float!, $files: [Upload!]!) {
+  uploadFiles(path: $path, datastoreId: $datastoreId, files: $files)
+}
+    `;
+export type UploadFilesMutationFn = Apollo.MutationFunction<UploadFilesMutation, UploadFilesMutationVariables>;
+
+/**
+ * __useUploadFilesMutation__
+ *
+ * To run a mutation, you first call `useUploadFilesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadFilesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadFilesMutation, { data, loading, error }] = useUploadFilesMutation({
+ *   variables: {
+ *      path: // value for 'path'
+ *      datastoreId: // value for 'datastoreId'
+ *      files: // value for 'files'
+ *   },
+ * });
+ */
+export function useUploadFilesMutation(baseOptions?: Apollo.MutationHookOptions<UploadFilesMutation, UploadFilesMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UploadFilesMutation, UploadFilesMutationVariables>(UploadFilesDocument, options);
+      }
+export type UploadFilesMutationHookResult = ReturnType<typeof useUploadFilesMutation>;
+export type UploadFilesMutationResult = Apollo.MutationResult<UploadFilesMutation>;
+export type UploadFilesMutationOptions = Apollo.BaseMutationOptions<UploadFilesMutation, UploadFilesMutationVariables>;
 export const CreateSessionDocument = gql`
     mutation createSession($data: [DownloadPathsInput!]!, $type: String!, $dataStoreId: Float!) {
   createDownloadSession(

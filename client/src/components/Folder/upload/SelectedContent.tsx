@@ -47,6 +47,9 @@ const SelectedEntry = styled.div`
 const Name = styled.div`
 	position: relative;
 	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 
 	> span {
 		color: ${props => props.theme.textColors[0]};

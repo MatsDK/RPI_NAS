@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { UpdateOwnershipMutation } from 'graphql/Folder/updateOwnership'
 import { createUploadSessionMutation } from 'graphql/TransferData/createUploadSession'
+import { UploadFilesMutation } from 'graphql/TransferData/UploadFilesMutatin'
 import { getTreeQuery } from 'graphql/TreeObject/queryTree'
 import React, { useContext, useState } from 'react'
 import { useApollo } from 'src/hooks/useApollo'
@@ -214,8 +215,25 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 				const { err } = await uploadSelectedFiles()
 				return console.log(err);
 			} else {
-				const files = Array.from(dropSelected).map(([_path, { file }]) => file)
-				console.log(files);
+				const files = Array.from(dropSelected).map(([_path, { file }]) => file),
+					{ datastoreId, path } = folderCtx?.currentFolderPath?.folderPath!
+
+				try {
+
+					setLoading(true)
+					const res = await mutate(UploadFilesMutation,
+						{
+							files,
+							datastoreId,
+							path: path || "/",
+						})
+					setLoading(false)
+
+					console.log(res);
+				} catch (err) {
+					console.log(err);
+					setLoading(false)
+				}
 			}
 
 			// hide()

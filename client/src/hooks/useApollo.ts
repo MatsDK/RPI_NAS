@@ -22,7 +22,8 @@ export const useApollo = (apolloOptions?: Options) => {
     mutation: DocumentNode,
     variables: any,
     options: MutationOptions = {}
-  ) => client.mutate({ mutation, variables, ...options, ...globalOptions });
+  ) => client.mutate({ mutation, variables, ...options, ...globalOptions })
+
 
   const query = (query: DocumentNode, variables: any) =>
     client.query({ query, variables, ...globalOptions });
