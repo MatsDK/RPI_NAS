@@ -92,6 +92,8 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 		setSelected(!!folderCtx?.selected.selectedItems.has(item.path));
 	}, [item, folderCtx]);
 
+	if (!folderCtx) return null
+
 	return (
 		<FolderItemWrapper
 			style={{ backgroundColor: selected ? "#ededed" : "#fff" }}
@@ -101,34 +103,34 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 			}
 			onClick={({ ctrlKey, shiftKey }) => {
 				if (ctrlKey) {
-					if (folderCtx?.selected.selectedItems.has(item.path))
-						folderCtx?.selected.selectedItems.delete(item.path)
+					if (folderCtx.selected.selectedItems.has(item.path))
+						folderCtx.selected.selectedItems.delete(item.path)
 					else
-						folderCtx?.selected.selectedItems.set(item.path, item)
+						folderCtx.selected.selectedItems.set(item.path, item)
 
-					folderCtx && folderCtx.selected.setSelected?.(new Map(folderCtx.selected.selectedItems))
+					folderCtx.selected.setSelected(new Map(folderCtx.selected.selectedItems))
 				} else if (shiftKey) {
-					if (folderCtx?.selected.selectedItems.size == 0) {
-						folderCtx?.selected.selectedItems.set(item.path, item)
-						folderCtx.selected.setSelected?.(new Map(folderCtx.selected.selectedItems))
+					if (folderCtx.selected.selectedItems.size == 0) {
+						folderCtx.selected.selectedItems.set(item.path, item)
+						folderCtx.selected.setSelected(new Map(folderCtx.selected.selectedItems))
 					} else {
-						const lastItem = (Array.from(folderCtx?.selected.selectedItems || new Map()).pop())
+						const lastItem: any = (Array.from(folderCtx.selected.selectedItems || new Map()).pop())
 						if (!lastItem) return
 
 						if (lastItem[1].idx == idx) {
-							folderCtx?.selected.selectedItems.delete(item.path)
-							folderCtx?.selected.setSelected?.(new Map(folderCtx.selected.selectedItems))
+							folderCtx.selected.selectedItems.delete(item.path)
+							folderCtx.selected.setSelected(new Map(folderCtx.selected.selectedItems))
 						}
 
 						for (let i = Math.min(lastItem[1].idx, idx) + 1; i < Math.max(lastItem[1].idx, idx); i++) {
-							folderCtx?.selected.setSelected?.(new Map(folderCtx.selected.selectedItems.set(items[i].path, items[i])))
+							folderCtx.selected.setSelected(new Map(folderCtx.selected.selectedItems.set(items[i].path, items[i])))
 						}
-						folderCtx?.selected.setSelected?.(new Map(folderCtx.selected.selectedItems.set(item.path, item)))
+						folderCtx.selected.setSelected(new Map(folderCtx.selected.selectedItems.set(item.path, item)))
 					}
 				} else {
-					if (folderCtx?.selected.selectedItems.has(item.path))
-						folderCtx.selected.setSelected?.(new Map());
-					else folderCtx?.selected.setSelected?.(new Map([[item.path, item]]));
+					if (folderCtx.selected.selectedItems.has(item.path))
+						folderCtx.selected.setSelected(new Map());
+					else folderCtx.selected.setSelected(new Map([[item.path, item]]));
 				}
 			}}
 		>
@@ -136,12 +138,12 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 				onClick={(e) => {
 					e.stopPropagation();
 
-					if (!folderCtx?.selected.selectedItems.has(item.path))
-						folderCtx?.selected.setSelected?.(
+					if (!folderCtx.selected.selectedItems.has(item.path))
+						folderCtx.selected.setSelected(
 							(m) => new Map(m.set(item.path, item))
 						);
 					else
-						folderCtx?.selected.setSelected?.((m) => {
+						folderCtx.selected.setSelected((m) => {
 							m.delete(item.path);
 							return new Map(m);
 						});

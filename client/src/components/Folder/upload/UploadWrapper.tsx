@@ -226,7 +226,16 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 							files,
 							datastoreId,
 							path: path || "/",
-						})
+						},
+						{
+							refetchQueries: [
+								{
+									query: getTreeQuery,
+									variables: { datastoreId, path, depth: 1 }
+								}
+							]
+						}
+					)
 					setLoading(false)
 
 					console.log(res);

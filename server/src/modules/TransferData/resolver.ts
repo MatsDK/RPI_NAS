@@ -15,6 +15,7 @@ import { UploadSessionInput } from "./UploadSessionInput";
 import { UploadSessionReturn } from "./UploadSessionReturn";
 import { createWriteStream } from "fs";
 import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
+import { uploadFiles, uploadFilesToRemote } from "../../utils/transferData/uploadFiles";
 
 @Resolver()
 export class TreeResolver {
@@ -102,20 +103,16 @@ export class TreeResolver {
 		if (!node) return null
 
 		if (node.hostNode) {
-			for (let file of files) {
-				file = await file;
-				const filePath = fsPath.join(datastore.basePath, path, file.filename)
-
-				try {
-					await new Promise((res, rej) => {
-						file.createReadStream()
-							.pipe(createWriteStream(filePath))
-							.on("finish", () => res(null))
-							.on("error", err => rej(err.message))
-					})
-				} catch (err) {
-					console.log(err)
-				}
+			const { err } = await uploadFiles({ files, path: fsPath.join(datastore.basePath, path) })
+			if (err) {
+				console.log(err)
+				return null
+			}
+		} else {
+			const { err } = await uploadFilesToRemote({ datastore, node, files, path })
+			if (err) {
+				console.log(err)
+				return null
 			}
 		}
 

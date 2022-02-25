@@ -20,13 +20,14 @@ interface FolderContext {
   };
   selected: {
     selectedItems: Map<string, TreeItem>;
-    setSelected?: React.Dispatch<React.SetStateAction<Map<string, TreeItem>>>;
+    setSelected: React.Dispatch<React.SetStateAction<Map<string, TreeItem>>>;
   };
 }
 
-export let FolderContextValue: FolderContext = {
-  selected: {
-    selectedItems: new Map(),
-  },
-};
+// export let FolderContextValue: FolderContext = {
+//   selected: {
+//     selectedItems: new Map(),
+//     setSelected
+//   },
+// };
 export const FolderContext = React.createContext<FolderContextType>(null);

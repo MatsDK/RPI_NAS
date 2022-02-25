@@ -5,9 +5,8 @@ import React, { useState } from "react";
 import { ApolloProvider } from "react-apollo";
 import withApollo from "src/HOC/withApollo";
 import {
-  CurrentFolderType,
-  FolderContext,
-  FolderContextValue,
+	CurrentFolderType,
+	FolderContext,
 } from "src/providers/folderState";
 import "../css/global.css";
 import { theme } from "src/utils/theme";
@@ -15,61 +14,60 @@ import { MeContext } from "src/providers/meState";
 import { TreeItem } from "generated/apolloComponents";
 
 interface Props {
-  apolloClient: ApolloClient<NormalizedCacheObject>;
-  githubApolloClient: ApolloClient<NormalizedCacheObject>;
+	apolloClient: ApolloClient<NormalizedCacheObject>;
+	githubApolloClient: ApolloClient<NormalizedCacheObject>;
 }
 
 const MyApp = (props: AppProps & Props) => {
-  const { Component, pageProps, apolloClient } = props;
+	const { Component, pageProps, apolloClient } = props;
 
-  const [folderPath, setFolderPath] = useState<CurrentFolderType>({
-    path: null,
-    datastoreId: null,
-    datastoreName: null,
-  });
-  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+	const [folderPath, setFolderPath] = useState<CurrentFolderType>({
+		path: null,
+		datastoreId: null,
+		datastoreName: null,
+	});
+	const [showNewFolderInput, setShowNewFolderInput] = useState(false);
 
-  const [me, setMe] = useState<any>(null);
-  const [selectedItems, setSelected] = useState<Map<string, TreeItem>>(
-    new Map()
-  );
+	const [me, setMe] = useState<any>(null);
+	const [selectedItems, setSelected] = useState<Map<string, TreeItem>>(
+		new Map()
+	);
 
-  const Selected = {
-    ...FolderContextValue.selected,
-    selectedItems,
-    setSelected,
-  };
+	const Selected = {
+		selected: new Map(),
+		selectedItems,
+		setSelected,
+	};
 
-  return (
-    <ApolloProvider client={apolloClient}>
-      <FolderContext.Provider
-        value={{
-          ...FolderContextValue,
-          currentFolderPath: { folderPath, setFolderPath },
-          selected: Selected,
-          newFolderInput: {
-            showNewFolderInput,
-            setShowNewFolderInput,
-          },
-        }}
-      >
-        <MeContext.Provider value={{ me, setMe }}>
-          <ThemeProvider theme={theme}>
-            <Component {...pageProps} />
-          </ThemeProvider>
-        </MeContext.Provider>
-      </FolderContext.Provider>
-    </ApolloProvider>
-  );
+	return (
+		<ApolloProvider client={apolloClient}>
+			<FolderContext.Provider
+				value={{
+					currentFolderPath: { folderPath, setFolderPath },
+					selected: Selected,
+					newFolderInput: {
+						showNewFolderInput,
+						setShowNewFolderInput,
+					},
+				}}
+			>
+				<MeContext.Provider value={{ me, setMe }}>
+					<ThemeProvider theme={theme}>
+						<Component {...pageProps} />
+					</ThemeProvider>
+				</MeContext.Provider>
+			</FolderContext.Provider>
+		</ApolloProvider>
+	);
 };
 
 MyApp.getInitialProps = async ({ Component, ctx }) => {
-  let pageProps = {};
+	let pageProps = {};
 
-  if (Component.getInitialProps)
-    pageProps = await Component.getInitialProps(ctx);
+	if (Component.getInitialProps)
+		pageProps = await Component.getInitialProps(ctx);
 
-  return { pageProps };
+	return { pageProps };
 };
 
 export default withApollo(MyApp);
