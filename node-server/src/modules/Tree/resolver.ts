@@ -88,14 +88,16 @@ export class TreeResolver {
 				])
 
 				if (type === "move") {
+					const { sessionToken, client: connClient } = getOrCreateConnection()
 					const client = srcNode.hostNode ?
-						getOrCreateConnection().client :
+						connClient :
 						getOrCreateApolloClient(`http://${srcNode.ip}:${srcNode.port}/graphql`)
 
 					const { errors } = await client.mutate({
 						mutation: srcNode.hostNode ? DeleteOnHostMutation : DeleteMutation,
 						variables: {
 							datastoreId: srcDatastoreId,
+							sessionToken,
 							paths: [...downloadDirectories, ...downloadFiles].map(({ type, remote }) => ({ path: remote, type }))
 						}
 					})

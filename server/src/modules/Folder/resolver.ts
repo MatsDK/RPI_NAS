@@ -6,6 +6,7 @@ import { Node } from "../../entity/CloudNode";
 import { Datastore } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
 import { checkPermissions } from "../../middleware/checkPermissions";
+import { isNodeValid } from "../../middleware/isNodeValid";
 import { MyContext } from "../../types/Context";
 import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
 import { exec } from "../../utils/exec";
@@ -137,10 +138,11 @@ export class FolderResolver {
 		return updateOwnership(datastoreId, req.userId)
 	}
 
-	// TODO: validate request
+	@UseMiddleware(isNodeValid)
 	@Mutation(() => Boolean, { nullable: true })
 	async deleteFromRemote(
 		@Arg("datastoreId") _datastoreId: number,
+		@Arg("sessionToken", () => String) _sessionToken: string,
 		@Arg("paths", () => [DeletePathsInput]) paths: DeletePathsInput[]
 	) {
 		try {

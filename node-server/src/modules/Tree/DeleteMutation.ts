@@ -12,8 +12,9 @@ mutation DeleteDataMutation(
 export const DeleteOnHostMutation = gql`
 mutation DeleteOnHostMutation(
 	$paths: [DeletePathsInput!]!
+	$sessionToken: String!
 	$datastoreId: Float!
 ) {
-	deleteFromRemote(paths: $paths, datastoreId: $datastoreId)
+	deleteFromRemote(paths: $paths, datastoreId: $datastoreId, sessionToken: $sessionToken)
 }
 `;
