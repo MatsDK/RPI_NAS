@@ -6,16 +6,15 @@ import { Datastore } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
 import { getDataStoreAndNode } from "../../middleware/getDataStoreNode";
 import { MyContext } from "../../types/Context";
-import { GraphQLUpload } from "graphql-upload";
 import { Upload } from "../../types/Upload";
+import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
 import { downloadSessions } from "../../utils/transferData/downloadSessions";
+import { uploadFiles, uploadFilesToRemote } from "../../utils/transferData/uploadFiles";
 import { DownloadSessionInput } from "./DownloadSessionInput";
 import { DownloadSessionReturn } from "./DownloadSessionReturn";
 import { UploadSessionInput } from "./UploadSessionInput";
 import { UploadSessionReturn } from "./UploadSessionReturn";
-import { createWriteStream } from "fs";
-import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
-import { uploadFiles, uploadFilesToRemote } from "../../utils/transferData/uploadFiles";
+import { FileUpload, GraphQLUpload, Upload as TEST } from "graphql-upload"
 
 @Resolver()
 export class TreeResolver {
@@ -90,7 +89,7 @@ export class TreeResolver {
 	@Mutation(() => Boolean, { nullable: true })
 	async uploadFiles(
 		@Ctx() { req }: MyContext,
-		@Arg("files", () => FileList) files: Upload[],
+		@Arg("files", () => [GraphQLUpload]) files: Upload[],
 		@Arg("datastoreId") datastoreId: number,
 		@Arg("path") path: string,
 	) {

@@ -27,10 +27,13 @@ export const uploadFilesToRemote = async ({ datastore, node, path, files }: Prop
 		const client = await getOrCreateNodeClient({ node, ping: false })
 		if (!client) return { err: `could not connect to node: ${node.name}` }
 
+		const srcNode = await Node.findOne({ where: { hostNode: true } })
+		if (!srcNode) return { err: "Host node not found" }
+
 		const variables = {
 			type: "copy",
-			remote: false,
-			srcNode: node,
+			remote: true,
+			srcNode,
 			nodeLoginName: node.loginName,
 			datastoreName: fsPath.basename(datastore.basePath),
 			datastoreBasePath: datastore.basePath,
@@ -48,14 +51,14 @@ export const uploadFilesToRemote = async ({ datastore, node, path, files }: Prop
 				})),
 				...variables
 			}
-		}), 750)
+		}), 750, (err) => console.log(err))
 
 		if (!res) {
 			console.log("FAILED", res)
 			return { err: true }
 		}
 
-		console.log(res)
+		fs.rmdirSync(tmpFolder)
 
 		return { err: false }
 	} catch (err) {
