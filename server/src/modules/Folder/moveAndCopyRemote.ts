@@ -1,12 +1,11 @@
-import { Node } from "../../entity/CloudNode";
-import fsPath from "path"
-import { Client } from "ssh-package"
-import { CopyMoveDataObject, CopyMoveDestinationObject } from "./copyMoveMutationInput";
-import { GetDsAndNodeReturn } from "./moveCopyData";
+import fsPath from "path";
 import { Datastore } from "../../entity/Datastore";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
+import { createSSHClientForNode } from "../../utils/transferData/createSSHClientForNode";
 import { CopyMoveMutation } from "./CopyMoveMutation";
+import { CopyMoveDataObject, CopyMoveDestinationObject } from "./copyMoveMutationInput";
 import { DeleteMutation } from "./DeleteMutation";
+import { GetDsAndNodeReturn } from "./moveCopyData";
 import { updateOwnership } from "./updateOwnership";
 
 interface moveAndCopyProps {
@@ -78,17 +77,6 @@ export const moveAndCopyRemote = async ({ destDatastore, destNode, srcNode, srcD
 
 	return { err: false }
 }
-
-const createSSHClientForNode = async ({ ip, password, loginName }: Node): Promise<Client> => new Promise((res, rej) => {
-	const client = new Client({
-		host: ip,
-		username: loginName,
-		password,
-	})
-
-	client.on("ready", () => res(client))
-	client.on("timeout", () => rej("connection timed out"))
-})
 
 const parseMoveAndCopyDataPaths = (data: CopyMoveDataObject[], srcDatastore: Datastore, destDatastore: Datastore, destinationPath: string) => {
 	const _ = (_data: CopyMoveDataObject[]) => _data.map(({ path, type }) => {

@@ -8,7 +8,7 @@ export type Type = "file" | "directory";
 interface ReqProps {
 	userId: number;
 	user: User | undefined,
-	dataStore?: Datastore,
+	datastore?: Datastore,
 	localNode?: Node
 }
 

@@ -25,7 +25,7 @@ export class TreeResolver {
 		{ uploadPath }: UploadSessionInput,
 		@Ctx() { req }: MyContext
 	): UploadSessionReturn {
-		const dataStore = req.dataStore as Datastore,
+		const dataStore = req.datastore as Datastore,
 			localNode = req.localNode as Node,
 			returnObj = new UploadSessionReturn();
 
@@ -41,13 +41,20 @@ export class TreeResolver {
 
 	@UseMiddleware(isAuth, getDataStoreAndNode)
 	@Mutation(() => DownloadSessionReturn, { nullable: true })
-	createDownloadSession(
+	async createDownloadSession(
 		@Arg("data", () => DownloadSessionInput)
 		{ downloadPaths, type }: DownloadSessionInput,
 		@Ctx() { req }: MyContext
-	): DownloadSessionReturn {
+	): Promise<DownloadSessionReturn | null> {
 		const returnObj = new DownloadSessionReturn(),
-			dataStore = req.dataStore as Datastore;
+			datastore = req.datastore,
+			node = req.localNode
+
+		if (!datastore || !node)
+			return null
+
+		if (!(await hasAccessToDatastore(datastore.id, req.userId, datastore.userId)))
+			return null
 
 		switch (type) {
 			case "http":
@@ -55,10 +62,14 @@ export class TreeResolver {
 
 				downloadSessions.addSession(
 					id,
-					downloadPaths.map((obj) => ({
-						...obj,
-						path: fsPath.join(dataStore.basePath, obj.path),
-					}))
+					{
+						paths: downloadPaths.map((obj) => ({
+							...obj,
+							path: fsPath.join(datastore.basePath, obj.path),
+						})),
+						datastore,
+						node
+					}
 				);
 
 				returnObj.id = id;
@@ -69,7 +80,7 @@ export class TreeResolver {
 
 				returnObj.data = downloadPaths.map(({ path, ...rest }) => ({
 					...rest,
-					path: fsPath.join(dataStore.basePath, path),
+					path: fsPath.join(datastore.basePath, path),
 				}));
 
 				returnObj.hostIp = localNode.ip;

@@ -7,16 +7,16 @@ export const getDataStoreAndNode: MiddlewareFn<MyContext> = async (
   { context: { req }, args },
   next
 ) => {
-  const dataStore = await Datastore.findOne({
+  const datastore = await Datastore.findOne({
     where: { id: args.data.dataStoreId },
   });
 
-  (req as any).dataStore = dataStore;
+  (req as any).datastore = datastore;
 
-  dataStore &&
+  datastore &&
     ((req as any).localNode = await Node.findOne({
-      where: { id: dataStore.localNodeId },
+      where: { id: datastore.localNodeId },
     }));
 
-  return dataStore && (req as any).localNode ? next() : null;
+  return datastore && (req as any).localNode ? next() : null;
 };
