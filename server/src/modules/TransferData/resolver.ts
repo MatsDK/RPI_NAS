@@ -4,7 +4,7 @@ import { v4 } from "uuid";
 import { Node } from "../../entity/CloudNode";
 import { Datastore } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
-import { getDataStoreAndNode } from "../../middleware/getDataStoreNode";
+import { getDatastoreAndNode } from "../../middleware/getDataStoreNode";
 import { MyContext } from "../../types/Context";
 import { Upload } from "../../types/Upload";
 import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
@@ -14,11 +14,11 @@ import { DownloadSessionInput } from "./DownloadSessionInput";
 import { DownloadSessionReturn } from "./DownloadSessionReturn";
 import { UploadSessionInput } from "./UploadSessionInput";
 import { UploadSessionReturn } from "./UploadSessionReturn";
-import { FileUpload, GraphQLUpload, Upload as TEST } from "graphql-upload"
+import { GraphQLUpload } from "graphql-upload"
 
 @Resolver()
 export class TreeResolver {
-	@UseMiddleware(isAuth, getDataStoreAndNode)
+	@UseMiddleware(isAuth, getDatastoreAndNode)
 	@Mutation(() => UploadSessionReturn, { nullable: true })
 	createUploadSession(
 		@Arg("data", () => UploadSessionInput)
@@ -39,7 +39,7 @@ export class TreeResolver {
 		return returnObj;
 	}
 
-	@UseMiddleware(isAuth, getDataStoreAndNode)
+	@UseMiddleware(isAuth, getDatastoreAndNode)
 	@Mutation(() => DownloadSessionReturn, { nullable: true })
 	async createDownloadSession(
 		@Arg("data", () => DownloadSessionInput)

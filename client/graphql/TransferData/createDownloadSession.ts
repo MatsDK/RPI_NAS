@@ -4,10 +4,10 @@ export const createSessionMutation = gql`
   mutation createSession(
     $data: [DownloadPathsInput!]!
     $type: String!
-    $dataStoreId: Float!
+    $datastoreId: Float!
   ) {
     createDownloadSession(
-      data: { type: $type, downloadPaths: $data, dataStoreId: $dataStoreId }
+      data: { type: $type, downloadPaths: $data, datastoreId: $datastoreId }
     ) {
       data {
         type

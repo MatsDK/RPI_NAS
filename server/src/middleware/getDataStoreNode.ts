@@ -3,12 +3,12 @@ import { Node } from "../entity/CloudNode";
 import { Datastore } from "../entity/Datastore";
 import { MyContext } from "../types/Context";
 
-export const getDataStoreAndNode: MiddlewareFn<MyContext> = async (
+export const getDatastoreAndNode: MiddlewareFn<MyContext> = async (
   { context: { req }, args },
   next
 ) => {
   const datastore = await Datastore.findOne({
-    where: { id: args.data.dataStoreId },
+    where: { id: args.data.datastoreId },
   });
 
   (req as any).datastore = datastore;

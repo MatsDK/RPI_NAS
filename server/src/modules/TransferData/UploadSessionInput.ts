@@ -6,5 +6,5 @@ export class UploadSessionInput {
   uploadPath: string;
 
   @Field(() => Number)
-  dataStoreId: number;
+  datastoreId: number;
 }

@@ -197,7 +197,7 @@ export const UploadWrapper: React.FC<UploadWrapperProps> = ({ hide }) => {
 					query: getTreeQuery, variables: {
 						depth: 1,
 						path: folderCtx?.currentFolderPath?.folderPath.path,
-						dataStoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
+						datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
 					}
 				}]
 			})

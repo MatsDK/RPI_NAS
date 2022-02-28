@@ -10,7 +10,7 @@ export class DownloadSessionInput {
   downloadPaths: DownloadPathsInput[];
 
   @Field(() => Number)
-  dataStoreId: number;
+  datastoreId: number;
 }
 
 @InputType()

@@ -12,6 +12,8 @@ import "../css/global.css";
 import { theme } from "src/utils/theme";
 import { MeContext } from "src/providers/meState";
 import { TreeItem } from "generated/apolloComponents";
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 interface Props {
 	apolloClient: ApolloClient<NormalizedCacheObject>;
@@ -52,9 +54,12 @@ const MyApp = (props: AppProps & Props) => {
 				}}
 			>
 				<MeContext.Provider value={{ me, setMe }}>
-					<ThemeProvider theme={theme}>
-						<Component {...pageProps} />
-					</ThemeProvider>
+					<DndProvider backend={HTML5Backend}>
+
+						<ThemeProvider theme={theme}>
+							<Component {...pageProps} />
+						</ThemeProvider>
+					</DndProvider>
 				</MeContext.Provider>
 			</FolderContext.Provider>
 		</ApolloProvider>
