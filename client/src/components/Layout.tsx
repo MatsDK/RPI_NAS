@@ -5,6 +5,7 @@ import Navbar from "./Navbar";
 
 const PageBody = styled.div`
   display: flex;
+  width: 100vw;
   height: 100%;
   background-color: ${(props) => props.theme.lightBgColors[0]};
 `;

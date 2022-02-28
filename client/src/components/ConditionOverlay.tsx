@@ -24,7 +24,6 @@ interface OverlayProps {
 const Children = styled.div<OverlayProps>`
 	opacity: ${props => props.show ? .3 : 1};
 	transition: opacity .15s ease-in-out;
-
 `
 
 const Overlay = styled.div<OverlayProps>`

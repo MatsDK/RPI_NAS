@@ -3,17 +3,12 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import prettyBytes from "pretty-bytes";
 import React, { useContext, useEffect, useState } from "react";
-import { useDrag } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-import ReactDOMServer from "react-dom/server";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import Icon from "src/ui/Icon";
 import styled from "styled-components";
 import { DragCursor } from "./DragCursor";
-
-const test = (el: any) => {
-	return `data:image/png;base64,${escape(ReactDOMServer.renderToStaticMarkup(el))}`
-}
 
 interface Props {
 	item: TreeItem & { idx?: number };
@@ -22,14 +17,21 @@ interface Props {
 	items: TreeItem[]
 }
 
-export const FolderItemWrapper = styled.div<{ selected: boolean }>`
-	margin: 0 5px;
+interface FolderItemWrapperProps {
+	selected: boolean
+	canDrop: boolean
+	isOver: boolean
+}
+
+export const FolderItemWrapper = styled.div<FolderItemWrapperProps>`
+	margin: 1px 5px;
 	display: flex;
-	padding: 2px 3px;
 	align-items: center;
 	width: 100%;
 
 	background-color: ${props => props.selected ? props.theme.lightBgColors[1] : props.theme.lightBgColors[0]};
+	padding: ${props => props.canDrop ? "1px 2px" : "2px 3px"};
+	border: ${props => props.canDrop ? `1px dashed ${props.isOver ? props.theme.bgColors[0] : props.theme.lightBgColors[2]}` : "none"};
 
 	:hover input[type="checkbox"] {
 		opacity: 1;
@@ -98,12 +100,26 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 
 	const [{ isDragging }, drag, preview] = useDrag(
 		() => ({
-			type: "test",
+			type: "any",
 			collect: (monitor) => ({
 				isDragging: !!monitor.isDragging(),
 			}),
 		}),
 		[],
+	)
+
+	const [{ isOver, canDrop }, drop] = useDrop(
+		() => ({
+			accept: "any",
+			canDrop: () => item.isDirectory && !isSelected(item, folderCtx?.selected.selectedItems || new Map()),
+			drop: (_item) => {
+				console.log("drop", item);
+			},
+			collect: (monitor) => ({
+				isOver: !!monitor.isOver(),
+				canDrop: !!monitor.canDrop(),
+			}),
+		})
 	)
 
 	item.idx = idx
@@ -151,81 +167,98 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 		preview(getEmptyImage(), { captureDraggingState: true, })
 	}, [])
 
+	useEffect(() => {
+		if (isDragging) {
+			if (folderCtx.selected.selectedItems.size === 0 ||
+				!isSelected(item, folderCtx.selected.selectedItems)) {
+				const newSelected: Map<string, TreeItem> = new Map()
+				folderCtx.selected.setSelected(newSelected.set(item.path, item))
+			}
+		}
+		return () => { }
+	}, [isDragging])
+
 	return (
 		<>
 			{isDragging && <DragCursor selectedCount={folderCtx.selected.selectedItems.size} />}
-			<FolderItemWrapper
-				ref={drag}
-				style={{ opacity: isDragging ? 1 : 1 }}
-				selected={selected}
-				onDoubleClick={() =>
-					item.isDirectory &&
-					router.push(`/path/${item.relativePath}?d=${datastoreId}`)
-				}
-				onClick={({ ctrlKey, shiftKey }) => updateSelected(ctrlKey, shiftKey)}
-			>
-				<SelectButtonWrapper
-					onClick={(e) => {
-						e.stopPropagation();
-
-						if (!folderCtx.selected.selectedItems.has(item.path))
-							folderCtx.selected.setSelected(
-								(m) => new Map(m.set(item.path, item))
-							);
-						else
-							folderCtx.selected.setSelected((m) => {
-								m.delete(item.path);
-								return new Map(m);
-							});
-
-						setSelected((s) => !s);
-					}}
+			<div ref={drop}>
+				<FolderItemWrapper
+					ref={drag}
+					canDrop={canDrop}
+					isOver={isOver}
+					selected={selected}
+					onDoubleClick={() =>
+						item.isDirectory &&
+						router.push(`/path/${item.relativePath}?d=${datastoreId}`)
+					}
+					onClick={({ ctrlKey, shiftKey }) => updateSelected(ctrlKey, shiftKey)}
 				>
-					<input
-						type="checkbox"
-						checked={selected || false}
-						onChange={() => { }}
-					/>
-				</SelectButtonWrapper>
-				<IconWrapper>
-					{item.isDirectory ? (
-						<Icon
-							color={{ idx: 2, propName: "bgColors" }}
-							width={24}
-							height={22}
-							viewPort={30}
-							name="folderIcon"
+
+					<SelectButtonWrapper
+						onClick={(e) => {
+							e.stopPropagation();
+
+							if (!folderCtx.selected.selectedItems.has(item.path))
+								folderCtx.selected.setSelected(
+									(m) => new Map(m.set(item.path, item))
+								);
+							else
+								folderCtx.selected.setSelected((m) => {
+									m.delete(item.path);
+									return new Map(m);
+								});
+
+							setSelected((s) => !s);
+						}}
+					>
+						<input
+							type="checkbox"
+							checked={selected || false}
+							onChange={() => { }}
 						/>
-					) : (
-						<div style={{ marginLeft: 2 }}>
+					</SelectButtonWrapper>
+					<IconWrapper>
+						{item.isDirectory ? (
 							<Icon
-								name={"fileIcon"}
 								color={{ idx: 2, propName: "bgColors" }}
-								height={26}
-								width={26}
-								viewPort={26}
+								width={24}
+								height={22}
+								viewPort={30}
+								name="folderIcon"
 							/>
-						</div>
-					)}
-				</IconWrapper>
-				<Info>
-					{item.isDirectory ? (
-						<div>
-							<Link href={`/path/${item.relativePath}?d=${datastoreId}`}>
-								<FolderButtonItem onClick={e => e.stopPropagation()}>{item.name}</FolderButtonItem>
-							</Link>
-							<p />
-						</div>
-					) : (
-						<div>
-							<Name>{item.name}</Name>
-							<p>{item.size != null && <Size>{prettyBytes(item.size)}</Size>}</p>
-						</div>
-					)}
-				</Info>
-			</FolderItemWrapper >
+						) : (
+							<div style={{ marginLeft: 2 }}>
+								<Icon
+									name={"fileIcon"}
+									color={{ idx: 2, propName: "bgColors" }}
+									height={26}
+									width={26}
+									viewPort={26}
+								/>
+							</div>
+						)}
+					</IconWrapper>
+					<Info>
+						{item.isDirectory ? (
+							<div>
+								<Link href={`/path/${item.relativePath}?d=${datastoreId}`}>
+									<FolderButtonItem onClick={e => e.stopPropagation()}>{item.name}</FolderButtonItem>
+								</Link>
+								<p />
+							</div>
+						) : (
+							<div>
+								<Name>{item.name}</Name>
+								<p>{item.size != null && <Size>{prettyBytes(item.size)}</Size>}</p>
+							</div>
+						)}
+					</Info>
+				</FolderItemWrapper >
+			</div>
 		</>
 	);
 };
 
 export default FolderItem;
+
+const isSelected = (item: TreeItem, selected: Map<string, TreeItem>) => selected.has(item.path)
