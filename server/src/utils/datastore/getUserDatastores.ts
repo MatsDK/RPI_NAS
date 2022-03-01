@@ -7,6 +7,6 @@ export const getUserDatastores = (userId: number): Promise<Datastore[]> =>
   getConnection()
     .getRepository(Datastore)
     .createQueryBuilder("d")
-    .leftJoin("shared_data_store", "s", `s."datastoreId"=d.id`)
+    .leftJoin("shared_datastore", "s", `s."datastoreId"=d.id`)
     .where("d.userId=:id OR s.userId=:id", { id: userId })
     .getMany();

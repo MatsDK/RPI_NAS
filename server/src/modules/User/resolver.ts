@@ -66,13 +66,15 @@ export class UserResolver {
 		@Arg("data") { email, password, userName }: RegisterInput
 	): Promise<User | null> {
 		const hashedPassword = await hash(password, 10),
-			osUserName = userName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+			osUserName = userName.replace(/[^a-z0-9]/gi, "_").toLowerCase(),
+			usersCount = await User.count();
 
 		const user = await User.create({
 			email,
 			userName,
 			password: hashedPassword,
 			osUserName,
+			isAdmin: usersCount === 0
 		}).save();
 
 		const { err } = await createUser(osUserName, password, false);
