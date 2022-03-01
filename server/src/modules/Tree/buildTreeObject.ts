@@ -1,7 +1,7 @@
 import { ApolloError } from "apollo-server-core";
 import { Node } from "../../entity/CloudNode";
 import { Datastore } from "../../entity/Datastore";
-import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
+import { hasAccessToDatastore } from "../../utils/datastore/hasAccessToDatastore";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { GetTreeQuery } from "./GetTreeQuery";
 import { Tree } from "./TreeObject";

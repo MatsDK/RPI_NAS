@@ -17,10 +17,10 @@ export class TreeItem {
   isDirectory: boolean;
 
   @Field(() => Number, { nullable: true })
-  dataStoreId: number;
+  datastoreId: number;
 
   @Field(() => Boolean, { nullable: true })
-  sharedDataStore: boolean;
+  sharedDatastore: boolean;
 
   @Field(() => Number, { nullable: true })
   size: number;

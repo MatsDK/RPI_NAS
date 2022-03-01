@@ -8,7 +8,7 @@ export const CreateDataStoreMutation = gql`
     $ownerId: Float!
     $ownerPassword: String
   ) {
-    createDataStore(
+    createDatastore(
       data: {
         localNodeId: $localNodeId
         name: $name

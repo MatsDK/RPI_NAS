@@ -1,6 +1,6 @@
 import { gql } from "apollo-server-core";
 import { dfOptions } from "../../constants";
-import { Datastore, DataStoreStatus, SizeObject } from "../../entity/Datastore";
+import { Datastore, DatastoreStatus, SizeObject } from "../../entity/Datastore";
 import { getOrCreateNodeClient } from "../nodes/nodeClients";
 import { Node } from "../../entity/CloudNode"
 import { withTimeout } from "../withTimeout";
@@ -51,7 +51,7 @@ const getRemoteDatastoreSizes = async (datastores: Datastore[], node: Node): Pro
 			query: GET_REMOTE_DATASTORE_SIZES_QUERY,
 			variables: { datastores: datastores.map(({ id, basePath }) => ({ id, path: basePath })) }
 		}), 300, () => {
-			datastores = datastores.map((ds) => ({ ...ds, status: DataStoreStatus.OFFLINE })) as Datastore[]
+			datastores = datastores.map((ds) => ({ ...ds, status: DatastoreStatus.OFFLINE })) as Datastore[]
 		})
 
 		if (response?.data) {

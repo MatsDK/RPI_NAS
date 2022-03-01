@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 
 export const getDataStoresQuery = gql`
   query GetDataStores {
-    getDataStores {
+    getDatastores {
       id
       name
       userId

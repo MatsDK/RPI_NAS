@@ -1,7 +1,7 @@
 import { Field, ObjectType } from "type-graphql";
 import { getTreeObject } from "../../utils/getTreeObject";
 import { TreeItem } from "./TreeItem";
-import { getDataStoresTreeObject } from "../../utils/dataStore/getDataStoresTreeObject";
+import { getDatastoresTreeObject } from "../../utils/datastore/getDatastoresTreeObject";
 
 @ObjectType()
 export class Tree {
@@ -38,7 +38,7 @@ export class Tree {
         basePath,
       });
     else if (userOptions)
-      this.tree = await getDataStoresTreeObject(
+      this.tree = await getDatastoresTreeObject(
         userOptions,
         depth,
         path,

@@ -5,6 +5,6 @@ export const ToggleDatastoreServiceMutation = gql`
     $serviceName: String!
     $datastoreId: Float!
   ) {
-    toggleDatastoreService(serviceName: $serviceName, dataStoreId: $datastoreId)
+    toggleDatastoreService(serviceName: $serviceName, datastoreId: $datastoreId)
   }
 `;

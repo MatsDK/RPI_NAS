@@ -1,7 +1,7 @@
 import { Field, InputType } from "type-graphql";
 
 @InputType()
-export class CreateDataStoreInput {
+export class CreateDatastoreInput {
   @Field()
   localNodeId: number;
 
@@ -14,6 +14,6 @@ export class CreateDataStoreInput {
   @Field()
   ownerId: number;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   ownerPassword: string;
 }

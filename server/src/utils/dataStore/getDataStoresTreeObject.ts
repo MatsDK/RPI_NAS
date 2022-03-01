@@ -1,23 +1,23 @@
 import { Any } from "typeorm";
 import fsPath from "path";
-import { SharedDataStore } from "../../entity/SharedDataStore";
+import { SharedDatastore } from "../../entity/SharedDatastore";
 import { TreeItem } from "../../modules/Tree/TreeItem";
 import { Datastore } from "../../entity/Datastore";
-import { getUserDataStores } from "./getUserDataStores";
+import { getUserDatastores } from "./getUserDatastores";
 
-export const getDataStoresTreeObject = async (
+export const getDatastoresTreeObject = async (
   { userId }: { userId: number },
   depth: number,
   path: string,
   directoryTree: boolean
 ): Promise<TreeItem[]> => {
-  const userDataStores: Datastore[] = await getUserDataStores(userId),
+  const userDatastores: Datastore[] = await getUserDatastores(userId),
     items: TreeItem[] = [];
 
-  const sharedDatastores = await SharedDataStore.find({
-    where: { dataStoreId: Any(userDataStores.map(({ id }) => id)) },
+  const sharedDatastores = await SharedDatastore.find({
+    where: { datastoreId: Any(userDatastores.map(({ id }) => id)) },
   });
-  for (const { basePath, name, id } of userDataStores) {
+  for (const { basePath, name, id } of userDatastores) {
     const newItem = new TreeItem(
       depth,
       fsPath.join(basePath, path),
@@ -26,13 +26,13 @@ export const getDataStoresTreeObject = async (
     );
 
     const isShared = !!sharedDatastores.filter(
-      ({ dataStoreId }) => dataStoreId === id
+      ({ datastoreId }) => datastoreId === id
     ).length;
 
     newItem.name = name;
     newItem.path = basePath;
-    newItem.dataStoreId = id;
-    newItem.sharedDataStore = isShared;
+    newItem.datastoreId = id;
+    newItem.sharedDatastore = isShared;
     newItem.relativePath = "";
     newItem.isDirectory = true;
 

@@ -1,4 +1,4 @@
-import { SharedDataStore } from "../../entity/SharedDataStore";
+import { SharedDatastore } from "../../entity/SharedDatastore";
 
 export const hasAccessToDatastore = async (datastoreId: number, userId: number, datastoreOwnerId: number) =>
-	(!!(await SharedDataStore.count({ where: { datastoreId, userId } })) || datastoreOwnerId == userId)
+	(!!(await SharedDatastore.count({ where: { datastoreId, userId } })) || datastoreOwnerId == userId)

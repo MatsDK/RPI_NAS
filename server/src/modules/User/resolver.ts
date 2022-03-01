@@ -124,7 +124,7 @@ export class UserResolver {
 
 	@UseMiddleware(isAuth)
 	@Query(() => [Datastore], { nullable: true })
-	getMyDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
+	getMyDatastores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
 		return Datastore.find({ where: { userId: req.userId } });
 	}
 

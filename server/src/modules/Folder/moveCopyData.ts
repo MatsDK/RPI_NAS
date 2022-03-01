@@ -4,7 +4,7 @@ import fsPath from "path";
 import { CopyMoveInput } from "./copyMoveMutationInput";
 import { Node } from "../../entity/CloudNode";
 import { ApolloError } from "apollo-server-core";
-import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
+import { hasAccessToDatastore } from "../../utils/datastore/hasAccessToDatastore";
 import { moveAndCopyRemote } from "./moveAndCopyRemote";
 import { updateOwnership } from "./updateOwnership";
 

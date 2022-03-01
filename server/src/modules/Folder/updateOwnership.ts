@@ -1,5 +1,5 @@
 import { Datastore } from "../../entity/Datastore"
-import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore"
+import { hasAccessToDatastore } from "../../utils/datastore/hasAccessToDatastore"
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients"
 import { UpdateOwnershipMutation } from "./UpdateOwnershipMutation"
 import { Node } from "../../entity/CloudNode"

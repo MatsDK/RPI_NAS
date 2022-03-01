@@ -11,7 +11,7 @@ export const checkPermissions: MiddlewareFn<MyContext> = async (
 
   const [res] = await getConnection().query(
     `SELECT (SELECT COUNT(*) FROM datastore WHERE "id"=$1 AND "userId"=$2) AS count1,
-		(SELECT COUNT(*) FROM shared_data_store WHERE "dataStoreId"=$1 AND "userId"=$2) AS count2`,
+		(SELECT COUNT(*) FROM shared_data_store WHERE "datastoreId"=$1 AND "userId"=$2) AS count2`,
     [id, req.userId]
   );
 

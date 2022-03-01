@@ -105,7 +105,7 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 				isDragging: !!monitor.isDragging(),
 			}),
 		}),
-		[],
+		[folderCtx?.selected.selectedItems],
 	)
 
 	const [{ isOver, canDrop }, drop] = useDrop(
@@ -119,7 +119,8 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 				isOver: !!monitor.isOver(),
 				canDrop: !!monitor.canDrop(),
 			}),
-		})
+		}),
+		[folderCtx?.selected.selectedItems]
 	)
 
 	item.idx = idx

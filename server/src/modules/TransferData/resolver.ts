@@ -4,10 +4,10 @@ import { v4 } from "uuid";
 import { Node } from "../../entity/CloudNode";
 import { Datastore } from "../../entity/Datastore";
 import { isAuth } from "../../middleware/auth";
-import { getDatastoreAndNode } from "../../middleware/getDataStoreNode";
+import { getDatastoreAndNode } from "../../middleware/getDatastoreNode";
 import { MyContext } from "../../types/Context";
 import { Upload } from "../../types/Upload";
-import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
+import { hasAccessToDatastore } from "../../utils/datastore/hasAccessToDatastore";
 import { downloadSessions } from "../../utils/transferData/downloadSessions";
 import { uploadFiles, uploadFilesToRemote } from "../../utils/transferData/uploadFiles";
 import { DownloadSessionInput } from "./DownloadSessionInput";
@@ -25,11 +25,11 @@ export class TreeResolver {
 		{ uploadPath }: UploadSessionInput,
 		@Ctx() { req }: MyContext
 	): UploadSessionReturn {
-		const dataStore = req.datastore as Datastore,
+		const datastore = req.datastore as Datastore,
 			localNode = req.localNode as Node,
 			returnObj = new UploadSessionReturn();
 
-		returnObj.uploadPath = fsPath.join(dataStore.basePath, uploadPath);
+		returnObj.uploadPath = fsPath.join(datastore.basePath, uploadPath);
 
 		returnObj.hostIp = localNode.ip;
 		returnObj.password = localNode.password;

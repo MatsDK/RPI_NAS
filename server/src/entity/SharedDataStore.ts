@@ -3,7 +3,7 @@ import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
 @ObjectType()
 @Entity()
-export class SharedDataStore extends BaseEntity {
+export class SharedDatastore extends BaseEntity {
   @Field(() => ID)
   @PrimaryColumn("int", { generated: true })
   id: number;
@@ -14,7 +14,7 @@ export class SharedDataStore extends BaseEntity {
 
   @Field()
   @Column("int")
-  dataStoreId: number;
+  datastoreId: number;
 
   @Field()
   @Column()

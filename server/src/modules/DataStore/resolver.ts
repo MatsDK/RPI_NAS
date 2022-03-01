@@ -10,45 +10,43 @@ import {
   UseMiddleware
 } from "type-graphql";
 import { Node } from "../../entity/CloudNode";
-import { Datastore, DataStoreStatus } from "../../entity/Datastore";
+import { Datastore, DatastoreStatus } from "../../entity/Datastore";
 import { DatastoreService, ServiceNames } from "../../entity/DatastoreService";
-import { SharedDataStore } from "../../entity/SharedDataStore";
+import { SharedDatastore } from "../../entity/SharedDatastore";
 import { User } from "../../entity/User";
 import { isAuth } from "../../middleware/auth";
 import { getUser } from "../../middleware/getUser";
 import { isAdmin } from "../../middleware/isAdmin";
 import { MyContext } from "../../types/Context";
-import { createDatastoreFolder } from "../../utils/dataStore/createDatastoreFolder";
-import { getDatastoresWithSizesAndSharedUsers } from "../../utils/dataStore/getDatastoresWithSizesAndSharedUsers";
-import { getUserDataStores } from "../../utils/dataStore/getUserDataStores";
-import {
-  addUsersToGroup, createGroup
-} from "../../utils/dataStore/handleGroups";
-import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
-import { updateDatastoreOwnerAndName, updateSharedUsers, updateSharedUsersServices } from "../../utils/dataStore/updateDatastore";
+import { createDatastoreFolder } from "../../utils/datastore/createDatastoreFolder";
+import { getDatastoresWithSizesAndSharedUsers } from "../../utils/datastore/getDatastoresWithSizesAndSharedUsers";
+import { getUserDatastores } from "../../utils/datastore/getUserDatastores";
+import { addUsersToGroup, createGroup } from "../../utils/datastore/handleGroups";
+import { hasAccessToDatastore } from "../../utils/datastore/hasAccessToDatastore";
+import { updateDatastoreOwnerAndName, updateSharedUsers, updateSharedUsersServices } from "../../utils/datastore/updateDatastore";
 import { createRemoteDatastore } from "../../utils/nodes/createDatastore";
 import { toggleService } from "../../utils/services/toggleService";
 import { updateSMB } from "../../utils/services/updateSMB";
-import { CreateDataStoreInput } from "./CreateDataStoreInput";
-import { CreateSharedDataStoreInput } from "./CreateSharedDataStoreInput";
+import { CreateDatastoreInput } from "./CreateDatastoreInput";
+import { CreateSharedDatastoreInput } from "./CreateSharedDatastoreInput";
 import { UpdateDatastoreInput } from "./UpdateDatastoreInput";
 
 @Resolver()
-export class DataStoreResolver {
+export class DatastoreResolver {
   @UseMiddleware(isAuth, getUser)
   @Query(() => [Datastore], { nullable: true })
-  async getDataStores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
-    const dataStores = await (req.user?.isAdmin
+  async getDatastores(@Ctx() { req }: MyContext): Promise<Datastore[]> {
+    const datastores = await (req.user?.isAdmin
       ? Datastore.find()
-      : getUserDataStores(req.userId));
+      : getUserDatastores(req.userId));
 
-    return await getDatastoresWithSizesAndSharedUsers(dataStores, req.userId!);
+    return await getDatastoresWithSizesAndSharedUsers(datastores, req.userId!);
   }
 
   @UseMiddleware(isAuth, getUser, isAdmin)
   @Mutation(() => Datastore, { nullable: true })
-  async createDataStore(
-    @Arg("data") data: CreateDataStoreInput
+  async createDatastore(
+    @Arg("data") data: CreateDatastoreInput
   ): Promise<Datastore | null> {
     const { localNodeId, name, ownerId, sizeInMB, ownerPassword } = data
 
@@ -77,7 +75,7 @@ export class DataStoreResolver {
       throw new Error("User not initialized")
     }
 
-    const setStatusToOnline = async () => newDatastore && await Datastore.update({ id: newDatastore.id }, { status: DataStoreStatus.ONLINE })
+    const setStatusToOnline = async () => newDatastore && await Datastore.update({ id: newDatastore.id }, { status: DatastoreStatus.ONLINE })
 
     if (hostNode.id != thisNode.id) {
       const { err } = await createRemoteDatastore({
@@ -112,23 +110,23 @@ export class DataStoreResolver {
 
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
-  async createSharedDataStore(
-    @Arg("data") { ids }: CreateSharedDataStoreInput,
+  async createSharedDatastore(
+    @Arg("data") { ids }: CreateSharedDatastoreInput,
     @Ctx() { req }: MyContext
   ): Promise<boolean | null> {
     const { userId } = req as any,
-      dataStoreIds: Set<number> = new Set();
+      datastoreIds: Set<number> = new Set();
 
-    ids.forEach((i) => dataStoreIds.add(i.dataStoreId));
+    ids.forEach((i) => datastoreIds.add(i.datastoreId));
 
-    for (const dataStoreId of dataStoreIds) {
-      const dataStore = await Datastore.findOne({
-        where: { id: dataStoreId },
+    for (const datastoreId of datastoreIds) {
+      const datastore = await Datastore.findOne({
+        where: { id: datastoreId },
       });
-      if (!dataStore || dataStore.userId != userId) return null;
+      if (!datastore || datastore.userId != userId) return null;
     }
 
-    await SharedDataStore.insert(ids);
+    await SharedDatastore.insert(ids);
 
     const { err } = await addUsersToGroup(ids);
     if (err) {
@@ -181,13 +179,13 @@ export class DataStoreResolver {
   @Mutation(() => Boolean, { nullable: true })
   async toggleDatastoreService(
     @Ctx() { req }: MyContext,
-    @Arg("dataStoreId") datastoreId: number,
+    @Arg("datastoreId") datastoreId: number,
     @Arg("serviceName", () => String) serviceName: "SMB" | "FTP"
   ): Promise<boolean | null> {
     const datastore = await Datastore.findOne({
       where: { id: datastoreId },
     });
-    if (!datastore || datastore.status !== DataStoreStatus.ONLINE) return null;
+    if (!datastore || datastore.status !== DatastoreStatus.ONLINE) return null;
 
     if (
       req.userId != datastore.userId &&
@@ -212,7 +210,7 @@ export class DataStoreResolver {
   @Mutation(() => Boolean, { nullable: true })
   async updateDatastore(
     @Ctx() { req }: MyContext,
-    @Arg("dataStoreId") datastoreId: number,
+    @Arg("datastoreId") datastoreId: number,
     @Arg("updateProps") updateProps: UpdateDatastoreInput
   ): Promise<boolean | null> {
     if (!Object.values(updateProps).filter((v) => v != null).length)
@@ -223,7 +221,7 @@ export class DataStoreResolver {
     });
     if (
       !datastore ||
-      datastore.status == DataStoreStatus.INIT ||
+      datastore.status == DatastoreStatus.INIT ||
       datastore.userId != req.userId
     )
       return null;
@@ -238,12 +236,12 @@ export class DataStoreResolver {
     if (updateProps?.allowedSMBUsers?.length) updateSMBRequired = await updateSharedUsersServices({ updateProps, updateSMBRequired, datastore })
 
     if (updateSMBRequired) {
-      datastore.status = DataStoreStatus.INIT;
+      datastore.status = DatastoreStatus.INIT;
 
       updateSMB(host.loginName).then(async (res) => {
         console.log(res);
 
-        datastore.status = DataStoreStatus.ONLINE;
+        datastore.status = DatastoreStatus.ONLINE;
         await datastore.save();
       });
     }

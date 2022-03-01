@@ -2,7 +2,7 @@ import { Any } from "typeorm";
 import { Node } from "../../entity/CloudNode";
 import { Datastore } from "../../entity/Datastore";
 import { DatastoreService, ServiceNames } from "../../entity/DatastoreService";
-import { SharedDataStore } from "../../entity/SharedDataStore";
+import { SharedDatastore } from "../../entity/SharedDatastore";
 import { User } from "../../entity/User";
 import { getDatastoreSizes } from "./getDatastoresSizes";
 
@@ -11,9 +11,9 @@ export const getDatastoresWithSizesAndSharedUsers = async (
   userId: number,
   getSMBData: boolean = false
 ) => {
-  const sharedDataStores = await SharedDataStore.find({
+  const sharedDatastores = await SharedDatastore.find({
     where: {
-      dataStoreId: Any(datastores.map((v) => v.id)),
+      datastoreId: Any(datastores.map((v) => v.id)),
     },
   });
 
@@ -23,7 +23,7 @@ export const getDatastoresWithSizesAndSharedUsers = async (
         Array.from(
           new Set([
             userId,
-            ...sharedDataStores.map(({ userId }) => userId),
+            ...sharedDatastores.map(({ userId }) => userId),
             ...datastores.map(({ userId }) => userId),
           ])
         )
@@ -33,21 +33,21 @@ export const getDatastoresWithSizesAndSharedUsers = async (
 
   const sharedUsersMap: Map<number, User[]> = new Map();
 
-  sharedDataStores.forEach(async (sharedDatastore) => {
+  sharedDatastores.forEach(async (sharedDatastore) => {
     let thisUser = users.find(({ id }) => id === sharedDatastore.userId);
 
     if (thisUser) {
       if (getSMBData) {
         const datastore = datastores.find(
-          (ds) => ds.id === sharedDatastore.dataStoreId
+          (ds) => ds.id === sharedDatastore.datastoreId
         );
 
         if (datastore)
           thisUser.smbEnabled = datastore.allowedSMBUsers.includes(thisUser.id);
       }
 
-      sharedUsersMap.set(sharedDatastore.dataStoreId, [
-        ...(sharedUsersMap.get(sharedDatastore.dataStoreId) || []),
+      sharedUsersMap.set(sharedDatastore.datastoreId, [
+        ...(sharedUsersMap.get(sharedDatastore.datastoreId) || []),
         thisUser,
       ]);
     }

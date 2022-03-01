@@ -3,7 +3,7 @@ import fsPath from "path";
 import { Any } from "typeorm";
 import { Datastore } from "../../entity/Datastore";
 import { User } from "../../entity/User";
-import { SharedDataStoresIdsInput } from "../../modules/DataStore/CreateSharedDataStoreInput";
+import { SharedDatastoresIdsInput } from "../../modules/Datastore/CreateSharedDatastoreInput";
 
 export const createGroup = async (
   groupName: string,
@@ -22,7 +22,7 @@ export const createGroup = async (
 
 interface Props {
   cmd: (groupName: string, osUserName: string) => Promise<any>;
-  ids: SharedDataStoresIdsInput[];
+  ids: SharedDatastoresIdsInput[];
 }
 
 const addAndRemoveUsersFromGroup = async ({
@@ -30,14 +30,14 @@ const addAndRemoveUsersFromGroup = async ({
   ids,
 }: Props): Promise<{ err: any }> => {
   const datastores = await Datastore.find({
-    where: { id: Any(ids.map((i) => i.dataStoreId)) },
+    where: { id: Any(ids.map((i) => i.datastoreId)) },
   }),
     users = await User.find({ where: { id: Any(ids.map((i) => i.userId)) } });
 
   for (const sharedDatastore of ids) {
     try {
       const datastore = datastores.find(
-        (d) => d.id === sharedDatastore.dataStoreId
+        (d) => d.id === sharedDatastore.datastoreId
       ),
         user = users.find((d) => d.id === sharedDatastore.userId);
 
@@ -57,7 +57,7 @@ const addAndRemoveUsersFromGroup = async ({
 };
 
 export const addUsersToGroup = async (
-  ids: SharedDataStoresIdsInput[]
+  ids: SharedDatastoresIdsInput[]
 ): Promise<{ err: any }> => ({
   err:
     (
@@ -70,7 +70,7 @@ export const addUsersToGroup = async (
 });
 
 export const removeUsersFromGroup = async (
-  ids: SharedDataStoresIdsInput[]
+  ids: SharedDatastoresIdsInput[]
 ): Promise<{ err: any }> => ({
   err:
     (

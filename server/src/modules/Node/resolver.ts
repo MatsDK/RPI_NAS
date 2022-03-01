@@ -12,7 +12,7 @@ import { createUser } from "../../utils/createUser";
 import { getSharedDatastoresWithoutInitializedUser } from "../../utils/nodes/getSharedDatastoresWithoutInitializedUser";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { pingNodes } from "../../utils/nodes/pingNodes";
-import { InitializeUserMutation } from "../DataStore/InitUserMutation";
+import { InitializeUserMutation } from "../Datastore/InitUserMutation";
 import { AcceptNodeRequestInput } from "./AcceptNodeRequestInput";
 import { CreateNodeInput } from "./CreateNodeInput";
 import { GetNodesReturn } from "./GetNodesReturn";

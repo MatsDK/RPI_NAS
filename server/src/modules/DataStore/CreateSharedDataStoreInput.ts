@@ -1,16 +1,16 @@
 import { Field, InputType } from "type-graphql";
 
 @InputType()
-export class CreateSharedDataStoreInput {
-  @Field(() => [SharedDataStoresIdsInput])
-  ids: SharedDataStoresIdsInput[];
+export class CreateSharedDatastoreInput {
+  @Field(() => [SharedDatastoresIdsInput])
+  ids: SharedDatastoresIdsInput[];
 }
 
 @InputType()
-export class SharedDataStoresIdsInput {
+export class SharedDatastoresIdsInput {
   @Field(() => Number)
   userId: number;
 
   @Field(() => Number)
-  dataStoreId: number;
+  datastoreId: number;
 }

@@ -8,7 +8,7 @@ import { isAuth } from "../../middleware/auth";
 import { checkPermissions } from "../../middleware/checkPermissions";
 import { isNodeValid } from "../../middleware/isNodeValid";
 import { MyContext } from "../../types/Context";
-import { hasAccessToDatastore } from "../../utils/dataStore/hasAccessToDatastore";
+import { hasAccessToDatastore } from "../../utils/datastore/hasAccessToDatastore";
 import { exec } from "../../utils/exec";
 import { getOrCreateNodeClient } from "../../utils/nodes/nodeClients";
 import { CopyMoveInput } from "./copyMoveMutationInput";

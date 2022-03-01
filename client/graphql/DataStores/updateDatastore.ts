@@ -9,7 +9,7 @@ export const UpdateDatastoreMutation = gql`
     $allowedSMBUsers: [AllowedSMBUser!]
   ) {
     updateDatastore(
-      dataStoreId: $datastoreId
+      datastoreId: $datastoreId
       updateProps: {
         sharedUsers: $sharedUsers
         allowedSMBUsers: $allowedSMBUsers
