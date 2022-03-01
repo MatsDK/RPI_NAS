@@ -87,7 +87,7 @@ export const CopyToWrapper: React.FC<CopyToWrapperProps> = ({ hide }) => {
             <span>
               {
                 data?.directoryTree?.tree?.find(
-                  (v) => v.dataStoreId == copyToPath?.datastoreId
+                  (v) => v.datastoreId == copyToPath?.datastoreId
                 )?.name
               }
               /{copyToPath?.path.replace(/\\/g, "/")}

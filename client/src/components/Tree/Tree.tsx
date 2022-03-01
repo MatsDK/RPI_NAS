@@ -91,9 +91,9 @@ const Tree: React.FC<Props> = ({ path = "/" }) => {
             <TreeObjectItem
               showNested={
                 FolderCtx?.currentFolderPath?.folderPath.datastoreId ===
-                item.dataStoreId
+                item.datastoreId
               }
-              datastoreId={item.dataStoreId}
+              datastoreId={item.datastoreId}
               item={item as TreeItem}
               key={idx}
             />

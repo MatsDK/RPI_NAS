@@ -72,14 +72,14 @@ const DataStoresContainer: React.FC = () => {
 
   useEffect(() => {
     setOthersDatastores(
-      (data?.getDataStores?.filter(
+      (data?.getDatastores?.filter(
         (d) =>
           d.owner?.id !== me?.id &&
           !d.sharedUsers.find((su) => su.id === me?.id)
       ) || []) as any
     );
     setMyDatastores(
-      (data?.getDataStores?.filter(
+      (data?.getDatastores?.filter(
         (d) =>
           d.owner?.id === me?.id || d.sharedUsers.find((su) => su.id === me?.id)
       ) || []) as any
@@ -104,8 +104,8 @@ const DataStoresContainer: React.FC = () => {
           </Link>
           {!loading && (
             <span>
-              <p>{data?.getDataStores?.length}</p> Datastore
-              {data?.getDataStores?.length === 1 ? "" : "s"}
+              <p>{data?.getDatastores?.length}</p> Datastore
+              {data?.getDatastores?.length === 1 ? "" : "s"}
             </span>
           )}
         </DataStoresTitle>

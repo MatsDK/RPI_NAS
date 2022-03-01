@@ -90,7 +90,7 @@ export const SSHDownloadDropdown: React.FC<SSHDownloadDropdownProps> = ({
         type: isDirectory ? "directory" : "file",
       })),
       type: "SSH",
-      dataStoreId: Number(router.query.d),
+      datastoreId: Number(router.query.d),
     });
 
     const { data: resData, hostIp, ...rest } = data.createDownloadSession;

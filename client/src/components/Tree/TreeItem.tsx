@@ -100,7 +100,7 @@ const Item: React.FC<Props> = ({ item, datastoreId, showNested = false }) => {
       }}
     >
       <DataStoreItemWrapper
-        style={{ padding: item.dataStoreId !== null ? "6px 0" : "2px 0" }}
+        style={{ padding: item.datastoreId !== null ? "6px 0" : "2px 0" }}
         active={showNestedItems}
       >
         <ArrowButton
@@ -131,20 +131,20 @@ const Item: React.FC<Props> = ({ item, datastoreId, showNested = false }) => {
             router.push(`/path/${item.relativePath}?d=${datastoreId}`);
           }}
         >
-          {item.dataStoreId != null ? (
+          {item.datastoreId != null ? (
             <DataStoreFolderItem style={{ display: "flex" }}>
               <Icon
                 width={24}
                 height={24}
                 viewPort={28}
                 name={
-                  item.sharedDataStore ? "sharedDataStore" : "dataStoreIcon"
+                  item.sharedDatastore ? "sharedDataStore" : "dataStoreIcon"
                 }
                 color={{ propName: "bgColors", idx: 2 }}
               />
               <p
                 onDoubleClick={(e) =>
-                  router.push(`/datastore/${item.dataStoreId}`)
+                  router.push(`/datastore/${item.datastoreId}`)
                 }
               >
                 {item.name}

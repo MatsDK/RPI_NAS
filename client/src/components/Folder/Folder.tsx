@@ -100,7 +100,6 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
 	if (error) return <div>error</div>;
 	if (!data?.tree?.tree) return <div>folder not found</div>;
 
-
 	const initialized = !!data?.tree?.userInitialized
 
 	return (
@@ -113,7 +112,7 @@ const Folder: React.FC<Props> = ({ path, datastoreId, datastoreName }) => {
 				<FolderContainer>
 					<FolderPath
 						path={path.split("/")}
-						dataStore={{
+						datastore={{
 							id: datastoreId,
 							name: datastoreName,
 						}}

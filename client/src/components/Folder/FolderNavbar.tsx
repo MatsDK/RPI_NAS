@@ -108,7 +108,7 @@ const FolderNavbar: React.FC<Props> = ({ setFilterInput, filterInput }) => {
         type: isDirectory ? "directory" : "file",
       })),
       type: "http",
-      dataStoreId: Number(router.query.d),
+      datastoreId: Number(router.query.d),
     });
 
     const sessionId = data?.createDownloadSession?.id;

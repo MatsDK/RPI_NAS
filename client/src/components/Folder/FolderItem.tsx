@@ -189,8 +189,7 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 					isOver={isOver}
 					selected={selected}
 					onDoubleClick={() =>
-						item.isDirectory &&
-						router.push(`/path/${item.relativePath}?d=${datastoreId}`)
+						item.isDirectory && router.push(`/path/${item.relativePath}?d=${datastoreId}`)
 					}
 					onClick={({ ctrlKey, shiftKey }) => updateSelected(ctrlKey, shiftKey)}
 				>

@@ -28,7 +28,7 @@ const Folder: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
 
   useEffect(() => {
     setDatastoreName(
-      tree?.directoryTree?.tree?.find((d) => d.dataStoreId == datastoreId)
+      tree?.directoryTree?.tree?.find((d) => d.datastoreId == datastoreId)
         ?.name || ""
     );
   }, [path, datastoreId]);

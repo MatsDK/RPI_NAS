@@ -70,7 +70,7 @@ export const NewFolderForm: React.FC<NewFolderFormProps> = ({ path, datastoreId 
 
 	return (
 
-		<FolderItemWrapper>
+		<FolderItemWrapper canDrop={false} isOver={false} selected={false}>
 			<div style={{ width: 38 }} />
 			<IconWrapper>
 				<Icon

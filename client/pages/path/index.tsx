@@ -32,7 +32,7 @@ const Page: NextFunctionComponentWithAuth<Props> = ({ me, tree }) => {
 
   useEffect(() => {
     setDataStoreName(
-      tree?.directoryTree?.tree?.find((d) => d.dataStoreId == dataStoreId)
+      tree?.directoryTree?.tree?.find((d) => d.datastoreId == dataStoreId)
         ?.name || ""
     );
   }, [dataStoreId]);

@@ -98,7 +98,7 @@ export const MoveToWrapper: React.FC<MoveToWrapperProps> = ({ hide }) => {
             <span>
               {
                 data?.directoryTree?.tree?.find(
-                  (v) => v.dataStoreId == movePath?.datastoreId
+                  (v) => v.datastoreId == movePath?.datastoreId
                 )?.name
               }
               /{movePath?.path.replace(/\\/g, "/")}

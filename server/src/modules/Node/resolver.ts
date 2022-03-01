@@ -49,7 +49,7 @@ export class NodeResolver {
 			initializedUsers: users.map(({ id }) => id)
 		}).save()
 
-		const { err } = await createUser(osLoginName, password, false);
+		const { err } = await createUser(osLoginName, password, true, false);
 		if (err) {
 			console.log(err);
 			Node.delete({ id: node.id });

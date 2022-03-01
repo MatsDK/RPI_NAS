@@ -203,7 +203,7 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 		<Wrapper>
 			<Container>
 				<ConditionOverlay
-					condition={!nodesLoading ? false : !!nodes?.getNodes?.nodes.find(({ hostNode }) => hostNode)}
+					condition={!nodesLoading && !nodes?.getNodes?.nodes.find(({ hostNode }) => hostNode)}
 					renderOverlay={() => <OverlayElement hide={hide} />}
 				>
 					<div style={{ "display": "flex", "flexDirection": "column", height: "100%", padding: "10px 20px" }}>
