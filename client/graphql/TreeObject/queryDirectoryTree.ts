@@ -13,8 +13,8 @@ export const getDirectoryTreeQuery = gql`
       __typename
       tree {
         isDirectory
-        dataStoreId
-        sharedDataStore
+        datastoreId
+        sharedDatastore
         name
         relativePath
         path
@@ -23,3 +23,4 @@ export const getDirectoryTreeQuery = gql`
     }
   }
 `;
+

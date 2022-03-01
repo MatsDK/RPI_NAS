@@ -3,10 +3,10 @@ import gql from "graphql-tag";
 export const createUploadSessionMutation = gql`
   mutation createUploadSessionMutation(
     $uploadPath: String!
-    $dataStoreId: Float!
+    $datastoreId: Float!
   ) {
     createUploadSession(
-      data: { uploadPath: $uploadPath, dataStoreId: $dataStoreId }
+      data: { uploadPath: $uploadPath, datastoreId: $datastoreId }
     ) {
       uploadPath
       hostIp
@@ -16,3 +16,4 @@ export const createUploadSessionMutation = gql`
     }
   }
 `;
+
