@@ -7,6 +7,7 @@ import withApollo from "src/HOC/withApollo";
 import {
 	CurrentFolderType,
 	FolderContext,
+	moveSelected
 } from "src/providers/folderState";
 import "../css/global.css";
 import { theme } from "src/utils/theme";
@@ -51,6 +52,7 @@ const MyApp = (props: AppProps & Props) => {
 						showNewFolderInput,
 						setShowNewFolderInput,
 					},
+					moveSelected
 				}}
 			>
 				<MeContext.Provider value={{ me, setMe }}>
@@ -62,7 +64,7 @@ const MyApp = (props: AppProps & Props) => {
 					</DndProvider>
 				</MeContext.Provider>
 			</FolderContext.Provider>
-		</ApolloProvider>
+		</ApolloProvider >
 	);
 };
 

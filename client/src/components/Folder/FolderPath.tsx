@@ -6,6 +6,7 @@ import Icon from "src/ui/Icon";
 import { Scrollbar } from "src/ui/Scrollbar";
 import { useDrop } from "react-dnd";
 import { FolderContext } from "src/providers/folderState";
+import { useApollo } from "src/hooks/useApollo";
 
 interface FolderPathProps {
 	path: string[];
@@ -61,6 +62,7 @@ export const FolderPath: React.FC<FolderPathProps> = ({
 	datastore: { id, name },
 }) => {
 	const folderCtx = useContext(FolderContext)
+	const { mutate } = useApollo()
 
 	const [{ isOver, canDrop }, drop] = useDrop(
 		() => ({
@@ -68,14 +70,19 @@ export const FolderPath: React.FC<FolderPathProps> = ({
 			canDrop: () => folderCtx?.currentFolderPath?.folderPath.datastoreId === id &&
 				folderCtx?.currentFolderPath?.folderPath.path !== "",
 			drop: (_item) => {
-				console.log("drop", _item);
+				const currentPath = folderCtx?.currentFolderPath?.folderPath.path
+				currentPath != null &&
+					folderCtx?.moveSelected(folderCtx.selected.selectedItems,
+						{ path: "", datastoreId: id, currentPath }
+						, mutate
+					)
 			},
 			collect: (monitor) => ({
 				isOver: !!monitor.isOver(),
 				canDrop: !!monitor.canDrop(),
 			})
 		}),
-		[folderCtx?.currentFolderPath?.folderPath]
+		[folderCtx]
 	)
 
 	return (
@@ -123,20 +130,31 @@ interface PathItemProps {
 }
 
 const PathItem: React.FC<PathItemProps> = ({ id, path, isNotCurrentPath, relativePath }) => {
+	const folderCtx = useContext(FolderContext)
+	const { mutate } = useApollo()
+
+	const datastoreId = folderCtx?.currentFolderPath?.folderPath.datastoreId
+
 	const [{ isOver, canDrop }, drop] = useDrop(
 		() => ({
 			accept: "any",
 			canDrop: () => isNotCurrentPath,
 			drop: (_item) => {
-				console.log("drop", _item);
+				const currentPath = folderCtx?.currentFolderPath?.folderPath.path
+				datastoreId != null && currentPath != null &&
+					folderCtx?.moveSelected(folderCtx.selected.selectedItems,
+						{ datastoreId, path, currentPath },
+						mutate
+					)
 			},
 			collect: (monitor) => ({
 				isOver: !!monitor.isOver(),
 				canDrop: !!monitor.canDrop(),
 			})
 		}),
-		[isNotCurrentPath]
+		[isNotCurrentPath, folderCtx]
 	)
+
 	return <div style={{ display: "flex" }}>
 		{!isNotCurrentPath ? (
 			<CurrentPath>{path}</CurrentPath>

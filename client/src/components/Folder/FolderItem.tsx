@@ -5,6 +5,7 @@ import prettyBytes from "pretty-bytes";
 import React, { useContext, useEffect, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
+import { useApollo } from "src/hooks/useApollo";
 import { FolderContext, FolderContextType } from "src/providers/folderState";
 import Icon from "src/ui/Icon";
 import styled from "styled-components";
@@ -95,6 +96,7 @@ const Size = styled.p`
 const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 	const folderCtx: FolderContextType = useContext(FolderContext);
 	const router = useRouter();
+	const { mutate } = useApollo()
 
 	const [selected, setSelected] = useState(false);
 
@@ -113,7 +115,11 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 			accept: "any",
 			canDrop: () => item.isDirectory && !isSelected(item, folderCtx?.selected.selectedItems || new Map()),
 			drop: (_item) => {
-				console.log("drop", item);
+				const currentPath = folderCtx?.currentFolderPath?.folderPath.path
+				datastoreId != null && currentPath != null &&
+					folderCtx?.moveSelected(folderCtx.selected.selectedItems,
+						{ datastoreId, path: item.relativePath, currentPath },
+						mutate)
 			},
 			collect: (monitor) => ({
 				isOver: !!monitor.isOver(),
@@ -165,8 +171,8 @@ const FolderItem: React.FC<Props> = ({ item, datastoreId, idx, items }) => {
 	}
 
 	useEffect(() => {
-		preview(getEmptyImage(), { captureDraggingState: true, })
-	}, [])
+		preview(getEmptyImage(), { captureDraggingState: true })
+	}, [preview])
 
 	useEffect(() => {
 		if (isDragging) {
