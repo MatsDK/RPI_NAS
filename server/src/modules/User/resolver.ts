@@ -216,7 +216,9 @@ export class UserResolver {
 		try {
 			const ids = [req.userId, userId],
 				users = await User.find({ where: { id: In(ids) } })
-			users.forEach(u => u.friendsIds.filter((id) => !ids.includes(id)))
+			users.forEach(u => {
+				u.friendsIds = u.friendsIds.filter((id) => !ids.includes(id))
+			})
 
 			await Promise.all(users.map(u => u.save()))
 

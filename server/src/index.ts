@@ -43,7 +43,6 @@ dotenv.config();
 		"type": "postgres",
 		"host": "localhost",
 		"port": 5432,
-		dropSchema: true,
 		"username": "postgres",
 		"password": process.env.POSTGRES_PASSWORD,
 		"database": "cloud",
