@@ -118,7 +118,7 @@ export class NodeResolver {
 		}).save();
 		const deleteNode = () => Node.delete({ id: node.id });
 
-		const nodeClient = await getOrCreateNodeClient({ node, ping: true });
+		const nodeClient = await getOrCreateNodeClient({ node, ping: false });
 		if (!nodeClient) {
 			await deleteNode()
 			console.log("Could not connect to host")

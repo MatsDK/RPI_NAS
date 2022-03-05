@@ -13,7 +13,6 @@ export const isNodeValid: MiddlewareFn<MyContext> = async ({ context: { req }, a
 	if (!node) return null
 
 	const conn = await getOrCreateNodeClient({ node, ping: false })
-	console.log(conn?.sessionToken, sessionToken)
 	if (!conn || conn.sessionToken !== sessionToken) return null
 
 	next()

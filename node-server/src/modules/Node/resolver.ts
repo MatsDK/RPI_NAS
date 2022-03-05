@@ -15,7 +15,10 @@ export class NodeResolver {
 	@Mutation(() => Boolean, { nullable: true })
 	async setupNode(@Arg("data", () => SetupNodeInput) { loginName, password, token, id }: SetupNodeInput): Promise<boolean | null> {
 		const { err } = await createUser(loginName, password)
-		if (err) throw new ApolloError(err)
+		if (err) {
+			console.log(err)
+			return false
+		}
 
 		const conn = getOrCreateConnection();
 		conn.id = id;

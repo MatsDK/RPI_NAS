@@ -49,7 +49,7 @@ export const Tree: React.FC<TreeProps> = ({
 interface TreeItemProps {
   item: {
     isDirectory: boolean;
-    dataStoreId?: number | null;
+    datastoreId?: number | null;
     sharedDataStore?: boolean | null;
     name: string;
     relativePath: string;
@@ -133,7 +133,7 @@ const TreeItem: React.FC<TreeItemProps> = ({
     query(getDirectoryTreeQuery, {
       depth: 1,
       path: item.relativePath,
-      datastoreId: item.dataStoreId,
+      datastoreId: item.datastoreId,
     }).then((res) => {
       setNestedItems(res.data.directoryTree.tree || [])
     });
@@ -155,7 +155,7 @@ const TreeItem: React.FC<TreeItemProps> = ({
       newFolderName
     );
 
-    if (!newFolderName || !newFolderFullPath.trim() || item.dataStoreId == null) return
+    if (!newFolderName || !newFolderFullPath.trim() || item.datastoreId == null) return
 
     try {
       setLoading(true)
@@ -163,7 +163,7 @@ const TreeItem: React.FC<TreeItemProps> = ({
       const { data, errors } = await mutate(CreateFolderMutation,
         {
           path: newFolderFullPath,
-          datastoreId: item.dataStoreId,
+          datastoreId: item.datastoreId,
         },
         {
           refetchQueries: [
@@ -172,11 +172,11 @@ const TreeItem: React.FC<TreeItemProps> = ({
               variables: {
                 depth: 1,
                 path: item.relativePath,
-                datastoreId: item.dataStoreId,
+                datastoreId: item.datastoreId,
               },
             },
           ],
-          update: updateNewFolder(newFolderFullPath, item.relativePath, item.dataStoreId)
+          update: updateNewFolder(newFolderFullPath, item.relativePath, item.datastoreId)
         }
       )
 
@@ -210,13 +210,13 @@ const TreeItem: React.FC<TreeItemProps> = ({
         </ArrowButton>
         <FolderName
           selected={
-            selectedPath?.datastoreId == item.dataStoreId &&
+            selectedPath?.datastoreId == item.datastoreId &&
             selectedPath?.path === item.relativePath
           }
           isDatastore={!item.relativePath}
           onClick={() =>
             setSelectedPath({
-              datastoreId: item.dataStoreId || 0,
+              datastoreId: item.datastoreId || 0,
               path: item.relativePath,
             })
           }
@@ -245,7 +245,7 @@ const TreeItem: React.FC<TreeItemProps> = ({
               key={idx}
               setSelectedPath={setSelectedPath}
               selectedPath={selectedPath}
-              item={{ ...v, dataStoreId: item.dataStoreId }}
+              item={{ ...v, datastoreId: item.datastoreId }}
             />
           ))}
         </NestedItems>

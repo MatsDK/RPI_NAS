@@ -179,8 +179,8 @@ export class UserResolver {
 	@UseMiddleware(isAuth)
 	@Mutation(() => Boolean, { nullable: true })
 	async acceptFriendRequest(
+		@Ctx() { req }: MyContext,
 		@Arg("userId") userId: number,
-		@Ctx() { req }: MyContext
 	) {
 		await getConnection()
 			.createQueryBuilder()
@@ -205,6 +205,26 @@ export class UserResolver {
 		await Promise.all(promiseList);
 
 		return true;
+	}
+
+	@UseMiddleware(isAuth)
+	@Mutation(() => Boolean, { nullable: true })
+	async removeFriend(
+		@Ctx() { req }: MyContext,
+		@Arg("userId") userId: number
+	) {
+		try {
+			const ids = [req.userId, userId],
+				users = await User.find({ where: { id: In(ids) } })
+			users.forEach(u => u.friendsIds.filter((id) => !ids.includes(id)))
+
+			await Promise.all(users.map(u => u.save()))
+
+			return true
+		} catch (err) {
+			console.log(err)
+			return null
+		}
 	}
 
 	@UseMiddleware(isAuth)

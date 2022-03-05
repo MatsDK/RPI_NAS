@@ -57,14 +57,13 @@ const MyApp = (props: AppProps & Props) => {
 			>
 				<MeContext.Provider value={{ me, setMe }}>
 					<DndProvider backend={HTML5Backend}>
-
 						<ThemeProvider theme={theme}>
 							<Component {...pageProps} />
 						</ThemeProvider>
 					</DndProvider>
 				</MeContext.Provider>
 			</FolderContext.Provider>
-		</ApolloProvider >
+		</ApolloProvider>
 	);
 };
 

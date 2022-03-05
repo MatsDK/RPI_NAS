@@ -1,5 +1,6 @@
 import { CreateFolderMutation } from 'graphql/Folder/createFolder';
 import { getDirectoryTreeQuery } from 'graphql/TreeObject/queryDirectoryTree';
+import { getTreeQuery } from 'graphql/TreeObject/queryTree';
 import fsPath from "path";
 import React, { FormEvent, useContext, useEffect, useRef, useState } from 'react';
 import { useApollo } from 'src/hooks/useApollo';
@@ -59,6 +60,14 @@ export const NewFolderForm: React.FC<NewFolderFormProps> = ({ path, datastoreId 
 							datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
 						},
 					},
+					// {
+					// 	query: getTreeQuery,
+					// 	variables: {
+					// 		depth: 1,
+					// 		path: folderCtx?.currentFolderPath?.folderPath.path,
+					// 		datastoreId: folderCtx?.currentFolderPath?.folderPath.datastoreId,
+					// 	},
+					// },
 				],
 				update: update(newPath, path, datastoreId)
 			},

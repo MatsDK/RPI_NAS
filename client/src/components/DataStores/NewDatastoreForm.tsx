@@ -13,6 +13,7 @@ import { BgButton, Button, ConditionButton, LoadingOverlay } from "../../ui/Butt
 import { useApollo } from 'src/hooks/useApollo';
 import { CreateDataStoreMutation } from 'graphql/DataStores/CreateDataStore';
 import { getDataStoresQuery } from 'graphql/DataStores/getDataStores';
+import { Scrollbar } from 'src/ui/Scrollbar';
 
 interface NewDatastoreFormProps {
 	hide: () => void
@@ -30,6 +31,9 @@ const Wrapper = styled.div`
 `
 
 const Container = styled.div`
+	${Scrollbar}
+	overflow-y: scroll;
+
 	min-width: 600px;
 	background-color: ${props => props.theme.lightBgColors[0]};
 	border: 1px solid ${props => props.theme.lightBgColors[1]};
@@ -182,21 +186,27 @@ export const NewDatastoreForm: React.FC<NewDatastoreFormProps> = ({ hide }) => {
 	const createDatastore = async () => {
 		if (!name.trim() || selectedNode == null || selectedOwner == null || !isValidSize(sizeInput || "")) return null
 
-		setLoading(true)
-		const { data } = await mutate(
-			CreateDataStoreMutation,
-			{
-				ownerId: Number(selectedOwner),
-				localNodeId: Number(selectedNode),
-				name: name.trim(),
-				sizeInMb: isValidSize(sizeInput!),
-				ownerPassword: passwordInput?.trim()
-			},
-			{ refetchQueries: [{ query: getDataStoresQuery, variables: {} }] },
-		);
-		setLoading(false)
+		try {
 
-		console.log(data);
+			setLoading(true)
+			const { data } = await mutate(
+				CreateDataStoreMutation,
+				{
+					ownerId: Number(selectedOwner),
+					localNodeId: Number(selectedNode),
+					name: name.trim(),
+					sizeInMb: isValidSize(sizeInput!),
+					ownerPassword: passwordInput?.trim()
+				},
+				{ refetchQueries: [{ query: getDataStoresQuery, variables: {} }] },
+			);
+			setLoading(false)
+			console.log(data);
+		} catch (err) {
+			console.log(err);
+			setLoading(false)
+		}
+
 	}
 
 	return (

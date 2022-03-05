@@ -1,7 +1,6 @@
 import { SendFriendRequestMutation } from "graphql/Friends/sendFriendRequest";
 import { ProfilePicture } from "src/ui/ProfilePicture";
 import Icon from "src/ui/Icon";
-import { PlaceHolder, Title } from "pages/friends";
 import { FindUsersQuery } from "graphql/User/findUsers";
 import React, { FormEvent, useState } from "react";
 import { useApollo } from "src/hooks/useApollo";
@@ -9,6 +8,7 @@ import { useTimeoutInput } from "src/hooks/useTimeoutInput";
 import styled from "styled-components";
 import { Scrollbar } from "src/ui/Scrollbar";
 import { Button } from "src/ui/Button";
+import { PlaceHolder, Title } from "./FriendsView";
 
 interface FindFriendsContainerProps {
   friendsIds: number[];
